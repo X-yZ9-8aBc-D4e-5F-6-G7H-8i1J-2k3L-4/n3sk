@@ -128,29 +128,15 @@ const SUPA_URL = 'https://gkzxuerurfedfwuxhimf.supabase.co';
 const SUPA_KEY = 'sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6';
 const TABLE = 'n3sk';
 
-// GERA FINGERPRINT ÚNICO DO NAVEGADOR/PC
-async function generateFingerprint() {
-    const canvas = document.createElement('canvas');
-    const gl = canvas.getContext('webgl');
-    const vendor = gl ? gl.getParameter(gl.VENDOR) : 'unknown';
-    const renderer = gl ? gl.getParameter(gl.RENDERER) : 'unknown';
-    const screen = `${screen.width}x${screen.height}`;
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const raw = `${vendor}|${renderer}|${screen}|${tz}|${navigator.language}`;
-    
-    // Hash simples para criar ID curto
-    let hash = 0;
-    for (let i = 0; i < raw.length; i++) {
-        const char = raw.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash |= 0;
-    }
-    return 'FP-' + Math.abs(hash).toString(16).toUpperCase().padStart(8, '0');
+// Leitura de URL (Para QR do Celular)
+function getParam(name) {
+    const regex = new RegExp('[?&]' + name + '=([^&#]*)');
+    const results = regex.exec(window.location.href);
+    return results ? decodeURIComponent(results[1]) : null;
 }
 
-let DEVICE_FP = '';
-let SESSION_ID = null;
-let SESSION_TOKEN = null;
+let SESSION_ID = getParam('id') || localStorage.getItem('n3sk_session_id');
+let SESSION_TOKEN = getParam('token') || localStorage.getItem('n3sk_session_token');
 let currentState = null;
 let isConnected = false;
 
@@ -159,18 +145,6 @@ const detailEl = document.getElementById('status-detail');
 function updateStatus(msg, sub='') { 
     if(statusEl) statusEl.innerText = msg; 
     if(detailEl) detailEl.innerText = sub; 
-}
-
-// Verifica se veio via QR Code (celular)
-const urlParams = new URLSearchParams(window.location.search);
-const qrId = urlParams.get('id');
-const qrToken = urlParams.get('token');
-const qrFp = urlParams.get('fp');
-
-if (qrId && qrToken) {
-    SESSION_ID = qrId;
-    SESSION_TOKEN = qrToken;
-    DEVICE_FP = qrFp || ''; // Celular usa FP do QR
 }
 
 // CURSOR E PREVIEW (Mantidos)
@@ -202,25 +176,17 @@ cpOl.addEventListener('mousedown',e=>{if(e.target===cpOl){cpOl.classList.remove(
 cpOl.addEventListener('touchstart',e=>{if(e.target===cpOl){cpOl.classList.remove('open');if(cpTarget)sendFinalColor()}},{passive:true});
 function sendFinalColor(){if(!cpTarget)return;var rgb=h2r(cpH,cpS,cpV),hex=r2h(rgb[0],rgb[1],rgb[2]);sendColor(cpTarget,hex);sendAlpha(cpTarget,cpA)}
 
-// INTEGRAÇÃO SUPABASE COM VALIDAÇÃO DE FINGERPRINT
+// INTEGRAÇÃO SUPABASE COM VALIDAÇÃO DE TOKEN
 async function fetchSession() {
     if (!SESSION_ID) return null;
     try {
-        const res = await fetch(`${SUPA_URL}/rest/v1/${TABLE}?id=eq.${SESSION_ID}&select=state,token,device_fingerprint`, {
+        const res = await fetch(`${SUPA_URL}/rest/v1/${TABLE}?id=eq.${SESSION_ID}&select=state,token`, {
             headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}` }
         });
         if (!res.ok) return null;
         const data = await res.json();
         return data.length > 0 ? data[0] : null;
     } catch(e) { return null; }
-}
-
-async function registerDevice(id, token, fp) {
-    await fetch(`${SUPA_URL}/rest/v1/${TABLE}`, {
-        method: 'POST',
-        headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
-        body: JSON.stringify({ id, token, device_fingerprint: fp, state: {} })
-    });
 }
 
 async function updateState(newState) {
@@ -236,7 +202,11 @@ function applyState(d) {
     if (!d) return;
     if (!isConnected) {
         isConnected = true;
-        updateStatus("CONECTADO", `Hardware Validado: ${DEVICE_FP}`);
+        // Salva no LocalStorage apenas após sucesso
+        localStorage.setItem('n3sk_session_id', SESSION_ID);
+        localStorage.setItem('n3sk_session_token', d.token || SESSION_TOKEN);
+        
+        updateStatus("CONECTADO", `Token: ${SESSION_ID}`);
         document.getElementById('waiting-screen').style.opacity = '0';
         setTimeout(() => { document.getElementById('waiting-screen').style.display = 'none'; document.getElementById('app').style.display = 'block'; }, 500);
     }
@@ -253,61 +223,63 @@ function applyState(d) {
     scheduleRender();
 }
 
-// LOOP PRINCIPAL DE AUTO-CONEXÃO POR HARDWARE
+// LOOP PRINCIPAL DE AUTO-CONEXÃO POR LOCALSTORAGE
 async function init() {
     // Se veio via QR (celular), tenta conectar direto
-    if (SESSION_ID && SESSION_TOKEN) {
-        updateStatus("Validando dispositivo móvel...", DEVICE_FP);
+    if (getParam('id') && getParam('token')) {
+        updateStatus("Conectando via QR Code...", SESSION_ID);
         const session = await fetchSession();
-        if (session && session.device_fingerprint === DEVICE_FP) {
-            applyState(session);
-            setInterval(poll, 200);
-            return;
-        } else if (session && !session.device_fingerprint) {
-            // Sessão nova sem FP ainda, registra o do celular
-            await registerDevice(SESSION_ID, SESSION_TOKEN, DEVICE_FP);
+        if (session) {
             applyState(session);
             setInterval(poll, 200);
             return;
         } else {
-            updateStatus("ACESSO NEGADO", "Este token não pertence a este dispositivo.");
+            updateStatus("Token inválido ou expirado", "O Loader pode ter sido fechado.");
             return;
         }
     }
 
-    // Se é PC: Gera fingerprint e busca sessão ativa compatível
-    DEVICE_FP = await generateFingerprint();
-    updateStatus("Buscando Loader neste PC...", `Fingerprint: ${DEVICE_FP}`);
+    // Se é PC: Verifica se tem ID salvo no LocalStorage
+    if (SESSION_ID) {
+        updateStatus("Verificando sessão salva...", SESSION_ID);
+        const session = await fetchSession();
+        if (session) {
+            applyState(session);
+            setInterval(poll, 200);
+            return;
+        } else {
+            // Sessão deletada (C# fechou)
+            localStorage.removeItem('n3sk_session_id');
+            localStorage.removeItem('n3sk_session_token');
+            updateStatus("PC Offline", "O Loader foi fechado. Reinicie para reconectar.");
+            SESSION_ID = null;
+            setTimeout(init, 3000);
+            return;
+        }
+    }
 
-    // Busca todas as sessões ativas recentes (última criada pelo C#)
+    // Sem ID salvo e sem QR: Fica aguardando (segurança máxima)
+    updateStatus("Aguardando Loader...", "Inicie o C# neste PC para conectar automaticamente.");
+    
+    // Opcional: Buscar sessão ativa recente para auto-vinculação na PRIMEIRA vez
+    // Descomente as linhas abaixo se quiser que o site conecte sozinho na primeira vez
+    /*
     try {
-        const res = await fetch(`${SUPA_URL}/rest/v1/${TABLE}?select=id,token,device_fingerprint,state&order=created_at.desc&limit=1`, {
+        const res = await fetch(`${SUPA_URL}/rest/v1/${TABLE}?select=id,token,state&order=created_at.desc&limit=1`, {
             headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}` }
         });
         const sessions = await res.json();
-        
         if (sessions.length > 0) {
-            const s = sessions[0];
-            // Se a sessão não tem FP ou tem o mesmo FP deste PC, conecta
-            if (!s.device_fingerprint || s.device_fingerprint === DEVICE_FP) {
-                SESSION_ID = s.id;
-                SESSION_TOKEN = s.token;
-                
-                // Registra o fingerprint deste PC na sessão
-                if (!s.device_fingerprint) {
-                    await registerDevice(SESSION_ID, SESSION_TOKEN, DEVICE_FP);
-                }
-                
-                applyState(s);
-                setInterval(poll, 200);
-                return;
-            } else {
-                updateStatus("Loader encontrado mas vinculado a outro PC", `Esperando Loader neste dispositivo...`);
-            }
+            SESSION_ID = sessions[0].id;
+            SESSION_TOKEN = sessions[0].token;
+            updateStatus("Sessão detectada! Conectando...", SESSION_ID);
+            applyState(sessions[0]);
+            setInterval(poll, 200);
+            return;
         }
     } catch(e) {}
-
-    // Nenhuma sessão compatível encontrada, continua buscando
+    */
+    
     setTimeout(init, 2000);
 }
 
@@ -324,6 +296,8 @@ async function poll() {
         document.getElementById('txt').classList.remove('on');
         document.getElementById('txt').textContent = 'OFFLINE';
         updateStatus("PC DESCONECTADO", "O Loader foi fechado. Reinicie para reconectar.");
+        localStorage.removeItem('n3sk_session_id');
+        localStorage.removeItem('n3sk_session_token');
         SESSION_ID = null;
         setTimeout(init, 3000);
         return;
@@ -338,7 +312,7 @@ function sendAlpha(el,val){if(!currentState)return;const ak=el.dataset.k.replace
 // MODAL QR
 function openQR(){
     if(!SESSION_ID){alert("Conecte o Loader primeiro.");return}
-    const url=`${location.origin}${location.pathname}?id=${SESSION_ID}&token=${SESSION_TOKEN}&fp=${DEVICE_FP}`;
+    const url=`${location.origin}${location.pathname}?id=${SESSION_ID}&token=${SESSION_TOKEN}`;
     document.getElementById('qrImage').src=`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
     document.getElementById('qrModal').classList.add('active');
 }
