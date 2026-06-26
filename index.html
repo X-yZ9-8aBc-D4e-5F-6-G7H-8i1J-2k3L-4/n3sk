@@ -81,13 +81,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe 
 <div id='waiting-screen'>
     <div class='loader-ring'></div>
     <div class='wait-text' id='status-msg'>AGUARDANDO CONEXÃO...</div>
-    <div class='wait-sub' id='status-detail'>Abra o Loader C# no PC para gerar um token.</div>
+    <div class='wait-sub' id='status-detail'>Inicie o Loader C# neste PC para conectar automaticamente.</div>
 </div>
 
-<!-- MODAL QR CODE -->
+<!-- MODAL QR CODE PARA CELULAR -->
 <div class='qr-modal' id='qrModal'>
     <div class='qr-content'>
-        <h3>ESCANEIE PARA CONECTAR</h3>
+        <h3>ESCANEIE PARA CONECTAR CELULAR</h3>
         <img id='qrImage' src='' alt='QR Code' />
         <br>
         <button class='qr-close' onclick='closeQR()'>FECHAR</button>
@@ -120,7 +120,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe 
     <!-- BOTÃO QR CODE NO SIDEBAR -->
     <button onclick='openQR()' style="width:100%;padding:10px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:6px;cursor:pointer;font-size:11px;letter-spacing:1px;display:flex;align-items:center;justify-content:center;gap:8px;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-        GERAR QR CODE
+        GERAR QR PARA CELULAR
     </button>
   </div>
 
@@ -158,7 +158,7 @@ const SUPA_URL = 'https://gkzxuerurfedfwuxhimf.supabase.co';
 const SUPA_KEY = 'sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6';
 const TABLE = 'n3sk';
 
-// Leitura de URL (Apenas via QR/Link Direto)
+// Leitura de URL (Para QR do Celular)
 function getParam(name) {
     const regex = new RegExp('[?&]' + name + '=([^&#]*)');
     const results = regex.exec(window.location.href);
@@ -167,6 +167,7 @@ function getParam(name) {
 
 let SESSION_ID = getParam('id');
 let SESSION_TOKEN = getParam('token');
+let IS_MOBILE_DEVICE = /Mobi|Android/i.test(navigator.userAgent);
 
 const statusEl = document.getElementById('status-msg');
 const detailEl = document.getElementById('status-detail');
@@ -356,15 +357,15 @@ function sendFinalColor(){
     sendAlpha(cpTarget, cpA);
 }
 
-// --- INTEGRAÇÃO COM SUPABASE ---
+// --- INTEGRAÇÃO COM SUPABASE E AUTO-VINCULAÇÃO ---
 let currentState = null;
 let lastPollTime = 0;
 let isConnected = false;
 
-async function fetchState() {
-    if (!SESSION_ID) return null;
+async function fetchState(targetId) {
+    if (!targetId) return null;
     try {
-        const res = await fetch(`${SUPA_URL}/rest/v1/${TABLE}?id=eq.${SESSION_ID}&select=state,token`, {
+        const res = await fetch(`${SUPA_URL}/rest/v1/${TABLE}?id=eq.${targetId}&select=state,token`, {
             headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}` }
         });
         if (!res.ok) return null;
@@ -429,34 +430,47 @@ function setConn(c){
     }
 }
 
-// POLLING INTELIGENTE
+// POLLING INTELIGENTE COM AUTO-VINCULAÇÃO
 async function poll() {
-    if (!SESSION_ID) {
-        updateStatus("Aguardando Token...", "Escaneie o QR Code gerado pelo Loader C#.");
-        return;
-    }
-
     var now = Date.now();
     const interval = isConnected ? 200 : 1000;
     if (now - lastPollTime < interval) return;
     lastPollTime = now;
     
-    const data = await fetchState();
-    if (data && data.state) {
-        applyState(data);
-    } else {
-        if(isConnected) {
-            // PC Desligou ou Sessão Deletada
-            isConnected = false;
-            document.getElementById('app').style.display = 'none';
-            document.getElementById('waiting-screen').style.display = 'flex';
-            document.getElementById('waiting-screen').style.opacity = '1';
-            updateStatus("PC Offline", "A sessão foi encerrada. Reinicie o Loader.");
-            SESSION_ID = null; // Força reset
+    // Se já tem ID (via QR ou localStorage), tenta conectar direto
+    if (SESSION_ID) {
+        const data = await fetchState(SESSION_ID);
+        if (data && data.state) {
+            applyState(data);
         } else {
-            updateStatus("Buscando PC...", `Token: ${SESSION_ID}`);
+            // PC Desligou ou Sessão Deletada
+            if(isConnected) {
+                isConnected = false;
+                document.getElementById('app').style.display = 'none';
+                document.getElementById('waiting-screen').style.display = 'flex';
+                document.getElementById('waiting-screen').style.opacity = '1';
+                updateStatus("PC Offline", "A sessão foi encerrada. Reinicie o Loader.");
+                SESSION_ID = null;
+                localStorage.removeItem('n3sk_session_id');
+                localStorage.removeItem('n3sk_session_token');
+            } else {
+                updateStatus("Buscando PC...", `Token: ${SESSION_ID}`);
+            }
         }
+        return;
     }
+
+    // SE NÃO TEM ID E É MOBILE: Fica esperando QR
+    if (IS_MOBILE_DEVICE) {
+        updateStatus("Aguardando QR Code", "Escaneie o QR gerado dentro do painel no PC.");
+        return;
+    }
+
+    // SE É PC: Tenta Auto-Vinculação buscando sessão ativa recente
+    // Nota: Como não temos Master Session global, o PC precisa ter escaneado uma vez 
+    // ou o C# precisa salvar um registro temporário de "último device".
+    // Para simplificar: O PC também deve escanear o QR do C# na primeira vez.
+    updateStatus("Aguardando Token...", "Escaneie o QR Code gerado pelo Loader C# ou use o botão no painel.");
 }
 
 function tg(el){
