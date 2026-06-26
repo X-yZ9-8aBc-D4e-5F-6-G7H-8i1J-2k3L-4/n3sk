@@ -70,13 +70,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe 
 
 <div id='waiting-screen'>
     <div class='loader-ring'></div>
-    <div class='wait-text' id='status-msg'>AGUARDANDO LOADER...</div>
-    <div class='wait-sub' id='status-detail'>Inicie o C# neste PC para conectar automaticamente.</div>
+    <div class='wait-text' id='status-msg'>AGUARDANDO CONEXÃO...</div>
+    <div class='wait-sub' id='status-detail'>Escaneie o QR Code gerado pelo Loader C# para vincular este dispositivo.</div>
 </div>
 
 <div class='qr-modal' id='qrModal'>
     <div class='qr-content'>
-        <h3>QR CODE PARA CELULAR</h3>
+        <h3>ESCANEIE PARA CONECTAR</h3>
         <img id='qrImage' src='' alt='QR' />
         <button class='qr-close' onclick='closeQR()'>FECHAR</button>
     </div>
@@ -100,10 +100,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe 
     </div>
     <div class='logo'></div>
     <div class='stat-box'><div class='stat-dot' id='dot'></div><div class='stat-txt' id='txt'>OFFLINE</div></div>
-    <button onclick='openQR()' style="width:100%;padding:10px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:6px;cursor:pointer;font-size:11px;letter-spacing:1px;display:flex;align-items:center;justify-content:center;gap:8px;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-        GERAR QR CELULAR
-    </button>
+    <!-- Botão QR removido da sidebar pois agora o QR vem do C# -->
   </div>
   <div class='main'>
     <div class='panel'><div class='ph'>ESP TOGGLES</div>
@@ -127,15 +124,15 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe 
 const SUPA_URL = 'https://gkzxuerurfedfwuxhimf.supabase.co';
 const SUPA_KEY = 'sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6';
 const TABLE = 'n3sk';
-const DISCOVERY_ID = 'PC_LOCAL_ACTIVE_SESSION';
 
-// Leitura de URL (Para QR do Celular)
+// Leitura de URL (Apenas via QR/Link Direto)
 function getParam(name) {
     const regex = new RegExp('[?&]' + name + '=([^&#]*)');
     const results = regex.exec(window.location.href);
     return results ? decodeURIComponent(results[1]) : null;
 }
 
+// Tenta pegar da URL (QR Scan) ou do LocalStorage (Reconexão)
 let SESSION_ID = getParam('id') || localStorage.getItem('n3sk_session_id');
 let SESSION_TOKEN = getParam('token') || localStorage.getItem('n3sk_session_token');
 let currentState = null;
@@ -177,11 +174,11 @@ cpOl.addEventListener('mousedown',e=>{if(e.target===cpOl){cpOl.classList.remove(
 cpOl.addEventListener('touchstart',e=>{if(e.target===cpOl){cpOl.classList.remove('open');if(cpTarget)sendFinalColor()}},{passive:true});
 function sendFinalColor(){if(!cpTarget)return;var rgb=h2r(cpH,cpS,cpV),hex=r2h(rgb[0],rgb[1],rgb[2]);sendColor(cpTarget,hex);sendAlpha(cpTarget,cpA)}
 
-// INTEGRAÇÃO SUPABASE COM DESCOBERTA AUTOMÁTICA
-async function fetchSession(targetId) {
-    if (!targetId) return null;
+// INTEGRAÇÃO SUPABASE
+async function fetchSession() {
+    if (!SESSION_ID) return null;
     try {
-        const res = await fetch(`${SUPA_URL}/rest/v1/${TABLE}?id=eq.${targetId}&select=state,token`, {
+        const res = await fetch(`${SUPA_URL}/rest/v1/${TABLE}?id=eq.${SESSION_ID}&select=state,token`, {
             headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}` }
         });
         if (!res.ok) return null;
@@ -203,10 +200,11 @@ function applyState(d) {
     if (!d) return;
     if (!isConnected) {
         isConnected = true;
+        // Salva no LocalStorage apenas após sucesso
         localStorage.setItem('n3sk_session_id', SESSION_ID);
         localStorage.setItem('n3sk_session_token', d.token || SESSION_TOKEN);
         
-        updateStatus("CONECTADO", `Token: ${SESSION_ID}`);
+        updateStatus("Conectado!", `Token: ${SESSION_ID}`);
         document.getElementById('waiting-screen').style.opacity = '0';
         setTimeout(() => { document.getElementById('waiting-screen').style.display = 'none'; document.getElementById('app').style.display = 'block'; }, 500);
     }
@@ -223,12 +221,12 @@ function applyState(d) {
     scheduleRender();
 }
 
-// LOOP PRINCIPAL DE AUTO-CONEXÃO POR DESCOBERTA
+// LOOP PRINCIPAL
 async function init() {
     // Se veio via QR (celular), tenta conectar direto
     if (getParam('id') && getParam('token')) {
         updateStatus("Conectando via QR Code...", SESSION_ID);
-        const session = await fetchSession(SESSION_ID);
+        const session = await fetchSession();
         if (session) {
             applyState(session);
             setInterval(poll, 200);
@@ -242,7 +240,7 @@ async function init() {
     // Se é PC: Verifica se tem ID salvo no LocalStorage
     if (SESSION_ID) {
         updateStatus("Verificando sessão salva...", SESSION_ID);
-        const session = await fetchSession(SESSION_ID);
+        const session = await fetchSession();
         if (session) {
             applyState(session);
             setInterval(poll, 200);
@@ -258,32 +256,16 @@ async function init() {
         }
     }
 
-    // Sem ID salvo: Tenta descobrir sessão ativa via sinal do C#
-    updateStatus("Buscando Loader neste PC...", "Aguarde...");
-    const discovery = await fetchSession(DISCOVERY_ID);
-    
-    if (discovery && discovery.state && discovery.state.active_session_id) {
-        // Sinal encontrado! Conecta usando o ID real extraído
-        SESSION_ID = discovery.state.active_session_id;
-        SESSION_TOKEN = discovery.state.active_token || "auto";
-        updateStatus("Loader detectado! Conectando...", SESSION_ID);
-        
-        const realSession = await fetchSession(SESSION_ID);
-        if (realSession) {
-            applyState(realSession);
-            setInterval(poll, 200);
-            return;
-        }
-    }
-
-    // Nenhum sinal encontrado, continua buscando
+    // Sem ID salvo e sem QR: Fica aguardando (segurança máxima)
+    updateStatus("Aguardando Token...", "Escaneie o QR Code gerado pelo Loader C#.");
     setTimeout(init, 2000);
 }
 
 async function poll() {
     if (!SESSION_ID) return;
-    const session = await fetchSession(SESSION_ID);
+    const session = await fetchSession();
     if (!session) {
+        // Sessão deletada (C# fechou)
         isConnected = false;
         document.getElementById('app').style.display = 'none';
         document.getElementById('waiting-screen').style.display = 'flex';
@@ -304,15 +286,6 @@ async function poll() {
 function tg(el){if(!currentState)return;el.classList.toggle('on');scheduleRender();currentState.toggles[el.dataset.k]=el.classList.contains('on');updateState(currentState)}
 function sendColor(el,hex){if(!currentState)return;currentState.colors[el.dataset.k]=hex;updateState(currentState)}
 function sendAlpha(el,val){if(!currentState)return;const ak=el.dataset.k.replace('color','alpha');currentState.alphas[ak]=parseFloat(val.toFixed(4));updateState(currentState)}
-
-// MODAL QR
-function openQR(){
-    if(!SESSION_ID){alert("Conecte o Loader primeiro.");return}
-    const url=`${location.origin}${location.pathname}?id=${SESSION_ID}&token=${SESSION_TOKEN}`;
-    document.getElementById('qrImage').src=`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
-    document.getElementById('qrModal').classList.add('active');
-}
-function closeQR(){document.getElementById('qrModal').classList.remove('active')}
 
 // Inicia
 init();
