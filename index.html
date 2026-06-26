@@ -11,6 +11,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe 
 @media(hover:hover){ body{cursor:none} #cur{position:fixed;width:18px;height:18px;border:2px solid rgba(199,48,48,.9);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:transform .12s ease,border-color .15s ease} #cur.ck{transform:translate(-50%,-50%) scale(.65);border-color:#ff6b6b} }
 @media(hover:none),(max-width:900px){ *{cursor:auto!important} #cur{display:none!important} }
 
+/* TELA DE ESPERA */
 #waiting-screen { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; transition: opacity 0.5s; }
 .loader-ring { width: 48px; height: 48px; border: 4px solid #333; border-top: 4px solid var(--red); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -61,15 +62,36 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe 
 .bck{width:100%;height:100%;background:repeating-conic-gradient(#555 0% 25%,#333 0% 50%) 0 0/8px 8px}
 .bag{position:absolute;inset:0;border-radius:99px;pointer-events:none}
 .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,.6),0 2px 5px rgba(0,0,0,.7);pointer-events:none;z-index:10;transition:top 0.1s linear,background 0.1s linear}
+
+/* MODAL QR CODE */
+.qr-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:10001; align-items:center; justify-content:center; backdrop-filter:blur(5px); }
+.qr-modal.active { display:flex; }
+.qr-content { background:var(--bg2); border:1.5px solid var(--border); border-radius:12px; padding:24px; text-align:center; max-width:90%; width:320px; }
+.qr-content h3 { margin-bottom:16px; font-size:14px; letter-spacing:1px; color:var(--text); }
+.qr-content img { width:200px; height:200px; border-radius:8px; border:1px solid #333; margin-bottom:16px; }
+.qr-close { background:var(--border); color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer; font-size:12px; letter-spacing:1px; }
+.qr-close:hover { background:#a03535; }
+
 @media(max-width:900px){ html,body{height:auto;min-height:100%;overflow-y:auto} .wrap{flex-direction:column;padding:8px;gap:8px;height:auto;min-height:100%} .sidebar{width:100%;flex-direction:row;flex-wrap:wrap;gap:10px;padding:12px;order:1} .profile-card{flex:1 1 100%} .logo{padding:8px 0 10px;flex:1 1 100%} .stat-box{flex:1} .main{flex:none;order:2;width:100%} .preview-panel{width:100%;height:60vh;min-height:500px;order:3;flex-shrink:0;margin-bottom:20px} }
 </style>
 </head>
 <body>
 
+<!-- TELA DE ESPERA -->
 <div id='waiting-screen'>
     <div class='loader-ring'></div>
-    <div class='wait-text' id='status-msg'>Inicializando...</div>
-    <div class='wait-sub' id='status-detail'></div>
+    <div class='wait-text' id='status-msg'>AGUARDANDO CONEXÃO...</div>
+    <div class='wait-sub' id='status-detail'>Abra o Loader C# no PC para gerar um token.</div>
+</div>
+
+<!-- MODAL QR CODE -->
+<div class='qr-modal' id='qrModal'>
+    <div class='qr-content'>
+        <h3>ESCANEIE PARA CONECTAR</h3>
+        <img id='qrImage' src='' alt='QR Code' />
+        <br>
+        <button class='qr-close' onclick='closeQR()'>FECHAR</button>
+    </div>
 </div>
 
 <div id='cur'></div>
@@ -95,6 +117,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe 
         <div class='stat-dot' id='dot'></div>
         <div class='stat-txt' id='txt'>OFFLINE</div>
     </div>
+    <!-- BOTÃO QR CODE NO SIDEBAR -->
+    <button onclick='openQR()' style="width:100%;padding:10px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:6px;cursor:pointer;font-size:11px;letter-spacing:1px;display:flex;align-items:center;justify-content:center;gap:8px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        GERAR QR CODE
+    </button>
   </div>
 
   <div class='main'>
@@ -130,28 +157,26 @@ const PREVIEW_IMG_URL = 'https://media.discordapp.net/attachments/11843230479315
 const SUPA_URL = 'https://gkzxuerurfedfwuxhimf.supabase.co';
 const SUPA_KEY = 'sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6';
 const TABLE = 'n3sk';
-const MASTER_ID = 'MASTER_SESSION';
 
-// --- LEITURA DE URL E LOCALSTORAGE ---
+// Leitura de URL (Apenas via QR/Link Direto)
 function getParam(name) {
     const regex = new RegExp('[?&]' + name + '=([^&#]*)');
     const results = regex.exec(window.location.href);
     return results ? decodeURIComponent(results[1]) : null;
 }
 
-// Tenta pegar da URL primeiro, senão pega do LocalStorage (Auto-Login)
-let SESSION_ID = getParam('id') || localStorage.getItem('n3sk_session_id');
-let SESSION_TOKEN = getParam('token') || localStorage.getItem('n3sk_session_token');
+let SESSION_ID = getParam('id');
+let SESSION_TOKEN = getParam('token');
 
 const statusEl = document.getElementById('status-msg');
 const detailEl = document.getElementById('status-detail');
-function updateStatus(msg, detail = '') { 
+function updateStatus(msg, sub = '') { 
     if(statusEl) statusEl.innerText = msg; 
-    if(detailEl) detailEl.innerText = detail;
-    console.log(msg, detail); 
+    if(detailEl) detailEl.innerText = sub;
+    console.log(msg, sub);
 }
 
-// --- LÓGICA DE CURSOR E PREVIEW (MANTIDA) ---
+// --- LÓGICA DE CURSOR E PREVIEW ---
 var cur=document.getElementById('cur');
 var mx=innerWidth/2,my=innerHeight/2,cx=mx,cy=my;
 document.addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY});
@@ -236,7 +261,7 @@ function renderPreview() {
   if (Math.abs(boxOpacity - targetBoxOpacity) > 0.01 || isHp) scheduleRender();
 }
 
-// --- COLOR PICKER LOGIC (MANTIDA) ---
+// --- COLOR PICKER LOGIC ---
 var cpTarget=null,cpH=0,cpS=1,cpV=1,cpA=1;
 var svTX=1,svTY=0,svCX=1,svCY=0;
 var hTY=0,hCY=0,aCY=0; 
@@ -331,15 +356,15 @@ function sendFinalColor(){
     sendAlpha(cpTarget, cpA);
 }
 
-// --- INTEGRAÇÃO COM SUPABASE E AUTO-LOGIN ---
+// --- INTEGRAÇÃO COM SUPABASE ---
 let currentState = null;
 let lastPollTime = 0;
 let isConnected = false;
-let retryCount = 0;
 
-async function fetchState(targetId) {
+async function fetchState() {
+    if (!SESSION_ID) return null;
     try {
-        const res = await fetch(`${SUPA_URL}/rest/v1/${TABLE}?id=eq.${targetId}&select=state,token`, {
+        const res = await fetch(`${SUPA_URL}/rest/v1/${TABLE}?id=eq.${SESSION_ID}&select=state,token`, {
             headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}` }
         });
         if (!res.ok) return null;
@@ -350,125 +375,96 @@ async function fetchState(targetId) {
 
 async function updateState(newState) {
     if (!SESSION_ID) return;
-    try {
-        await fetch(`${SUPA_URL}/rest/v1/${TABLE}`, {
-            method: 'POST',
-            headers: { 
-                'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}`,
-                'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates'
-            },
-            body: JSON.stringify({ id: SESSION_ID, token: SESSION_TOKEN, state: newState })
-        });
-    } catch(e) {}
+    await fetch(`${SUPA_URL}/rest/v1/${TABLE}`, {
+        method: 'POST',
+        headers: { 
+            'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}`,
+            'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates'
+        },
+        body: JSON.stringify({ id: SESSION_ID, token: SESSION_TOKEN, state: newState })
+    });
 }
 
-function applyState(d){
-  if(!d) return;
-  
-  if (!isConnected) {
-      isConnected = true;
-      retryCount = 0;
-      updateStatus("Conectado!", `Sessão: ${SESSION_ID}`);
-      
-      const waitScreen = document.getElementById('waiting-screen');
-      if(waitScreen) {
-          waitScreen.style.opacity = '0';
-          setTimeout(() => {
-              waitScreen.style.display = 'none';
-              document.getElementById('app').style.display = 'block';
-          }, 500);
-      }
-  }
-
-  setConn(true);
-  currentState = d.state || d; 
-  
-  var tm={box:'tgl-box',skeleton:'tgl-skeleton',snapline:'tgl-snapline',healthbar:'tgl-healthbar'};
-  for(var k in tm){var el=document.getElementById(tm[k]);if(el)el.classList.toggle('on',!!currentState.toggles?.[k]);}
-  var cm={boxcolor:'sw-boxcolor',skeletoncolor:'sw-skeletoncolor',snaplinecolor:'sw-snaplinecolor',healthbarcolor:'sw-healthbarcolor'};
-  for(var k in cm){
-    var el=document.getElementById(cm[k]);
-    if(el&&currentState.colors?.[k]){ 
-        var rect = el.querySelector('rect');
-        if(rect) rect.setAttribute('fill', currentState.colors[k]);
+function applyState(d) {
+    if (!d || !d.state) return;
+    
+    if (!isConnected) {
+        isConnected = true;
+        updateStatus("Conectado!", `Token: ${SESSION_ID}`);
+        document.getElementById('waiting-screen').style.opacity = '0';
+        setTimeout(() => {
+            document.getElementById('waiting-screen').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+        }, 500);
     }
-  }
-  if(currentState.alphas) {
-      if(currentState.alphas.boxalpha !== undefined) cpA = currentState.alphas.boxalpha;
-      aCY = 1 - cpA;
-      var aH=aTr.getBoundingClientRect().height||152;
-      aTh.style.top=(aCY*aH)+'px';
-  }
-  scheduleRender();
+
+    setConn(true);
+    currentState = d.state; 
+    
+    var tm={box:'tgl-box',skeleton:'tgl-skeleton',snapline:'tgl-snapline',healthbar:'tgl-healthbar'};
+    for(var k in tm){var el=document.getElementById(tm[k]);if(el)el.classList.toggle('on',!!currentState.toggles?.[k]);}
+    var cm={boxcolor:'sw-boxcolor',skeletoncolor:'sw-skeletoncolor',snaplinecolor:'sw-snaplinecolor',healthbarcolor:'sw-healthbarcolor'};
+    for(var k in cm){
+        var el=document.getElementById(cm[k]);
+        if(el&&currentState.colors?.[k]){ 
+            var rect = el.querySelector('rect');
+            if(rect) rect.setAttribute('fill', currentState.colors[k]);
+        }
+    }
+    if(currentState.alphas) {
+        if(currentState.alphas.boxalpha !== undefined) cpA = currentState.alphas.boxalpha;
+        aCY = 1 - cpA;
+        var aH=aTr.getBoundingClientRect().height||152;
+        aTh.style.top=(aCY*aH)+'px';
+    }
+    scheduleRender();
 }
 
 function setConn(c){
-  var d = document.getElementById('dot');
-  var t = document.getElementById('txt');
-  if(d && t) {
-      if(c){d.classList.add('on');t.classList.add('on');t.textContent='CONECTADO';}
-      else{d.classList.remove('on');t.classList.remove('on');t.textContent='OFFLINE';}
-  }
+    var d = document.getElementById('dot');
+    var t = document.getElementById('txt');
+    if(d && t) {
+        if(c){d.classList.add('on');t.classList.add('on');t.textContent='CONECTADO';}
+        else{d.classList.remove('on');t.classList.remove('on');t.textContent='OFFLINE';}
+    }
 }
 
-// LÓGICA PRINCIPAL DE CONEXÃO INTELIGENTE
-async function initConnection() {
-    // 1. Tenta conectar com ID atual (URL ou LocalStorage)
-    if (SESSION_ID) {
-        updateStatus("Verificando sessão...", SESSION_ID);
-        const data = await fetchState(SESSION_ID);
-        
-        if (data && data.state) {
-            // Sucesso! Salva no LocalStorage para próxima vez
-            localStorage.setItem('n3sk_session_id', SESSION_ID);
-            localStorage.setItem('n3sk_session_token', SESSION_TOKEN || data.token);
-            applyState(data);
-            startPolling();
-            return;
-        }
+// POLLING INTELIGENTE
+async function poll() {
+    if (!SESSION_ID) {
+        updateStatus("Aguardando Token...", "Escaneie o QR Code gerado pelo Loader C#.");
+        return;
     }
 
-    // 2. Se falhou, busca MASTER_SESSION para auto-login
-    updateStatus("Sessão expirada. Buscando PC ativo...");
-    const masterData = await fetchState(MASTER_ID);
+    var now = Date.now();
+    const interval = isConnected ? 200 : 1000;
+    if (now - lastPollTime < interval) return;
+    lastPollTime = now;
     
-    if (masterData && masterData.state && masterData.state.activeId) {
-        SESSION_ID = masterData.state.activeId;
-        SESSION_TOKEN = masterData.state.activeToken || "auto";
-        updateStatus("Novo PC detectado! Conectando...", SESSION_ID);
-        
-        // Tenta conectar com o novo ID
-        const newData = await fetchState(SESSION_ID);
-        if (newData && newData.state) {
-            localStorage.setItem('n3sk_session_id', SESSION_ID);
-            localStorage.setItem('n3sk_session_token', SESSION_TOKEN);
-            applyState(newData);
-            startPolling();
-            return;
+    const data = await fetchState();
+    if (data && data.state) {
+        applyState(data);
+    } else {
+        if(isConnected) {
+            // PC Desligou ou Sessão Deletada
+            isConnected = false;
+            document.getElementById('app').style.display = 'none';
+            document.getElementById('waiting-screen').style.display = 'flex';
+            document.getElementById('waiting-screen').style.opacity = '1';
+            updateStatus("PC Offline", "A sessão foi encerrada. Reinicie o Loader.");
+            SESSION_ID = null; // Força reset
+        } else {
+            updateStatus("Buscando PC...", `Token: ${SESSION_ID}`);
         }
     }
-
-    // 3. Se tudo falhar, tenta de novo em 3 segundos
-    retryCount++;
-    updateStatus(`Aguardando PC... (Tentativa ${retryCount})`);
-    setTimeout(initConnection, 3000);
-}
-
-function startPolling() {
-    setInterval(async () => {
-        if (!SESSION_ID) return;
-        const data = await fetchState(SESSION_ID);
-        if (data && data.state) applyState(data);
-        else setConn(false);
-    }, 500);
 }
 
 function tg(el){
-  if (!currentState) return;
-  el.classList.toggle('on'); scheduleRender();
-  const key = el.dataset.k;
-  currentState.toggles[key] = el.classList.contains('on');
-  updateState(currentState);
+    if (!currentState) return;
+    el.classList.toggle('on'); scheduleRender();
+    const key = el.dataset.k;
+    currentState.toggles[key] = el.classList.contains('on');
+    updateState(currentState);
 }
 
 function sendColor(el, hex){
@@ -484,8 +480,25 @@ function sendAlpha(el, val){
     updateState(currentState);
 }
 
-// Inicia sistema
-initConnection();
+// --- FUNÇÕES DO MODAL QR CODE ---
+function openQR() {
+    if (!SESSION_ID) {
+        alert("Conecte-se a um PC primeiro para gerar o QR Code.");
+        return;
+    }
+    const url = `${window.location.origin}${window.location.pathname}?id=${SESSION_ID}&token=${SESSION_TOKEN}`;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
+    document.getElementById('qrImage').src = qrUrl;
+    document.getElementById('qrModal').classList.add('active');
+}
+
+function closeQR() {
+    document.getElementById('qrModal').classList.remove('active');
+}
+
+// Inicia Polling
+setInterval(poll, 1000);
+poll(); // Executa imediatamente
 resizeCanvas(); scheduleRender();
 </script>
 </body>
