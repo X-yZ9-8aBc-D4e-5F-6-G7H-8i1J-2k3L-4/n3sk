@@ -6,7 +6,6 @@
 <meta name='color-scheme' content='light dark'>
 <title>n3sk Remote</title>
 <style>
-/* MANTENHA TODO O SEU CSS ORIGINAL AQUI */
 :root{ --red:#c73030; --bg:#0a0a0a; --bg2:#111; --bg3:#1a1a1a; --border:#8b2e2e; --text:#e0e0e0; --muted:#888; color-scheme: light dark; }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;cursor:none}
@@ -133,15 +132,32 @@ const SUPA_URL = 'https://gkzxuerurfedfwuxhimf.supabase.co';
 const SUPA_KEY = 'sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6';
 const TABLE = 'n3sk';
 
-// --- LEITURA ROBUSTA DE URL ---
-// Tenta pegar da URL normal (?id=...) e também do Hash (#id=...) caso haja redirecionamento
-let rawParams = window.location.search || window.location.hash.replace('#', '?');
-const urlParams = new URLSearchParams(rawParams);
+// --- LEITURA ROBUSTA DE PARÂMETROS (RESOLVE BUG DO GITHUB/CLOUDFLARE) ---
+function getParam(name) {
+    // Método 1: URLSearchParams padrão
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has(name)) return urlParams.get(name);
+    } catch(e) {}
+    
+    // Método 2: Regex direto na href (ignora redirecionamentos que removem query string)
+    const regex = new RegExp('[?&]' + name + '=([^&#]*)');
+    const results = regex.exec(window.location.href);
+    if (results && results[1]) return decodeURIComponent(results[1]);
+    
+    // Método 3: Tenta ler do hash se a search estiver vazia
+    try {
+        const hashParams = new URLSearchParams(window.location.hash.replace('#', '?'));
+        if (hashParams.has(name)) return hashParams.get(name);
+    } catch(e) {}
+    
+    return null;
+}
 
-window.SESSION_ID = urlParams.get('id');
-window.SESSION_TOKEN = urlParams.get('token');
+window.SESSION_ID = getParam('id');
+window.SESSION_TOKEN = getParam('token');
 
-// Debug visual imediato na tela de espera
+// Debug visual imediato
 const statusEl = document.getElementById('status-msg');
 function updateStatus(msg, isError = false) {
     if(statusEl) {
@@ -152,12 +168,12 @@ function updateStatus(msg, isError = false) {
 }
 
 if (!window.SESSION_ID) {
-    updateStatus(`ERRO: Nenhum ID detectado.\nURL Atual: ${window.location.href.substring(0, 60)}...`, true);
+    updateStatus(`ERRO: ID não encontrado.\nURL: ${window.location.href.substring(0, 80)}...`, true);
 } else {
-    updateStatus(`ID Detectado: ${window.SESSION_ID}\nBuscando sessão no servidor...`);
+    updateStatus(`ID Detectado: ${window.SESSION_ID}\nConectando ao Supabase...`);
 }
 
-// --- LÓGICA DE CURSOR E PREVIEW (MANTIDA) ---
+// --- LÓGICA DE CURSOR E PREVIEW ---
 var cur=document.getElementById('cur');
 var mx=innerWidth/2,my=innerHeight/2,cx=mx,cy=my;
 document.addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY});
@@ -242,7 +258,7 @@ function renderPreview() {
   if (Math.abs(boxOpacity - targetBoxOpacity) > 0.01 || isHp) scheduleRender();
 }
 
-// --- COLOR PICKER LOGIC (MANTIDA) ---
+// --- COLOR PICKER LOGIC ---
 var cpTarget=null,cpH=0,cpS=1,cpV=1,cpA=1;
 var svTX=1,svTY=0,svCX=1,svCY=0;
 var hTY=0,hCY=0,aCY=0; 
@@ -439,7 +455,7 @@ function setConn(c){
 }
 
 function poll(){
-  if (!window.SESSION_ID) return; // Não faz polling se não tem ID
+  if (!window.SESSION_ID) return;
   
   var now = Date.now();
   const interval = isConnected ? 200 : 1000;
