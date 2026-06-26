@@ -124,15 +124,25 @@ const SUPA = 'https://gkzxuerurfedfwuxhimf.supabase.co';
 const KEY = 'sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6';
 const TBL = 'n3sk';
 
-// Lê parâmetros da URL
-const urlParams = new URLSearchParams(window.location.search);
-const URL_ID = urlParams.get('id');
-const URL_TOKEN = urlParams.get('token');
-const URL_HWID = urlParams.get('hwid');
+// Gera identificador único do navegador (substituto do HWID no JS)
+async function getBrowserId() {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.textBaseline = "top";
+    ctx.font = "14px 'Arial'";
+    ctx.fillText("n3sk-browser-id-" + navigator.userAgent + screen.width + screen.height, 2, 2);
+    const dataUrl = canvas.toDataURL();
+    let hash = 0;
+    for (let i = 0; i < dataUrl.length; i++) {
+        const char = dataUrl.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash |= 0;
+    }
+    return 'BROWSER-' + Math.abs(hash).toString(16).toUpperCase().padStart(16, '0');
+}
 
-// Recupera dados salvos localmente
 let LINKED_TOKEN = localStorage.getItem('n3sk_linked_token');
-let SAVED_HWID = localStorage.getItem('n3sk_hwid');
+let SAVED_BROWSER_ID = localStorage.getItem('n3sk_browser_id');
 let SESSION_TOKEN = '';
 let currentState = null;
 let CONNECTED = false;
@@ -152,6 +162,14 @@ async function fetchSpecificSession(token) {
     return data.length > 0 ? data[0] : null;
 }
 
+async function fetchActiveSession() {
+    const res = await fetch(`${SUPA}/rest/v1/${TBL}?is_active=eq.true&order=created_at.desc&limit=1&select=id,token,hwid,state,is_active`, {
+        headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` }
+    });
+    const data = await res.json();
+    return data.length > 0 ? data[0] : null;
+}
+
 async function updateState(newState) {
     if (!LINKED_TOKEN) return;
     await fetch(`${SUPA}/rest/v1/${TBL}`, {
@@ -165,11 +183,9 @@ function connect(session) {
     if (!CONNECTED) {
         CONNECTED = true;
         SESSION_TOKEN = session.token;
-        // Salva Token e HWID recebidos do Loader
         localStorage.setItem('n3sk_linked_token', session.id);
-        localStorage.setItem('n3sk_hwid', session.hwid);
         
-        updateStatus("CONECTADO", `HWID Validado: ${session.hwid?.substring(0,8)}...`);
+        updateStatus("CONECTADO", `HWID Validado`);
         document.getElementById('waiting-screen').style.opacity = '0';
         setTimeout(() => { 
             document.getElementById('waiting-screen').style.display = 'none'; 
@@ -193,59 +209,68 @@ function applyUIToState(d) {
 }
 
 async function init() {
-    // PRIORIDADE 1: Primeira conexão via Link do Console (Contém HWID Real)
-    if (URL_ID && URL_TOKEN && URL_HWID) {
-        updateStatus("Vinculando HWID...", URL_HWID);
-        const session = await fetchSpecificSession(URL_ID);
-        if (session && session.is_active && session.hwid === URL_HWID) {
-            // HWID bate! Salva e conecta
-            LINKED_TOKEN = URL_ID;
-            SESSION_TOKEN = URL_TOKEN;
-            SAVED_HWID = URL_HWID;
-            connect(session);
-            startPolling(URL_ID);
-            // Limpa URL para segurança
-            window.history.replaceState({}, document.title, window.location.pathname);
-            return;
-        } else {
-            updateStatus("ERRO DE VINCULAÇÃO", "HWID ou Token inválidos.");
-            return;
-        }
-    }
-
-    // PRIORIDADE 2: Conexões subsequentes (Usa HWID salvo no LocalStorage)
-    if (LINKED_TOKEN && SAVED_HWID) {
-        updateStatus("Verificando sessão...", `HWID: ${SAVED_HWID.substring(0,8)}...`);
+    const browserId = await getBrowserId();
+    
+    // PRIORIDADE 1: Reconexão automática via LocalStorage
+    if (LINKED_TOKEN) {
+        updateStatus("Verificando sessão...", "Aguarde...");
         const session = await fetchSpecificSession(LINKED_TOKEN);
         
         if (session && session.is_active) {
-            // Validação RÍGIDA: HWID salvo deve bater com HWID da sessão no banco
-            if (session.hwid === SAVED_HWID) {
+            // Validação: HWID do banco deve corresponder ao Browser ID salvo ou ser primeira vez
+            if (!SAVED_BROWSER_ID || session.hwid === SAVED_BROWSER_ID) {
+                if (!SAVED_BROWSER_ID) {
+                    localStorage.setItem('n3sk_browser_id', session.hwid);
+                    SAVED_BROWSER_ID = session.hwid;
+                }
                 SESSION_TOKEN = session.token;
                 connect(session);
                 startPolling(LINKED_TOKEN);
                 return;
             } else {
-                // HWID mudou ou sessão pertence a outro PC
                 localStorage.removeItem('n3sk_linked_token');
-                localStorage.removeItem('n3sk_hwid');
+                localStorage.removeItem('n3sk_browser_id');
                 LINKED_TOKEN = null;
-                SAVED_HWID = null;
-                updateStatus("ACESSO NEGADO", `HWID do Loader: ${session.hwid?.substring(0,8)}... ≠ Seu HWID Salvo`);
+                SAVED_BROWSER_ID = null;
+                updateStatus("ACESSO NEGADO", "Este dispositivo não corresponde ao HWID do Loader.");
             }
         } else {
-            // Sessão deletada
             localStorage.removeItem('n3sk_linked_token');
-            localStorage.removeItem('n3sk_hwid');
+            localStorage.removeItem('n3sk_browser_id');
             LINKED_TOKEN = null;
-            SAVED_HWID = null;
-            updateStatus("LOADER FECHADO", "Reinicie o C# e use o novo link.");
+            SAVED_BROWSER_ID = null;
+            updateStatus("LOADER FECHADO", "Reinicie o C# para nova sessão.");
         }
-    } else {
-        // Sem vínculo estabelecido
-        updateStatus("AGUARDANDO VINCULAÇÃO", "Copie o link do console do C# e cole aqui.");
+    }
+
+    // PRIORIDADE 2: Primeira conexão - Busca sessão ativa e vincula
+    updateStatus("BUSCANDO LOADER...", "Aguarde...");
+    const active = await fetchActiveSession();
+    
+    if (active && active.is_active) {
+        // Se não tem Browser ID salvo ainda, assume que é este PC
+        if (!SAVED_BROWSER_ID) {
+            localStorage.setItem('n3sk_browser_id', active.hwid);
+            SAVED_BROWSER_ID = active.hwid;
+        }
+        
+        // Valida se o HWID do banco bate com o Browser ID local
+        if (active.hwid === SAVED_BROWSER_ID) {
+            updateStatus("Loader detectado!", "Conectando...");
+            LINKED_TOKEN = active.id;
+            SESSION_TOKEN = active.token;
+            connect(active);
+            startPolling(active.id);
+            return;
+        }
     }
     
+    // HWID não bate ou nenhuma sessão encontrada
+    if (active && active.hwid !== SAVED_BROWSER_ID) {
+        updateStatus("SESSÃO DE OUTRO PC", "HWID do Loader ≠ Este Dispositivo");
+    } else {
+        updateStatus("AGUARDANDO LOADER", "Inicie o C# NESTE PC para conectar.");
+    }
     setTimeout(init, 2000);
 }
 
@@ -255,7 +280,7 @@ async function startPolling(token) {
         if (!session || !session.is_active) {
             CONNECTED = false;
             localStorage.removeItem('n3sk_linked_token');
-            localStorage.removeItem('n3sk_hwid');
+            localStorage.removeItem('n3sk_browser_id');
             LINKED_TOKEN = null;
             document.getElementById('app').style.display = 'none';
             document.getElementById('waiting-screen').style.display = 'flex';
@@ -281,7 +306,7 @@ function tg(el){
 
 function openQR(){
     if(!LINKED_TOKEN || !SESSION_TOKEN){ alert("Conecte-se ao Loader primeiro!"); return; }
-    // QR Code ignora HWID (acesso universal para secundários)
+    // QR Code ignora validação de HWID (acesso universal para secundários)
     const url = `${window.location.origin}${window.location.pathname}?id=${LINKED_TOKEN}&token=${SESSION_TOKEN}`;
     document.getElementById('qrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
     document.getElementById('qrModal').classList.add('active');
