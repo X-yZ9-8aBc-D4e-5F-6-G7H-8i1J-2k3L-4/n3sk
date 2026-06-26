@@ -11,7 +11,7 @@ body{background:#0a0a0a;color:#e0e0e0;font-family:sans-serif;height:100vh;displa
 .loader{width:40px;height:40px;border:3px solid #333;border-top-color:#c73030;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 15px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .wait-text{font-size:14px;letter-spacing:2px;text-transform:uppercase;color:#888;margin-bottom:8px}
-.wait-sub{font-size:11px;color:#555}
+.wait-sub{font-size:11px;color:#555; margin-top: 5px;}
 #app{display:none;width:100%;height:100%;padding:20px;text-align:center}
 .token-display{background:#111;border:1px solid #333;padding:8px 16px;border-radius:4px;font-family:monospace;font-size:14px;color:#c73030;margin-top:10px;display:inline-block}
 </style>
@@ -20,8 +20,8 @@ body{background:#0a0a0a;color:#e0e0e0;font-family:sans-serif;height:100vh;displa
 
 <div id="waiting">
     <div class="loader"></div>
-    <p class="wait-text" id="status">BUSCANDO SESSÃO...</p>
-    <p class="wait-sub" id="sub">Inicie o Loader C# neste PC.</p>
+    <p class="wait-text" id="status">INICIALIZANDO...</p>
+    <p class="wait-sub" id="sub">Gerando identidade do dispositivo...</p>
 </div>
 
 <div id="app">
@@ -43,7 +43,7 @@ async function getDeviceId() {
         const ctx = canvas.getContext('2d');
         ctx.textBaseline = "top";
         ctx.font = "14px 'Arial'";
-        ctx.fillText("n3sk-fingerprint-" + navigator.userAgent, 2, 2);
+        ctx.fillText("n3sk-fingerprint-" + navigator.userAgent + screen.width + screen.height, 2, 2);
         const dataUrl = canvas.toDataURL();
         
         let hash = 0;
@@ -54,7 +54,6 @@ async function getDeviceId() {
         }
         return 'DEV-' + Math.abs(hash).toString(16).toUpperCase().padStart(8, '0');
     } catch(e) {
-        // Fallback se canvas falhar
         return 'DEV-FALLBACK-' + Math.random().toString(36).substr(2, 9).toUpperCase();
     }
 }
@@ -62,6 +61,31 @@ async function getDeviceId() {
 let DEVICE_ID = '';
 let LINKED_TOKEN = localStorage.getItem('n3sk_linked_token');
 let CONNECTED = false;
+
+// Função CORRETA para atualizar device_id no Supabase
+async function bindDevice(token) {
+    console.log(`[BIND] Tentando vincular ${token} ao device ${DEVICE_ID}`);
+    
+    // Usa PATCH para atualizar a linha existente
+    const res = await fetch(`${SUPA}/rest/v1/${TBL}?id=eq.${token}`, {
+        method: 'PATCH',
+        headers: { 
+            'apikey': KEY, 
+            'Authorization': `Bearer ${KEY}`, 
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal' 
+        },
+        body: JSON.stringify({ device_id: DEVICE_ID })
+    });
+
+    if (!res.ok) {
+        console.error("[BIND] Erro ao vincular:", res.status, await res.text());
+        document.getElementById('sub').innerText = `Erro ao vincular: ${res.status}`;
+        return false;
+    }
+    console.log("[BIND] Sucesso!");
+    return true;
+}
 
 async function fetchActiveSession() {
     const res = await fetch(`${SUPA}/rest/v1/${TBL}?is_active=eq.true&order=created_at.desc&limit=1&select=id,token,device_id,state,is_active`, {
@@ -79,14 +103,6 @@ async function fetchSpecificSession(token) {
     return data.length > 0 ? data[0] : null;
 }
 
-async function bindDevice(token) {
-    await fetch(`${SUPA}/rest/v1/${TBL}`, {
-        method: 'POST',
-        headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
-        body: JSON.stringify({ id: token, device_id: DEVICE_ID })
-    });
-}
-
 function connect(session) {
     if (!CONNECTED) {
         CONNECTED = true;
@@ -99,6 +115,7 @@ function connect(session) {
 
 async function init() {
     DEVICE_ID = await getDeviceId();
+    document.getElementById('sub').innerText = `Meu ID: ${DEVICE_ID}`;
     
     // PRIORIDADE 1: Verifica token salvo no LocalStorage
     if (LINKED_TOKEN) {
@@ -116,7 +133,7 @@ async function init() {
                 localStorage.removeItem('n3sk_linked_token');
                 LINKED_TOKEN = null;
                 document.getElementById('status').textContent = 'ACESSO NEGADO';
-                document.getElementById('sub').textContent = 'Esta sessão pertence a outro dispositivo.';
+                document.getElementById('sub').textContent = 'Esta sessão pertence a outro PC.';
             }
         } else {
             // Sessão deletada
@@ -128,18 +145,21 @@ async function init() {
     }
 
     // PRIORIDADE 2: Busca sessão ativa PARA VINCULAÇÃO INICIAL
-    // SÓ conecta se device_id for NULL (sessão virgem)
     document.getElementById('status').textContent = 'AGUARDANDO LOADER...';
     const active = await fetchActiveSession();
     
     if (active && active.device_id === null) {
         // Primeira conexão: vincula este dispositivo
-        await bindDevice(active.id);
-        localStorage.setItem('n3sk_linked_token', active.id);
-        LINKED_TOKEN = active.id;
-        connect(active);
-        startPolling(active.id);
-        return;
+        document.getElementById('status').textContent = 'VINCULANDO DISPOSITIVO...';
+        const success = await bindDevice(active.id);
+        
+        if (success) {
+            localStorage.setItem('n3sk_linked_token', active.id);
+            LINKED_TOKEN = active.id;
+            connect(active);
+            startPolling(active.id);
+            return;
+        }
     }
     
     // Se active.device_id existe e é diferente, IGNORA COMPLETAMENTE
