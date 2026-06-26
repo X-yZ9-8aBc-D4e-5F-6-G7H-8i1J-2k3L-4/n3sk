@@ -73,7 +73,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe 
 <div id='waiting-screen'>
     <div class='loader-ring'></div>
     <div class='wait-text' id='status-msg'>INICIALIZANDO...</div>
-    <div class='wait-sub' id='status-detail'>Gerando identidade do dispositivo...</div>
+    <div class='wait-sub' id='status-detail'>Verificando sessão...</div>
 </div>
 
 <div class='qr-modal' id='qrModal'>
@@ -130,7 +130,7 @@ const SUPA = 'https://gkzxuerurfedfwuxhimf.supabase.co';
 const KEY = 'sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6';
 const TBL = 'n3sk';
 
-// DeviceID Robusto via Canvas Fingerprinting
+// Gera DeviceID único para este navegador
 async function getDeviceId() {
     try {
         const canvas = document.createElement('canvas');
@@ -233,13 +233,38 @@ function applyUIToState(d) {
 
 async function init() {
     DEVICE_ID = await getDeviceId();
+    
+    // Verifica se veio via QR Code (URL params)
+    const urlParams = new URLSearchParams(window.location.search);
+    const qrId = urlParams.get('id');
+    const qrToken = urlParams.get('token');
+
+    // SE VEIO VIA QR CODE: Conecta DIRETO, ignora DeviceID
+    if (qrId && qrToken) {
+        updateStatus("Conectando via QR...", qrId);
+        const session = await fetchSpecificSession(qrId);
+        if (session && session.is_active) {
+            // Salva token mas NÃO sobrepõe device_id do PC principal
+            localStorage.setItem('n3sk_linked_token', qrId);
+            LINKED_TOKEN = qrId;
+            SESSION_TOKEN = qrToken;
+            connect(session);
+            startPolling(qrId);
+            return;
+        } else {
+            updateStatus("Sessão inválida", "Loader pode estar fechado.");
+            return;
+        }
+    }
+
+    // LÓGICA NORMAL DO PC (Busca sessão ativa e vincula)
     updateStatus("BUSCANDO SESSÃO...", `Meu ID: ${DEVICE_ID}`);
     
-    // Verifica token salvo (persistência entre recarregamentos)
     if (LINKED_TOKEN) {
         const session = await fetchSpecificSession(LINKED_TOKEN);
         if (session && session.is_active) {
-            if (session.device_id === DEVICE_ID || session.device_id === null) {
+            // Só vincula device_id se for null ou igual ao meu
+            if (session.device_id === null || session.device_id === DEVICE_ID) {
                 if(session.device_id === null) await bindDevice(LINKED_TOKEN);
                 connect(session);
                 startPolling(LINKED_TOKEN);
@@ -256,7 +281,7 @@ async function init() {
         }
     }
 
-    // Busca sessão ativa virgem
+    // Busca sessão ativa virgem para vincular PC
     const active = await fetchActiveSession();
     if (active && (active.device_id === null || active.device_id === DEVICE_ID)) {
         updateStatus("VINCULANDO DISPOSITIVO...", "Aguarde...");
@@ -272,7 +297,7 @@ async function init() {
     setTimeout(init, 2000);
 }
 
-// Polling Rápido (100ms) para Delay Zero
+// Polling Rápido (100ms)
 async function startPolling(token) {
     setInterval(async () => {
         const session = await fetchSpecificSession(token);
@@ -294,7 +319,7 @@ async function startPolling(token) {
             currentState = session.state;
             applyUIToState(currentState);
         }
-    }, 100); // 100ms para resposta instantânea
+    }, 100);
 }
 
 // Interações da UI
@@ -303,15 +328,16 @@ function tg(el){
     el.classList.toggle('on');
     currentState.toggles[el.dataset.k] = el.classList.contains('on');
     updateState(currentState);
-    scheduleRender(); // Renderiza imediatamente ao clicar
+    scheduleRender();
 }
 
-// Modal QR Code
+// Modal QR Code (Link Público)
 function openQR(){
     if(!LINKED_TOKEN || !SESSION_TOKEN){
         alert("Conecte-se ao Loader primeiro!");
         return;
     }
+    // Link público com ID e Token na URL
     const url = `${window.location.origin}${window.location.pathname}?id=${LINKED_TOKEN}&token=${SESSION_TOKEN}`;
     const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
     document.getElementById('qrImage').src = qrApi;
@@ -347,7 +373,7 @@ function renderPreview(){
     var isBox=document.getElementById('tgl-box')?.classList.contains('on'),isHp=document.getElementById('tgl-healthbar')?.classList.contains('on');
     function gc(id){var e=document.getElementById(id),r=e?.querySelector('rect');return r?r.getAttribute('fill'):'#fff'}
     var bC=gc('sw-boxcolor'),hC=gc('sw-healthbarcolor'),bH=canvasHeight*.75,bW=bH*.45,bX=(canvasWidth-bW)/2,bY=(canvasHeight-bH)/2+20;
-    targetBoxOpacity=isBox?1:0;boxOpacity=lerp(boxOpacity,targetBoxOpacity,.1); // Transição mais rápida
+    targetBoxOpacity=isBox?1:0;boxOpacity=lerp(boxOpacity,targetBoxOpacity,.1);
     if(boxOpacity>.01){ctx.globalAlpha=boxOpacity;ctx.strokeStyle=bC;ctx.lineWidth=2;var l=bW*.25;ctx.beginPath();ctx.moveTo(bX,bY+l);ctx.lineTo(bX,bY);ctx.lineTo(bX+l,bY);ctx.stroke();ctx.beginPath();ctx.moveTo(bX+bW-l,bY);ctx.lineTo(bX+bW,bY);ctx.lineTo(bX+bW,bY+l);ctx.stroke();ctx.beginPath();ctx.moveTo(bX,bY+bH-l);ctx.lineTo(bX,bY+bH);ctx.lineTo(bX+l,bY+bH);ctx.stroke();ctx.beginPath();ctx.moveTo(bX+bW-l,bY+bH);ctx.lineTo(bX+bW,bY+bH);ctx.lineTo(bX+bW,bY+bH-l);ctx.stroke();ctx.globalAlpha=1}
     if(isHp){var bw=6,bx=bX-12;hpAnimTime+=.08;var p=.5+.5*Math.sin(hpAnimTime*2*Math.PI*.4),ch=bH*p;ctx.fillStyle='rgba(15,15,15,.8)';ctx.fillRect(bx,bY,bw,bH);ctx.fillStyle=hC;ctx.fillRect(bx,bY+(bH-ch),bw,ch)}
     ctx.restore();if(Math.abs(boxOpacity-targetBoxOpacity)>.01||isHp)scheduleRender()
