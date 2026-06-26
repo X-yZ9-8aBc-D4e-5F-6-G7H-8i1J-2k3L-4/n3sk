@@ -5,367 +5,208 @@
 <meta name='viewport' content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no'>
 <title>n3sk Remote</title>
 <style>
-:root{ --red:#c73030; --bg:#0a0a0a; --bg2:#111; --bg3:#1a1a1a; --border:#8b2e2e; --text:#e0e0e0; --muted:#888; color-scheme: light dark; }
+:root{ --red:#c73030; --bg:#0a0a0a; --bg2:#111; --bg3:#1a1a1a; --border:#8b2e2e; --text:#e0e0e0; --muted:#888; }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;cursor:none}
-@media(hover:hover){ body{cursor:none} #cur{position:fixed;width:18px;height:18px;border:2px solid rgba(199,48,48,.9);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:transform .12s ease,border-color .15s ease} #cur.ck{transform:translate(-50%,-50%) scale(.65);border-color:#ff6b6b} }
-@media(hover:none),(max-width:900px){ *{cursor:auto!important} #cur{display:none!important} }
-
-/* TELA DE ESPERA */
-#waiting-screen { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; transition: opacity 0.5s; }
-.loader-ring { width: 48px; height: 48px; border: 4px solid #333; border-top: 4px solid var(--red); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-.wait-text { font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;}
-.wait-sub { font-size: 11px; color: #666; max-width: 80%; text-align: center; word-break: break-all; line-height: 1.4; }
-
+@media(hover:hover){body{cursor:none}#cur{position:fixed;width:18px;height:18px;border:2px solid rgba(199,48,48,.9);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:.12s}#cur.ck{transform:translate(-50%,-50%) scale(.65);border-color:#ff6b6b}}
+@media(hover:none),(max-width:900px){*{cursor:auto!important}#cur{display:none!important}}
+#waiting-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10000;transition:opacity .5s}
+.loader-ring{width:48px;height:48px;border:4px solid #333;border-top:4px solid var(--red);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:20px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.wait-text{font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.wait-sub{font-size:11px;color:#666;max-width:80%;text-align:center;line-height:1.4}
 #app{display:none;height:100%}
-@keyframes fadeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(74,222,128,.7)}70%{box-shadow:0 0 0 8px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
 .wrap{display:flex;height:100%;gap:12px;padding:12px;animation:fadeIn .5s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
 .sidebar{width:240px;flex-shrink:0;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:14px}
 .profile-card{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px}
-.profile-img{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--red);box-shadow:0 0 10px rgba(199,48,48,0.3)}
+.profile-img{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--red)}
 .profile-info{display:flex;flex-direction:column;gap:2px}
 .profile-name{font-size:14px;font-weight:700;color:#fff}
-.profile-sub{font-size:10px;color:var(--muted);letter-spacing:0.5px}
+.profile-sub{font-size:10px;color:var(--muted);letter-spacing:.5px}
 .logo{text-align:center;padding:10px 0 16px;border-bottom:1.5px solid var(--border)}
 .stat-box{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;background:var(--bg3);border-radius:6px;border:1.5px solid #333}
-.stat-dot{width:10px;height:10px;border-radius:50%;background:#444;transition:all .3s}
+.stat-dot{width:10px;height:10px;border-radius:50%;background:#444;transition:.3s}
 .stat-dot.on{background:#4ade80;box-shadow:0 0 8px #4ade80;animation:pulse 2s infinite}
-.stat-txt{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1px;transition:color .3s}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(74,222,128,.7)}70%{box-shadow:0 0 0 8px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
+.stat-txt{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1px;transition:.3s}
 .stat-txt.on{color:#4ade80}
 .main{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
-.main::-webkit-scrollbar{width:3px} .main::-webkit-scrollbar-thumb{background:#333;border-radius:99px}
 .panel{background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;overflow:hidden}
 .ph{background:var(--border);padding:8px 14px;font-size:10px;font-weight:700;letter-spacing:2px;color:#fff}
-.pgrid{display:grid;gap:0}
 .row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid #1c1c1c}
-.row:last-child{border-bottom:none} .row span{font-size:12px;color:var(--text)}
+.row:last-child{border-bottom:none}.row span{font-size:12px}
 .preview-panel{width:420px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;flex-shrink:0}
 .preview-canvas{flex:1;background:#050505;width:100%;height:100%;display:block}
-.tgl{width:46px;height:26px;background:#2a2a2a;border-radius:99px;position:relative;border:1.5px solid #444;transition:all 0.4s cubic-bezier(0.4,0,0.2,1);user-select:none;flex-shrink:0}
+.tgl{width:46px;height:26px;background:#2a2a2a;border-radius:99px;position:relative;border:1.5px solid #444;transition:.4s;user-select:none;flex-shrink:0}
 .tgl.on{background:var(--red);border-color:#ff6b6b;box-shadow:0 0 8px rgba(199,48,48,.4)}
-.tgl::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:2px;left:2px;transition:all 0.4s cubic-bezier(0.4,0,0.2,1);box-shadow:0 1px 4px rgba(0,0,0,.5)}
+.tgl::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:2px;left:2px;transition:.4s;box-shadow:0 1px 4px rgba(0,0,0,.5)}
 .tgl.on::after{left:22px}
-.sw-container{width:36px;height:24px;flex-shrink:0;border-radius:4px;overflow:hidden;border:1.5px solid #555;position:relative;cursor:pointer;isolation:isolate}
-.sw-svg{width:100%;height:100%;display:block;mix-blend-mode:normal!important}
-.cp-ol{display:none;position:fixed;inset:0;z-index:9000} .cp-ol.open{display:block}
-.cp-box{position:fixed;background:#161616;border:1.5px solid var(--border);border-radius:10px;padding:12px;display:flex;gap:10px;align-items:flex-start;z-index:901;box-shadow:0 16px 48px rgba(0,0,0,.9);user-select:none;touch-action:none}
-.sv{width:190px;height:152px;border-radius:5px;position:relative;overflow:hidden;flex-shrink:0;border:1px solid #222}
+.sw-container{width:36px;height:24px;flex-shrink:0;border-radius:4px;overflow:hidden;border:1.5px solid #555;cursor:pointer}
+.sw-svg{width:100%;height:100%;display:block}
+.cp-ol{display:none;position:fixed;inset:0;z-index:9000}.cp-ol.open{display:block}
+.cp-box{position:fixed;background:#161616;border:1.5px solid var(--border);border-radius:10px;padding:12px;display:flex;gap:10px;z-index:901;box-shadow:0 16px 48px rgba(0,0,0,.9)}
+.sv{width:190px;height:152px;border-radius:5px;position:relative;overflow:hidden;border:1px solid #222}
 .sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent)}
 .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,#000)}
-.sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,.7),0 2px 5px rgba(0,0,0,.8)}
+.sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none}
 .bars{display:flex;gap:8px}
-.btr{position:relative;width:14px;height:152px;border-radius:99px;overflow:visible;flex-shrink:0;border:1px solid #222}
+.btr{position:relative;width:14px;height:152px;border-radius:99px;overflow:visible;border:1px solid #222}
 .bin{position:absolute;inset:0;border-radius:99px;overflow:hidden}
 .bh{width:100%;height:100%;background:linear-gradient(to bottom,#f00 0%,#ff0 17%,#0f0 33%,#0ff 50%,#00f 67%,#f0f 83%,#f00 100%)}
 .bck{width:100%;height:100%;background:repeating-conic-gradient(#555 0% 25%,#333 0% 50%) 0 0/8px 8px}
 .bag{position:absolute;inset:0;border-radius:99px;pointer-events:none}
-.bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,.6),0 2px 5px rgba(0,0,0,.7);pointer-events:none;z-index:10;transition:top 0.1s linear,background 0.1s linear}
-
-/* MODAL QR CODE */
-.qr-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:10001; align-items:center; justify-content:center; backdrop-filter:blur(5px); }
-.qr-modal.active { display:flex; }
-.qr-content { background:var(--bg2); border:1.5px solid var(--border); border-radius:12px; padding:24px; text-align:center; max-width:90%; width:320px; }
-.qr-content h3 { margin-bottom:16px; font-size:14px; letter-spacing:1px; color:var(--text); }
-.qr-content img { width:200px; height:200px; border-radius:8px; border:1px solid #333; margin-bottom:16px; }
-.qr-close { background:var(--border); color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer; font-size:12px; letter-spacing:1px; }
-.qr-close:hover { background:#a03535; }
-
-@media(max-width:900px){ html,body{height:auto;min-height:100%;overflow-y:auto} .wrap{flex-direction:column;padding:8px;gap:8px;height:auto;min-height:100%} .sidebar{width:100%;flex-direction:row;flex-wrap:wrap;gap:10px;padding:12px;order:1} .profile-card{flex:1 1 100%} .logo{padding:8px 0 10px;flex:1 1 100%} .stat-box{flex:1} .main{flex:none;order:2;width:100%} .preview-panel{width:100%;height:60vh;min-height:500px;order:3;flex-shrink:0;margin-bottom:20px} }
+.bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#fff;border:2.5px solid #fff;pointer-events:none;z-index:10}
+.qr-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:10001;align-items:center;justify-content:center;backdrop-filter:blur(5px)}
+.qr-modal.active{display:flex}
+.qr-content{background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:24px;text-align:center;width:320px}
+.qr-content h3{margin-bottom:16px;font-size:14px;letter-spacing:1px}
+.qr-content img{width:200px;height:200px;border-radius:8px;border:1px solid #333;margin-bottom:16px}
+.qr-close{background:var(--border);color:white;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;font-size:12px;letter-spacing:1px}
+@media(max-width:900px){.wrap{flex-direction:column;height:auto}.sidebar{width:100%;flex-direction:row;flex-wrap:wrap}.profile-card{flex:1 1 100%}.logo{flex:1 1 100%}.stat-box{flex:1}.main{width:100%}.preview-panel{width:100%;height:60vh}}
 </style>
 </head>
 <body>
 
-<!-- TELA DE ESPERA -->
 <div id='waiting-screen'>
     <div class='loader-ring'></div>
-    <div class='wait-text' id='status-msg'>AGUARDANDO CONEXÃO...</div>
-    <div class='wait-sub' id='status-detail'>Inicie o Loader C# neste PC para conectar automaticamente.</div>
+    <div class='wait-text' id='status-msg'>AGUARDANDO LOADER...</div>
+    <div class='wait-sub' id='status-detail'>Inicie o C# neste PC para conectar automaticamente.</div>
 </div>
 
-<!-- MODAL QR CODE PARA CELULAR -->
 <div class='qr-modal' id='qrModal'>
     <div class='qr-content'>
-        <h3>ESCANEIE PARA CONECTAR CELULAR</h3>
-        <img id='qrImage' src='' alt='QR Code' />
-        <br>
+        <h3>QR CODE PARA CELULAR</h3>
+        <img id='qrImage' src='' alt='QR' />
         <button class='qr-close' onclick='closeQR()'>FECHAR</button>
     </div>
 </div>
 
 <div id='cur'></div>
-<div class='cp-ol' id='cpOl'>
-  <div class='cp-box' id='cpBox'>
+<div class='cp-ol' id='cpOl'><div class='cp-box' id='cpBox'>
     <div class='sv' id='sv'><div class='sv-w'></div><div class='sv-b'></div><div class='sv-th' id='svTh'></div></div>
     <div class='bars'>
-      <div class='btr' id='hueTr'><div class='bin'><div class='bh'></div></div><div class='bth' id='hueTh'></div></div>
-      <div class='btr' id='aTr'><div class='bin'><div class='bck'></div></div><div class='bag' id='aGr'></div><div class='bth' id='aTh'></div></div>
+        <div class='btr' id='hueTr'><div class='bin'><div class='bh'></div></div><div class='bth' id='hueTh'></div></div>
+        <div class='btr' id='aTr'><div class='bin'><div class='bck'></div></div><div class='bag' id='aGr'></div><div class='bth' id='aTh'></div></div>
     </div>
-  </div>
-</div>
+</div></div>
 
-<div id='app' style='display:block'>
+<div id='app'>
 <div class='wrap'>
   <div class='sidebar'>
     <div class='profile-card'>
-      <img src='https://via.placeholder.com/100/c73030/ffffff?text=SP' class='profile-img' alt='Profile' onerror="this.src='https://i.pinimg.com/474x/ff/c1/a5/ffc1a5f503e31b814ff8953ec6f50c7c.jpg'" />
+      <img src='https://via.placeholder.com/100/c73030/ffffff?text=SP' class='profile-img' onerror="this.src='https://i.pinimg.com/474x/ff/c1/a5/ffc1a5f503e31b814ff8953ec6f50c7c.jpg'" />
       <div class='profile-info'><div class='profile-name'>n3sk</div><div class='profile-sub'>Fuck any Anti-cheat</div></div>
     </div>
     <div class='logo'></div>
-    <div class='stat-box'>
-        <div class='stat-dot' id='dot'></div>
-        <div class='stat-txt' id='txt'>OFFLINE</div>
-    </div>
-    <!-- BOTÃO QR CODE NO SIDEBAR -->
+    <div class='stat-box'><div class='stat-dot' id='dot'></div><div class='stat-txt' id='txt'>OFFLINE</div></div>
     <button onclick='openQR()' style="width:100%;padding:10px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:6px;cursor:pointer;font-size:11px;letter-spacing:1px;display:flex;align-items:center;justify-content:center;gap:8px;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-        GERAR QR PARA CELULAR
+        GERAR QR CELULAR
     </button>
   </div>
-
   <div class='main'>
-    <div class='panel'>
-      <div class='ph'>ESP TOGGLES</div>
-      <div class='pgrid'>
-        <div class='row'><span>Draw box</span><div class='tgl on' id='tgl-box' data-k='box' onclick='tg(this)'></div></div>
-        <div class='row'><span>Draw skeleton</span><div class='tgl on' id='tgl-skeleton' data-k='skeleton' onclick='tg(this)'></div></div>
-        <div class='row'><span>Draw snapline</span><div class='tgl' id='tgl-snapline' data-k='snapline' onclick='tg(this)'></div></div>
-        <div class='row'><span>Draw healthbar</span><div class='tgl on' id='tgl-healthbar' data-k='healthbar' onclick='tg(this)'></div></div>
-      </div>
+    <div class='panel'><div class='ph'>ESP TOGGLES</div>
+      <div class='row'><span>Draw box</span><div class='tgl on' id='tgl-box' data-k='box' onclick='tg(this)'></div></div>
+      <div class='row'><span>Draw skeleton</span><div class='tgl on' id='tgl-skeleton' data-k='skeleton' onclick='tg(this)'></div></div>
+      <div class='row'><span>Draw snapline</span><div class='tgl' id='tgl-snapline' data-k='snapline' onclick='tg(this)'></div></div>
+      <div class='row'><span>Draw healthbar</span><div class='tgl on' id='tgl-healthbar' data-k='healthbar' onclick='tg(this)'></div></div>
     </div>
-    <div class='panel'>
-      <div class='ph'>ESP COLORS</div>
-      <div class='pgrid'>
-        <div class='row'><span>Box color</span><div class='sw-container' id='sw-boxcolor' data-k='boxcolor' onclick='openCP(this)'><svg class='sw-svg' viewBox='0 0 100 100' preserveAspectRatio='none'><rect width='100' height='100' fill='#ffffff'/></svg></div></div>
-        <div class='row'><span>Skeleton color</span><div class='sw-container' id='sw-skeletoncolor' data-k='skeletoncolor' onclick='openCP(this)'><svg class='sw-svg' viewBox='0 0 100 100' preserveAspectRatio='none'><rect width='100' height='100' fill='#ff0000'/></svg></div></div>
-        <div class='row'><span>Snapline color</span><div class='sw-container' id='sw-snaplinecolor' data-k='snaplinecolor' onclick='openCP(this)'><svg class='sw-svg' viewBox='0 0 100 100' preserveAspectRatio='none'><rect width='100' height='100' fill='#00ff00'/></svg></div></div>
-        <div class='row'><span>Healthbar color</span><div class='sw-container' id='sw-healthbarcolor' data-k='healthbarcolor' onclick='openCP(this)'><svg class='sw-svg' viewBox='0 0 100 100' preserveAspectRatio='none'><rect width='100' height='100' fill='#00ff00'/></svg></div></div>
-      </div>
+    <div class='panel'><div class='ph'>ESP COLORS</div>
+      <div class='row'><span>Box color</span><div class='sw-container' id='sw-boxcolor' data-k='boxcolor' onclick='openCP(this)'><svg class='sw-svg' viewBox='0 0 100 100' preserveAspectRatio='none'><rect width='100' height='100' fill='#ffffff'/></svg></div></div>
+      <div class='row'><span>Skeleton color</span><div class='sw-container' id='sw-skeletoncolor' data-k='skeletoncolor' onclick='openCP(this)'><svg class='sw-svg' viewBox='0 0 100 100' preserveAspectRatio='none'><rect width='100' height='100' fill='#ff0000'/></svg></div></div>
+      <div class='row'><span>Snapline color</span><div class='sw-container' id='sw-snaplinecolor' data-k='snaplinecolor' onclick='openCP(this)'><svg class='sw-svg' viewBox='0 0 100 100' preserveAspectRatio='none'><rect width='100' height='100' fill='#00ff00'/></svg></div></div>
+      <div class='row'><span>Healthbar color</span><div class='sw-container' id='sw-healthbarcolor' data-k='healthbarcolor' onclick='openCP(this)'><svg class='sw-svg' viewBox='0 0 100 100' preserveAspectRatio='none'><rect width='100' height='100' fill='#00ff00'/></svg></div></div>
     </div>
   </div>
-
-  <div class='preview-panel'>
-    <div class='ph'>Preview</div>
-    <canvas id='espCanvas' class='preview-canvas'></canvas>
-  </div>
+  <div class='preview-panel'><div class='ph'>Preview</div><canvas id='espCanvas' class='preview-canvas'></canvas></div>
 </div>
 </div>
 
 <script>
-const PREVIEW_IMG_URL = 'https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png?ex=6a3dcbea&is=6a3c7a6a&hm=95ab23192fdc65d73e612fadc773aac107802e9a93602097a289073aabc498b2&=&format=webp&quality=lossless&width=800&height=968';
 const SUPA_URL = 'https://gkzxuerurfedfwuxhimf.supabase.co';
 const SUPA_KEY = 'sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6';
 const TABLE = 'n3sk';
 
-// Leitura de URL (Para QR do Celular)
-function getParam(name) {
-    const regex = new RegExp('[?&]' + name + '=([^&#]*)');
-    const results = regex.exec(window.location.href);
-    return results ? decodeURIComponent(results[1]) : null;
+// GERA FINGERPRINT ÚNICO DO NAVEGADOR/PC
+async function generateFingerprint() {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl');
+    const vendor = gl ? gl.getParameter(gl.VENDOR) : 'unknown';
+    const renderer = gl ? gl.getParameter(gl.RENDERER) : 'unknown';
+    const screen = `${screen.width}x${screen.height}`;
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const raw = `${vendor}|${renderer}|${screen}|${tz}|${navigator.language}`;
+    
+    // Hash simples para criar ID curto
+    let hash = 0;
+    for (let i = 0; i < raw.length; i++) {
+        const char = raw.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash |= 0;
+    }
+    return 'FP-' + Math.abs(hash).toString(16).toUpperCase().padStart(8, '0');
 }
 
-let SESSION_ID = getParam('id');
-let SESSION_TOKEN = getParam('token');
-let IS_MOBILE_DEVICE = /Mobi|Android/i.test(navigator.userAgent);
+let DEVICE_FP = '';
+let SESSION_ID = null;
+let SESSION_TOKEN = null;
+let currentState = null;
+let isConnected = false;
 
 const statusEl = document.getElementById('status-msg');
 const detailEl = document.getElementById('status-detail');
-function updateStatus(msg, sub = '') { 
+function updateStatus(msg, sub='') { 
     if(statusEl) statusEl.innerText = msg; 
-    if(detailEl) detailEl.innerText = sub;
-    console.log(msg, sub);
+    if(detailEl) detailEl.innerText = sub; 
 }
 
-// --- LÓGICA DE CURSOR E PREVIEW ---
-var cur=document.getElementById('cur');
-var mx=innerWidth/2,my=innerHeight/2,cx=mx,cy=my;
-document.addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY});
-document.addEventListener('mousedown',function(){if(cur)cur.classList.add('ck')});
-document.addEventListener('mouseup',function(){if(cur)cur.classList.remove('ck')});
-(function loop(){cx+=(mx-cx)*.13;cy+=(my-cy)*.13;if(cur){cur.style.left=cx+'px';cur.style.top=cy+'px';}requestAnimationFrame(loop)})();
+// Verifica se veio via QR Code (celular)
+const urlParams = new URLSearchParams(window.location.search);
+const qrId = urlParams.get('id');
+const qrToken = urlParams.get('token');
+const qrFp = urlParams.get('fp');
 
-var canvas = document.getElementById('espCanvas');
-var ctx = canvas.getContext('2d', { alpha: false });
-var canvasWidth = 0, canvasHeight = 0, renderScheduled = false, bgImage = null;
-var hpAnimTime = 0; var boxOpacity = 0; var targetBoxOpacity = 0;
-
-if (PREVIEW_IMG_URL && PREVIEW_IMG_URL.length > 5) {
-    bgImage = new Image(); bgImage.crossOrigin = "Anonymous"; bgImage.src = PREVIEW_IMG_URL;
-    bgImage.onload = function() { scheduleRender(); };
+if (qrId && qrToken) {
+    SESSION_ID = qrId;
+    SESSION_TOKEN = qrToken;
+    DEVICE_FP = qrFp || ''; // Celular usa FP do QR
 }
 
-function resizeCanvas() {
-  var rect = canvas.parentElement.getBoundingClientRect();
-  var nw = rect.width, nh = rect.height - 35; 
-  var dpr = window.devicePixelRatio || 1;
-  if (canvasWidth !== nw || canvasHeight !== nh) { 
-      canvas.width = nw * dpr; canvas.height = nh * dpr; 
-      canvas.style.width = nw + 'px'; canvas.style.height = nh + 'px';
-      ctx.scale(dpr, dpr); canvasWidth = nw; canvasHeight = nh; scheduleRender(); 
-  }
-}
-window.addEventListener('resize', resizeCanvas);
-function scheduleRender() { if (!renderScheduled) { renderScheduled = true; requestAnimationFrame(renderPreview); } }
-function lerp(start, end, t) { return start * (1 - t) + end * t; }
+// CURSOR E PREVIEW (Mantidos)
+var cur=document.getElementById('cur'),mx=innerWidth/2,my=innerHeight/2,cx=mx,cy=my;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
+document.addEventListener('mousedown',()=>cur&&cur.classList.add('ck'));
+document.addEventListener('mouseup',()=>cur&&cur.classList.remove('ck'));
+(function loop(){cx+=(mx-cx)*.13;cy+=(my-cy)*.13;if(cur){cur.style.left=cx+'px';cur.style.top=cy+'px'}requestAnimationFrame(loop)})();
 
-function renderPreview() {
-  renderScheduled = false;
-  if (!canvasWidth || !canvasHeight) return;
-  ctx.save();
-  ctx.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0);
-  ctx.fillStyle = '#050505'; ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-  
-  if (bgImage && bgImage.complete && bgImage.naturalWidth > 0) {
-      var s = Math.min(canvasWidth / bgImage.width, canvasHeight / bgImage.height);
-      var w = bgImage.width * s, h = bgImage.height * s;
-      ctx.drawImage(bgImage, (canvasWidth - w)/2, (canvasHeight - h)/2, w, h);
-  }
-  
-  var isBox = document.getElementById('tgl-box').classList.contains('on');
-  var isHp = document.getElementById('tgl-healthbar').classList.contains('on');
-  
-  function getSvgColor(id) {
-      var el = document.getElementById(id);
-      var rect = el.querySelector('rect');
-      return rect ? rect.getAttribute('fill') : '#ffffff';
-  }
-  
-  var bC = getSvgColor('sw-boxcolor');
-  var hC = getSvgColor('sw-healthbarcolor');
-  
-  var bH = canvasHeight * 0.75, bW = bH * 0.45;
-  var bX = (canvasWidth - bW) / 2, bY = (canvasHeight - bH) / 2 + 20;
-  
-  targetBoxOpacity = isBox ? 1 : 0;
-  boxOpacity = lerp(boxOpacity, targetBoxOpacity, 0.05);
-  
-  if (boxOpacity > 0.01) {
-    ctx.globalAlpha = boxOpacity;
-    ctx.strokeStyle = bC; ctx.lineWidth = 2; var l = bW * 0.25;
-    ctx.beginPath(); ctx.moveTo(bX, bY + l); ctx.lineTo(bX, bY); ctx.lineTo(bX + l, bY); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(bX + bW - l, bY); ctx.lineTo(bX + bW, bY); ctx.lineTo(bX + bW, bY + l); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(bX, bY + bH - l); ctx.lineTo(bX, bY + bH); ctx.lineTo(bX + l, bY + bH); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(bX + bW - l, bY + bH); ctx.lineTo(bX + bW, bY + bH); ctx.lineTo(bX + bW, bY + bH - l); ctx.stroke();
-    ctx.globalAlpha = 1.0;
-  }
-  
-  if (isHp) {
-    var bw = 6, bx = bX - 12; 
-    hpAnimTime += 0.05; 
-    var pulse = 0.5 + 0.5 * Math.sin(hpAnimTime * 2 * Math.PI * 0.3);
-    var currentHpHeight = bH * pulse;
-    ctx.fillStyle = 'rgba(15,15,15,0.8)'; ctx.fillRect(bx, bY, bw, bH);
-    ctx.fillStyle = hC; ctx.fillRect(bx, bY + (bH - currentHpHeight), bw, currentHpHeight);
-  }
-  ctx.restore();
-  if (Math.abs(boxOpacity - targetBoxOpacity) > 0.01 || isHp) scheduleRender();
-}
+var canvas=document.getElementById('espCanvas'),ctx=canvas.getContext('2d',{alpha:false}),canvasWidth=0,canvasHeight=0,renderScheduled=false,bgImage=null,hpAnimTime=0,boxOpacity=0,targetBoxOpacity=0;
+const PREVIEW_IMG_URL='https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png?ex=6a3dcbea&is=6a3c7a6a&hm=95ab23192fdc65d73e612fadc773aac107802e9a93602097a289073aabc498b2&=&format=webp&quality=lossless&width=800&height=968';
+if(PREVIEW_IMG_URL){bgImage=new Image();bgImage.crossOrigin="Anonymous";bgImage.src=PREVIEW_IMG_URL;bgImage.onload=()=>scheduleRender()}
+function resizeCanvas(){var r=canvas.parentElement.getBoundingClientRect(),nw=r.width,nh=r.height-35,dpr=window.devicePixelRatio||1;if(canvasWidth!==nw||canvasHeight!==nh){canvas.width=nw*dpr;canvas.height=nh*dpr;canvas.style.width=nw+'px';canvas.style.height=nh+'px';ctx.scale(dpr,dpr);canvasWidth=nw;canvasHeight=nh;scheduleRender()}}
+window.addEventListener('resize',resizeCanvas);
+function scheduleRender(){if(!renderScheduled){renderScheduled=true;requestAnimationFrame(renderPreview)}}
+function lerp(a,b,t){return a*(1-t)+b*t}
+function renderPreview(){renderScheduled=false;if(!canvasWidth||!canvasHeight)return;ctx.save();ctx.setTransform(window.devicePixelRatio||1,0,0,window.devicePixelRatio||1,0,0);ctx.fillStyle='#050505';ctx.fillRect(0,0,canvasWidth,canvasHeight);if(bgImage&&bgImage.complete){var s=Math.min(canvasWidth/bgImage.width,canvasHeight/bgImage.height),w=bgImage.width*s,h=bgImage.height*s;ctx.drawImage(bgImage,(canvasWidth-w)/2,(canvasHeight-h)/2,w,h)}var isBox=document.getElementById('tgl-box').classList.contains('on'),isHp=document.getElementById('tgl-healthbar').classList.contains('on');function gc(id){var e=document.getElementById(id),r=e.querySelector('rect');return r?r.getAttribute('fill'):'#fff'}var bC=gc('sw-boxcolor'),hC=gc('sw-healthbarcolor'),bH=canvasHeight*.75,bW=bH*.45,bX=(canvasWidth-bW)/2,bY=(canvasHeight-bH)/2+20;targetBoxOpacity=isBox?1:0;boxOpacity=lerp(boxOpacity,targetBoxOpacity,.05);if(boxOpacity>.01){ctx.globalAlpha=boxOpacity;ctx.strokeStyle=bC;ctx.lineWidth=2;var l=bW*.25;ctx.beginPath();ctx.moveTo(bX,bY+l);ctx.lineTo(bX,bY);ctx.lineTo(bX+l,bY);ctx.stroke();ctx.beginPath();ctx.moveTo(bX+bW-l,bY);ctx.lineTo(bX+bW,bY);ctx.lineTo(bX+bW,bY+l);ctx.stroke();ctx.beginPath();ctx.moveTo(bX,bY+bH-l);ctx.lineTo(bX,bY+bH);ctx.lineTo(bX+l,bY+bH);ctx.stroke();ctx.beginPath();ctx.moveTo(bX+bW-l,bY+bH);ctx.lineTo(bX+bW,bY+bH);ctx.lineTo(bX+bW,bY+bH-l);ctx.stroke();ctx.globalAlpha=1}if(isHp){var bw=6,bx=bX-12;hpAnimTime+=.05;var p=.5+.5*Math.sin(hpAnimTime*2*Math.PI*.3),ch=bH*p;ctx.fillStyle='rgba(15,15,15,.8)';ctx.fillRect(bx,bY,bw,bH);ctx.fillStyle=hC;ctx.fillRect(bx,bY+(bH-ch),bw,ch)}ctx.restore();if(Math.abs(boxOpacity-targetBoxOpacity)>.01||isHp)scheduleRender()}
 
-// --- COLOR PICKER LOGIC ---
-var cpTarget=null,cpH=0,cpS=1,cpV=1,cpA=1;
-var svTX=1,svTY=0,svCX=1,svCY=0;
-var hTY=0,hCY=0,aCY=0; 
-var animRun=false;
-var cpOl=document.getElementById('cpOl'), cpBox=document.getElementById('cpBox');
-var svEl=document.getElementById('sv'), svTh=document.getElementById('svTh');
-var hueTr=document.getElementById('hueTr'), hueTh=document.getElementById('hueTh');
-var aTr=document.getElementById('aTr'), aGr=document.getElementById('aGr'), aTh=document.getElementById('aTh');
-
-function h2r(h,s,v){
-  var r,g,b,i=Math.floor(h*6),f=h*6-i,p=v*(1-s),q=v*(1-f*s),t=v*(1-(1-f)*s);
-  switch(i%6){case 0:r=v;g=t;b=p;break;case 1:r=q;g=v;b=p;break;case 2:r=p;g=v;b=t;break;case 3:r=p;g=q;b=v;break;case 4:r=t;g=p;b=v;break;case 5:r=v;g=p;b=q;break;}
-  return[Math.round(r*255),Math.round(g*255),Math.round(b*255)];
-}
+// COLOR PICKER (Mantido)
+var cpTarget=null,cpH=0,cpS=1,cpV=1,cpA=1,svTX=1,svTY=0,svCX=1,svCY=0,hTY=0,hCY=0,aCY=0,animRun=false;
+var cpOl=document.getElementById('cpOl'),cpBox=document.getElementById('cpBox'),svEl=document.getElementById('sv'),svTh=document.getElementById('svTh'),hueTr=document.getElementById('hueTr'),hueTh=document.getElementById('hueTh'),aTr=document.getElementById('aTr'),aGr=document.getElementById('aGr'),aTh=document.getElementById('aTh');
+function h2r(h,s,v){var r,g,b,i=Math.floor(h*6),f=h*6-i,p=v*(1-s),q=v*(1-f*s),t=v*(1-(1-f)*s);switch(i%6){case 0:r=v;g=t;b=p;break;case 1:r=q;g=v;b=p;break;case 2:r=p;g=v;b=t;break;case 3:r=p;g=q;b=v;break;case 4:r=t;g=p;b=v;break;case 5:r=v;g=p;b=q;break}return[Math.round(r*255),Math.round(g*255),Math.round(b*255)]}
 function r2h(r,g,b){return'#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('')}
-function hex2hsv(hex){
-  var r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255;
-  var mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn,h,s=mx===0?0:d/mx,v=mx;
-  if(d===0)h=0;else if(mx===r)h=((g-b)/d)%6;else if(mx===g)h=(b-r)/d+2;else h=(r-g)/d+4;
-  return[h/6,s,v];
-}
+function hex2hsv(hex){var r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn,h,s=mx===0?0:d/mx,v=mx;if(d===0)h=0;else if(mx===r)h=((g-b)/d)%6;else if(mx===g)h=(b-r)/d+2;else h=(r-g)/d+4;return[h/6,s,v]}
+function runAnim(){var sp=.28;svCX=lerp(svCX,svTX,sp);svCY=lerp(svCY,svTY,sp);hCY=lerp(hCY,hTY,sp);svTh.style.left=(svCX*100)+'%';svTh.style.top=(svCY*100)+'%';var hH=hueTr.getBoundingClientRect().height||152,aH=aTr.getBoundingClientRect().height||152;hueTh.style.top=(hCY*hH)+'px';aTh.style.top=(aCY*aH)+'px';if(Math.abs(svCX-svTX)>.0005||Math.abs(svCY-svTY)>.0005||Math.abs(hCY-hTY)>.0005)requestAnimationFrame(runAnim);else animRun=false}
+function updateCP(){var rgb=h2r(cpH,cpS,cpV),hRgb=h2r(cpH,1,1),hHex=r2h(hRgb[0],hRgb[1],hRgb[2]);svEl.style.background=hHex;svTh.style.background=r2h(rgb[0],rgb[1],rgb[2]);aGr.style.background='linear-gradient(to bottom,'+hHex+',transparent)';hueTh.style.background=hHex;aTh.style.background='rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+','+cpA+')';if(cpTarget){var hex=r2h(rgb[0],rgb[1],rgb[2]);var rect=cpTarget.querySelector('rect');if(rect)rect.setAttribute('fill',hex);scheduleRender()}}
+function openCP(el){cpTarget=el;var rect=el.getBoundingClientRect(),popW=240,popH=190,left=rect.right+10,top=rect.top;if(left+popW>innerWidth)left=rect.left-popW-10;if(top+popH>innerHeight)top=innerHeight-popH-10;if(left<4)left=4;if(top<4)top=4;cpBox.style.left=left+'px';cpBox.style.top=top+'px';var svgRect=el.querySelector('rect'),cc=svgRect?svgRect.getAttribute('fill'):'#ff0000';if(cc){var hsv=hex2hsv(cc);cpH=hsv[0];cpS=hsv[1];cpV=hsv[2];cpA=1}svCX=cpS;svTX=cpS;svCY=1-cpV;svTY=1-cpV;hCY=cpH;hTY=cpH;aCY=1-cpA;updateCP();svTh.style.left=(svCX*100)+'%';svTh.style.top=(svCY*100)+'%';var hH=hueTr.getBoundingClientRect().height||152,aH=aTr.getBoundingClientRect().height||152;hueTh.style.top=(hCY*hH)+'px';aTh.style.top=(aCY*aH)+'px';cpOl.classList.add('open')}
+cpOl.addEventListener('mousedown',e=>{if(e.target===cpOl){cpOl.classList.remove('open');if(cpTarget)sendFinalColor()}});
+cpOl.addEventListener('touchstart',e=>{if(e.target===cpOl){cpOl.classList.remove('open');if(cpTarget)sendFinalColor()}},{passive:true});
+function sendFinalColor(){if(!cpTarget)return;var rgb=h2r(cpH,cpS,cpV),hex=r2h(rgb[0],rgb[1],rgb[2]);sendColor(cpTarget,hex);sendAlpha(cpTarget,cpA)}
 
-function runAnim(){
-  var sp=0.28;
-  svCX=lerp(svCX,svTX,sp);svCY=lerp(svCY,svTY,sp);
-  hCY=lerp(hCY,hTY,sp);
-  svTh.style.left=(svCX*100)+'%';svTh.style.top=(svCY*100)+'%';
-  var hH=hueTr.getBoundingClientRect().height||152;
-  var aH=aTr.getBoundingClientRect().height||152;
-  hueTh.style.top=(hCY*hH)+'px';
-  aTh.style.top=(aCY*aH)+'px';
-  if(Math.abs(svCX-svTX)>.0005||Math.abs(svCY-svTY)>.0005||Math.abs(hCY-hTY)>.0005)
-    requestAnimationFrame(runAnim);
-  else animRun=false;
-}
-function startAnim(){if(!animRun){animRun=true;requestAnimationFrame(runAnim);}}
-
-function updateCP(){
-  var rgb=h2r(cpH,cpS,cpV),hRgb=h2r(cpH,1,1),hHex=r2h(hRgb[0],hRgb[1],hRgb[2]);
-  svEl.style.background=hHex;
-  svTh.style.background=r2h(rgb[0],rgb[1],rgb[2]);
-  aGr.style.background='linear-gradient(to bottom,'+hHex+',transparent)';
-  hueTh.style.background=hHex;
-  aTh.style.background='rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+','+cpA+')';
-  if(cpTarget){
-    var hex=r2h(rgb[0],rgb[1],rgb[2]);
-    var rect = cpTarget.querySelector('rect');
-    if(rect) rect.setAttribute('fill', hex);
-    scheduleRender();
-  }
-}
-
-function openCP(el){
-  cpTarget=el;
-  var rect=el.getBoundingClientRect(),popW=240,popH=190;
-  var left=rect.right+10,top=rect.top;
-  if(left+popW>innerWidth)left=rect.left-popW-10;
-  if(top+popH>innerHeight)top=innerHeight-popH-10;
-  if(left<4)left=4;if(top<4)top=4;
-  cpBox.style.left=left+'px';cpBox.style.top=top+'px';
-  
-  var svgRect = el.querySelector('rect');
-  var currentColor = svgRect ? svgRect.getAttribute('fill') : '#ff0000';
-  
-  if(currentColor){
-      var hsv=hex2hsv(currentColor);
-      cpH=hsv[0];cpS=hsv[1];cpV=hsv[2];cpA=1;
-  }
-  
-  svCX=cpS;svTX=cpS;svCY=1-cpV;svTY=1-cpV;hCY=cpH;hTY=cpH;aCY=1-cpA;
-  updateCP();
-  svTh.style.left=(svCX*100)+'%';svTh.style.top=(svCY*100)+'%';
-  var hH=hueTr.getBoundingClientRect().height||152;
-  var aH=aTr.getBoundingClientRect().height||152;
-  hueTh.style.top=(hCY*hH)+'px';
-  aTh.style.top=(aCY*aH)+'px';
-  cpOl.classList.add('open');
-}
-
-cpOl.addEventListener('mousedown',function(e){
-  if(e.target===cpOl){cpOl.classList.remove('open');if(cpTarget){sendFinalColor();}}
-});
-cpOl.addEventListener('touchstart',function(e){
-  if(e.target===cpOl){cpOl.classList.remove('open');if(cpTarget){sendFinalColor();}}
-},{passive:true});
-
-function sendFinalColor(){
-    if(!cpTarget) return;
-    var rgb=h2r(cpH,cpS,cpV);
-    var hex=r2h(rgb[0],rgb[1],rgb[2]);
-    sendColor(cpTarget, hex);
-    sendAlpha(cpTarget, cpA);
-}
-
-// --- INTEGRAÇÃO COM SUPABASE E AUTO-VINCULAÇÃO ---
-let currentState = null;
-let lastPollTime = 0;
-let isConnected = false;
-
-async function fetchState(targetId) {
-    if (!targetId) return null;
+// INTEGRAÇÃO SUPABASE COM VALIDAÇÃO DE FINGERPRINT
+async function fetchSession() {
+    if (!SESSION_ID) return null;
     try {
-        const res = await fetch(`${SUPA_URL}/rest/v1/${TABLE}?id=eq.${targetId}&select=state,token`, {
+        const res = await fetch(`${SUPA_URL}/rest/v1/${TABLE}?id=eq.${SESSION_ID}&select=state,token,device_fingerprint`, {
             headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}` }
         });
         if (!res.ok) return null;
@@ -374,146 +215,138 @@ async function fetchState(targetId) {
     } catch(e) { return null; }
 }
 
+async function registerDevice(id, token, fp) {
+    await fetch(`${SUPA_URL}/rest/v1/${TABLE}`, {
+        method: 'POST',
+        headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
+        body: JSON.stringify({ id, token, device_fingerprint: fp, state: {} })
+    });
+}
+
 async function updateState(newState) {
     if (!SESSION_ID) return;
     await fetch(`${SUPA_URL}/rest/v1/${TABLE}`, {
         method: 'POST',
-        headers: { 
-            'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}`,
-            'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates'
-        },
+        headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
         body: JSON.stringify({ id: SESSION_ID, token: SESSION_TOKEN, state: newState })
     });
 }
 
 function applyState(d) {
-    if (!d || !d.state) return;
-    
+    if (!d) return;
     if (!isConnected) {
         isConnected = true;
-        updateStatus("Conectado!", `Token: ${SESSION_ID}`);
+        updateStatus("CONECTADO", `Hardware Validado: ${DEVICE_FP}`);
         document.getElementById('waiting-screen').style.opacity = '0';
-        setTimeout(() => {
-            document.getElementById('waiting-screen').style.display = 'none';
-            document.getElementById('app').style.display = 'block';
-        }, 500);
+        setTimeout(() => { document.getElementById('waiting-screen').style.display = 'none'; document.getElementById('app').style.display = 'block'; }, 500);
     }
-
-    setConn(true);
-    currentState = d.state; 
+    document.getElementById('dot').classList.add('on');
+    document.getElementById('txt').classList.add('on');
+    document.getElementById('txt').textContent = 'CONECTADO';
+    currentState = d.state || d;
     
     var tm={box:'tgl-box',skeleton:'tgl-skeleton',snapline:'tgl-snapline',healthbar:'tgl-healthbar'};
-    for(var k in tm){var el=document.getElementById(tm[k]);if(el)el.classList.toggle('on',!!currentState.toggles?.[k]);}
+    for(var k in tm){var el=document.getElementById(tm[k]);if(el)el.classList.toggle('on',!!currentState.toggles?.[k])}
     var cm={boxcolor:'sw-boxcolor',skeletoncolor:'sw-skeletoncolor',snaplinecolor:'sw-snaplinecolor',healthbarcolor:'sw-healthbarcolor'};
-    for(var k in cm){
-        var el=document.getElementById(cm[k]);
-        if(el&&currentState.colors?.[k]){ 
-            var rect = el.querySelector('rect');
-            if(rect) rect.setAttribute('fill', currentState.colors[k]);
-        }
-    }
-    if(currentState.alphas) {
-        if(currentState.alphas.boxalpha !== undefined) cpA = currentState.alphas.boxalpha;
-        aCY = 1 - cpA;
-        var aH=aTr.getBoundingClientRect().height||152;
-        aTh.style.top=(aCY*aH)+'px';
-    }
+    for(var k in cm){var el=document.getElementById(cm[k]);if(el&&currentState.colors?.[k]){var rect=el.querySelector('rect');if(rect)rect.setAttribute('fill',currentState.colors[k])}}
+    if(currentState.alphas){if(currentState.alphas.boxalpha!==undefined)cpA=currentState.alphas.boxalpha;aCY=1-cpA;var aH=aTr.getBoundingClientRect().height||152;aTh.style.top=(aCY*aH)+'px'}
     scheduleRender();
 }
 
-function setConn(c){
-    var d = document.getElementById('dot');
-    var t = document.getElementById('txt');
-    if(d && t) {
-        if(c){d.classList.add('on');t.classList.add('on');t.textContent='CONECTADO';}
-        else{d.classList.remove('on');t.classList.remove('on');t.textContent='OFFLINE';}
-    }
-}
-
-// POLLING INTELIGENTE COM AUTO-VINCULAÇÃO
-async function poll() {
-    var now = Date.now();
-    const interval = isConnected ? 200 : 1000;
-    if (now - lastPollTime < interval) return;
-    lastPollTime = now;
-    
-    // Se já tem ID (via QR ou localStorage), tenta conectar direto
-    if (SESSION_ID) {
-        const data = await fetchState(SESSION_ID);
-        if (data && data.state) {
-            applyState(data);
+// LOOP PRINCIPAL DE AUTO-CONEXÃO POR HARDWARE
+async function init() {
+    // Se veio via QR (celular), tenta conectar direto
+    if (SESSION_ID && SESSION_TOKEN) {
+        updateStatus("Validando dispositivo móvel...", DEVICE_FP);
+        const session = await fetchSession();
+        if (session && session.device_fingerprint === DEVICE_FP) {
+            applyState(session);
+            setInterval(poll, 200);
+            return;
+        } else if (session && !session.device_fingerprint) {
+            // Sessão nova sem FP ainda, registra o do celular
+            await registerDevice(SESSION_ID, SESSION_TOKEN, DEVICE_FP);
+            applyState(session);
+            setInterval(poll, 200);
+            return;
         } else {
-            // PC Desligou ou Sessão Deletada
-            if(isConnected) {
-                isConnected = false;
-                document.getElementById('app').style.display = 'none';
-                document.getElementById('waiting-screen').style.display = 'flex';
-                document.getElementById('waiting-screen').style.opacity = '1';
-                updateStatus("PC Offline", "A sessão foi encerrada. Reinicie o Loader.");
-                SESSION_ID = null;
-                localStorage.removeItem('n3sk_session_id');
-                localStorage.removeItem('n3sk_session_token');
+            updateStatus("ACESSO NEGADO", "Este token não pertence a este dispositivo.");
+            return;
+        }
+    }
+
+    // Se é PC: Gera fingerprint e busca sessão ativa compatível
+    DEVICE_FP = await generateFingerprint();
+    updateStatus("Buscando Loader neste PC...", `Fingerprint: ${DEVICE_FP}`);
+
+    // Busca todas as sessões ativas recentes (última criada pelo C#)
+    try {
+        const res = await fetch(`${SUPA_URL}/rest/v1/${TABLE}?select=id,token,device_fingerprint,state&order=created_at.desc&limit=1`, {
+            headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}` }
+        });
+        const sessions = await res.json();
+        
+        if (sessions.length > 0) {
+            const s = sessions[0];
+            // Se a sessão não tem FP ou tem o mesmo FP deste PC, conecta
+            if (!s.device_fingerprint || s.device_fingerprint === DEVICE_FP) {
+                SESSION_ID = s.id;
+                SESSION_TOKEN = s.token;
+                
+                // Registra o fingerprint deste PC na sessão
+                if (!s.device_fingerprint) {
+                    await registerDevice(SESSION_ID, SESSION_TOKEN, DEVICE_FP);
+                }
+                
+                applyState(s);
+                setInterval(poll, 200);
+                return;
             } else {
-                updateStatus("Buscando PC...", `Token: ${SESSION_ID}`);
+                updateStatus("Loader encontrado mas vinculado a outro PC", `Esperando Loader neste dispositivo...`);
             }
         }
+    } catch(e) {}
+
+    // Nenhuma sessão compatível encontrada, continua buscando
+    setTimeout(init, 2000);
+}
+
+async function poll() {
+    if (!SESSION_ID) return;
+    const session = await fetchSession();
+    if (!session) {
+        // Sessão deletada (C# fechou)
+        isConnected = false;
+        document.getElementById('app').style.display = 'none';
+        document.getElementById('waiting-screen').style.display = 'flex';
+        document.getElementById('waiting-screen').style.opacity = '1';
+        document.getElementById('dot').classList.remove('on');
+        document.getElementById('txt').classList.remove('on');
+        document.getElementById('txt').textContent = 'OFFLINE';
+        updateStatus("PC DESCONECTADO", "O Loader foi fechado. Reinicie para reconectar.");
+        SESSION_ID = null;
+        setTimeout(init, 3000);
         return;
     }
-
-    // SE NÃO TEM ID E É MOBILE: Fica esperando QR
-    if (IS_MOBILE_DEVICE) {
-        updateStatus("Aguardando QR Code", "Escaneie o QR gerado dentro do painel no PC.");
-        return;
-    }
-
-    // SE É PC: Tenta Auto-Vinculação buscando sessão ativa recente
-    // Nota: Como não temos Master Session global, o PC precisa ter escaneado uma vez 
-    // ou o C# precisa salvar um registro temporário de "último device".
-    // Para simplificar: O PC também deve escanear o QR do C# na primeira vez.
-    updateStatus("Aguardando Token...", "Escaneie o QR Code gerado pelo Loader C# ou use o botão no painel.");
+    applyState(session);
 }
 
-function tg(el){
-    if (!currentState) return;
-    el.classList.toggle('on'); scheduleRender();
-    const key = el.dataset.k;
-    currentState.toggles[key] = el.classList.contains('on');
-    updateState(currentState);
-}
+function tg(el){if(!currentState)return;el.classList.toggle('on');scheduleRender();currentState.toggles[el.dataset.k]=el.classList.contains('on');updateState(currentState)}
+function sendColor(el,hex){if(!currentState)return;currentState.colors[el.dataset.k]=hex;updateState(currentState)}
+function sendAlpha(el,val){if(!currentState)return;const ak=el.dataset.k.replace('color','alpha');currentState.alphas[ak]=parseFloat(val.toFixed(4));updateState(currentState)}
 
-function sendColor(el, hex){
-    if (!currentState) return;
-    currentState.colors[el.dataset.k] = hex;
-    updateState(currentState);
-}
-
-function sendAlpha(el, val){
-    if (!currentState) return;
-    const alphaKey = el.dataset.k.replace('color', 'alpha');
-    currentState.alphas[alphaKey] = parseFloat(val.toFixed(4));
-    updateState(currentState);
-}
-
-// --- FUNÇÕES DO MODAL QR CODE ---
-function openQR() {
-    if (!SESSION_ID) {
-        alert("Conecte-se a um PC primeiro para gerar o QR Code.");
-        return;
-    }
-    const url = `${window.location.origin}${window.location.pathname}?id=${SESSION_ID}&token=${SESSION_TOKEN}`;
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
-    document.getElementById('qrImage').src = qrUrl;
+// MODAL QR
+function openQR(){
+    if(!SESSION_ID){alert("Conecte o Loader primeiro.");return}
+    const url=`${location.origin}${location.pathname}?id=${SESSION_ID}&token=${SESSION_TOKEN}&fp=${DEVICE_FP}`;
+    document.getElementById('qrImage').src=`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
     document.getElementById('qrModal').classList.add('active');
 }
+function closeQR(){document.getElementById('qrModal').classList.remove('active')}
 
-function closeQR() {
-    document.getElementById('qrModal').classList.remove('active');
-}
-
-// Inicia Polling
-setInterval(poll, 1000);
-poll(); // Executa imediatamente
-resizeCanvas(); scheduleRender();
+// Inicia
+init();
+resizeCanvas();scheduleRender();
 </script>
 </body>
 </html>
