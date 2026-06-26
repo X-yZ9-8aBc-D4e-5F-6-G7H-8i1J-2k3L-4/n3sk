@@ -12,7 +12,7 @@ body{background:#0a0a0a;color:#e0e0e0;font-family:sans-serif;height:100vh;displa
 @keyframes spin{to{transform:rotate(360deg)}}
 .wait-text{font-size:14px;letter-spacing:2px;text-transform:uppercase;color:#888;margin-bottom:8px}
 .wait-sub{font-size:11px;color:#555}
-#app{display:none;width:100%;height:100%;padding:20px}
+#app{display:none;width:100%;height:100%;padding:20px;text-align:center}
 .token-display{background:#111;border:1px solid #333;padding:8px 16px;border-radius:4px;font-family:monospace;font-size:14px;color:#c73030;margin-top:10px;display:inline-block}
 </style>
 </head>
@@ -21,14 +21,14 @@ body{background:#0a0a0a;color:#e0e0e0;font-family:sans-serif;height:100vh;displa
 <div id="waiting">
     <div class="loader"></div>
     <p class="wait-text" id="status">BUSCANDO SESSÃO...</p>
-    <p class="wait-sub" id="sub">Inicie o Loader C# neste PC para conectar automaticamente.</p>
+    <p class="wait-sub" id="sub">Inicie o Loader C# neste PC.</p>
 </div>
 
 <div id="app">
     <h2 style="color:#4ade80;margin-bottom:10px">● CONECTADO</h2>
-    <p>Token da Sessão:</p>
+    <p>Sessão Ativa:</p>
     <div class="token-display" id="displayToken">-</div>
-    <p style="margin-top:30px;color:#555;font-size:12px">Interface completa carregada.</p>
+    <p style="margin-top:30px;color:#555;font-size:12px">Controle total ativado.</p>
 </div>
 
 <script>
@@ -36,20 +36,34 @@ const SUPA = 'https://gkzxuerurfedfwuxhimf.supabase.co';
 const KEY = 'sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6';
 const TBL = 'n3sk';
 
-// Gera DeviceID único e persistente para este navegador
-function getDeviceId() {
-    const raw = navigator.userAgent + screen.width + screen.height + navigator.language + navigator.platform;
-    let h = 0;
-    for (let i = 0; i < raw.length; i++) { h = ((h << 5) - h) + raw.charCodeAt(i); h |= 0; }
-    return 'DEV-' + Math.abs(h).toString(16).toUpperCase().padStart(8, '0');
+// Gera DeviceID robusto via Canvas Fingerprinting
+async function getDeviceId() {
+    try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.textBaseline = "top";
+        ctx.font = "14px 'Arial'";
+        ctx.fillText("n3sk-fingerprint-" + navigator.userAgent, 2, 2);
+        const dataUrl = canvas.toDataURL();
+        
+        let hash = 0;
+        for (let i = 0; i < dataUrl.length; i++) {
+            const char = dataUrl.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash |= 0;
+        }
+        return 'DEV-' + Math.abs(hash).toString(16).toUpperCase().padStart(8, '0');
+    } catch(e) {
+        // Fallback se canvas falhar
+        return 'DEV-FALLBACK-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    }
 }
 
-const DEVICE_ID = getDeviceId();
+let DEVICE_ID = '';
 let LINKED_TOKEN = localStorage.getItem('n3sk_linked_token');
 let CONNECTED = false;
 
 async function fetchActiveSession() {
-    // Busca a sessão ativa mais recente
     const res = await fetch(`${SUPA}/rest/v1/${TBL}?is_active=eq.true&order=created_at.desc&limit=1&select=id,token,device_id,state,is_active`, {
         headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` }
     });
@@ -84,15 +98,16 @@ function connect(session) {
 }
 
 async function init() {
-    // PRIORIDADE 1: Se tem token salvo no LocalStorage, verifica ELE primeiro
+    DEVICE_ID = await getDeviceId();
+    
+    // PRIORIDADE 1: Verifica token salvo no LocalStorage
     if (LINKED_TOKEN) {
-        document.getElementById('status').textContent = 'VERIFICANDO SESSÃO SALVA...';
+        document.getElementById('status').textContent = 'VERIFICANDO SESSÃO...';
         const session = await fetchSpecificSession(LINKED_TOKEN);
         
         if (session && session.is_active) {
-            // Validação de DeviceID: só conecta se bater ou se ainda não foi vinculado
-            if (!session.device_id || session.device_id === DEVICE_ID) {
-                if (!session.device_id) await bindDevice(LINKED_TOKEN);
+            // SEGURANÇA CRÍTICA: Só conecta se device_id bater EXATAMENTE
+            if (session.device_id === DEVICE_ID) {
                 connect(session);
                 startPolling(LINKED_TOKEN);
                 return;
@@ -100,36 +115,34 @@ async function init() {
                 // Token pertence a outro dispositivo
                 localStorage.removeItem('n3sk_linked_token');
                 LINKED_TOKEN = null;
-                document.getElementById('status').textContent = 'TOKEN INVÁLIDO';
-                document.getElementById('sub').textContent = 'Este token está vinculado a outro PC.';
+                document.getElementById('status').textContent = 'ACESSO NEGADO';
+                document.getElementById('sub').textContent = 'Esta sessão pertence a outro dispositivo.';
             }
         } else {
-            // Sessão deletada (C# fechou)
+            // Sessão deletada
             localStorage.removeItem('n3sk_linked_token');
             LINKED_TOKEN = null;
             document.getElementById('status').textContent = 'LOADER FECHADO';
-            document.getElementById('sub').textContent = 'Reinicie o C# para gerar novo token.';
+            document.getElementById('sub').textContent = 'Reinicie o C# para nova sessão.';
         }
     }
 
-    // PRIORIDADE 2: Sem token salvo, busca sessão ativa para auto-vinculação
-    document.getElementById('status').textContent = 'BUSCANDO LOADER...';
+    // PRIORIDADE 2: Busca sessão ativa PARA VINCULAÇÃO INICIAL
+    // SÓ conecta se device_id for NULL (sessão virgem)
+    document.getElementById('status').textContent = 'AGUARDANDO LOADER...';
     const active = await fetchActiveSession();
     
-    if (active) {
-        // Só auto-conecta se device_id for null (nunca foi vinculado) ou bater com este PC
-        if (!active.device_id || active.device_id === DEVICE_ID) {
-            if (!active.device_id) await bindDevice(active.id);
-            localStorage.setItem('n3sk_linked_token', active.id);
-            LINKED_TOKEN = active.id;
-            connect(active);
-            startPolling(active.id);
-            return;
-        }
-        // Se device_id existe e é diferente, ignora (pertence a outro PC)
+    if (active && active.device_id === null) {
+        // Primeira conexão: vincula este dispositivo
+        await bindDevice(active.id);
+        localStorage.setItem('n3sk_linked_token', active.id);
+        LINKED_TOKEN = active.id;
+        connect(active);
+        startPolling(active.id);
+        return;
     }
-
-    // Nenhuma sessão válida encontrada, tenta novamente em 2s
+    
+    // Se active.device_id existe e é diferente, IGNORA COMPLETAMENTE
     setTimeout(init, 2000);
 }
 
@@ -137,18 +150,16 @@ async function startPolling(token) {
     setInterval(async () => {
         const session = await fetchSpecificSession(token);
         if (!session || !session.is_active) {
-            // C# fechou ou sessão deletada
             CONNECTED = false;
             localStorage.removeItem('n3sk_linked_token');
             LINKED_TOKEN = null;
             document.getElementById('app').style.display = 'none';
             document.getElementById('waiting').style.display = 'block';
             document.getElementById('status').textContent = 'PC OFFLINE';
-            document.getElementById('sub').textContent = 'O Loader foi fechado.';
+            document.getElementById('sub').textContent = 'Loader fechado.';
             setTimeout(init, 3000);
             return;
         }
-        // Mantém conectado
     }, 500);
 }
 
