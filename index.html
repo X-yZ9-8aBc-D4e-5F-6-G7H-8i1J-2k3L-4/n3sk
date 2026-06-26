@@ -10,27 +10,25 @@ body{background:#0a0a0a;color:#e0e0e0;font-family:sans-serif;height:100vh;displa
 #waiting{text-align:center}
 .loader{width:40px;height:40px;border:3px solid #333;border-top-color:#c73030;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 15px}
 @keyframes spin{to{transform:rotate(360deg)}}
+.wait-text{font-size:14px;letter-spacing:2px;text-transform:uppercase;color:#888;margin-bottom:8px}
+.wait-sub{font-size:11px;color:#555}
 #app{display:none;width:100%;height:100%;padding:20px}
-input{background:#111;border:1px solid #333;color:#fff;padding:8px 12px;border-radius:4px;width:200px;text-align:center;font-size:14px;margin-top:10px}
-button{background:#c73030;color:#fff;border:none;padding:8px 20px;border-radius:4px;cursor:pointer;margin-left:8px}
+.token-display{background:#111;border:1px solid #333;padding:8px 16px;border-radius:4px;font-family:monospace;font-size:14px;color:#c73030;margin-top:10px;display:inline-block}
 </style>
 </head>
 <body>
 
 <div id="waiting">
     <div class="loader"></div>
-    <p id="status">Aguardando Loader...</p>
-    <p style="font-size:11px;color:#666;margin-top:8px" id="sub">Cole o token gerado pelo C# abaixo:</p>
-    <div style="margin-top:12px">
-        <input type="text" id="tokenInput" placeholder="Cole o token aqui..." maxlength="20">
-        <button onclick="linkToken()">VINCULAR</button>
-    </div>
+    <p class="wait-text" id="status">BUSCANDO SESSÃO...</p>
+    <p class="wait-sub" id="sub">Inicie o Loader C# neste PC para conectar automaticamente.</p>
 </div>
 
 <div id="app">
-    <h2>CONECTADO</h2>
-    <p>Token: <span id="displayToken"></span></p>
-    <p style="margin-top:20px;color:#666">Interface completa aqui...</p>
+    <h2 style="color:#4ade80;margin-bottom:10px">● CONECTADO</h2>
+    <p>Token da Sessão:</p>
+    <div class="token-display" id="displayToken">-</div>
+    <p style="margin-top:30px;color:#555;font-size:12px">Interface completa carregada.</p>
 </div>
 
 <script>
@@ -38,20 +36,28 @@ const SUPA = 'https://gkzxuerurfedfwuxhimf.supabase.co';
 const KEY = 'sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6';
 const TBL = 'n3sk';
 
-// Gera DeviceID único baseado no navegador
+// Gera DeviceID único e persistente para este navegador
 function getDeviceId() {
-    const raw = navigator.userAgent + screen.width + screen.height + navigator.language + new Date().getTimezoneOffset();
+    const raw = navigator.userAgent + screen.width + screen.height + navigator.language + navigator.platform;
     let h = 0;
     for (let i = 0; i < raw.length; i++) { h = ((h << 5) - h) + raw.charCodeAt(i); h |= 0; }
-    return 'DEV-' + Math.abs(h).toString(16).toUpperCase();
+    return 'DEV-' + Math.abs(h).toString(16).toUpperCase().padStart(8, '0');
 }
 
 const DEVICE_ID = getDeviceId();
 let LINKED_TOKEN = localStorage.getItem('n3sk_linked_token');
-let SESSION_DATA = null;
 let CONNECTED = false;
 
-async function checkSession(token) {
+async function fetchActiveSession() {
+    // Busca a sessão ativa mais recente
+    const res = await fetch(`${SUPA}/rest/v1/${TBL}?is_active=eq.true&order=created_at.desc&limit=1&select=id,token,device_id,state,is_active`, {
+        headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` }
+    });
+    const data = await res.json();
+    return data.length > 0 ? data[0] : null;
+}
+
+async function fetchSpecificSession(token) {
     const res = await fetch(`${SUPA}/rest/v1/${TBL}?id=eq.${token}&select=id,token,device_id,state,is_active`, {
         headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` }
     });
@@ -75,72 +81,75 @@ function connect(session) {
         document.getElementById('app').style.display = 'block';
         document.getElementById('displayToken').textContent = session.id;
     }
-    SESSION_DATA = session.state;
 }
 
 async function init() {
+    // PRIORIDADE 1: Se tem token salvo no LocalStorage, verifica ELE primeiro
     if (LINKED_TOKEN) {
-        document.getElementById('status').textContent = 'Verificando sessão...';
-        const session = await checkSession(LINKED_TOKEN);
+        document.getElementById('status').textContent = 'VERIFICANDO SESSÃO SALVA...';
+        const session = await fetchSpecificSession(LINKED_TOKEN);
         
         if (session && session.is_active) {
-            // Verifica se device_id bate ou está vazio (primeira vez)
+            // Validação de DeviceID: só conecta se bater ou se ainda não foi vinculado
             if (!session.device_id || session.device_id === DEVICE_ID) {
                 if (!session.device_id) await bindDevice(LINKED_TOKEN);
                 connect(session);
-                setInterval(poll, 500);
+                startPolling(LINKED_TOKEN);
                 return;
             } else {
                 // Token pertence a outro dispositivo
                 localStorage.removeItem('n3sk_linked_token');
                 LINKED_TOKEN = null;
-                document.getElementById('status').textContent = 'Token inválido para este dispositivo.';
+                document.getElementById('status').textContent = 'TOKEN INVÁLIDO';
                 document.getElementById('sub').textContent = 'Este token está vinculado a outro PC.';
             }
         } else {
+            // Sessão deletada (C# fechou)
             localStorage.removeItem('n3sk_linked_token');
             LINKED_TOKEN = null;
-            document.getElementById('status').textContent = 'Loader fechado. Cole o novo token.';
+            document.getElementById('status').textContent = 'LOADER FECHADO';
+            document.getElementById('sub').textContent = 'Reinicie o C# para gerar novo token.';
         }
-    } else {
-        document.getElementById('status').textContent = 'Aguardando Loader...';
     }
+
+    // PRIORIDADE 2: Sem token salvo, busca sessão ativa para auto-vinculação
+    document.getElementById('status').textContent = 'BUSCANDO LOADER...';
+    const active = await fetchActiveSession();
+    
+    if (active) {
+        // Só auto-conecta se device_id for null (nunca foi vinculado) ou bater com este PC
+        if (!active.device_id || active.device_id === DEVICE_ID) {
+            if (!active.device_id) await bindDevice(active.id);
+            localStorage.setItem('n3sk_linked_token', active.id);
+            LINKED_TOKEN = active.id;
+            connect(active);
+            startPolling(active.id);
+            return;
+        }
+        // Se device_id existe e é diferente, ignora (pertence a outro PC)
+    }
+
+    // Nenhuma sessão válida encontrada, tenta novamente em 2s
     setTimeout(init, 2000);
 }
 
-async function poll() {
-    if (!LINKED_TOKEN) return;
-    const session = await checkSession(LINKED_TOKEN);
-    if (!session || !session.is_active) {
-        CONNECTED = false;
-        localStorage.removeItem('n3sk_linked_token');
-        LINKED_TOKEN = null;
-        document.getElementById('app').style.display = 'none';
-        document.getElementById('waiting').style.display = 'block';
-        document.getElementById('status').textContent = 'PC Offline. Cole o novo token.';
-        return;
-    }
-    connect(session);
-}
-
-async function linkToken() {
-    const token = document.getElementById('tokenInput').value.trim().toUpperCase();
-    if (!token) return;
-    
-    const session = await checkSession(token);
-    if (session && session.is_active) {
-        if (session.device_id && session.device_id !== DEVICE_ID) {
-            alert('Este token já está vinculado a outro dispositivo!');
+async function startPolling(token) {
+    setInterval(async () => {
+        const session = await fetchSpecificSession(token);
+        if (!session || !session.is_active) {
+            // C# fechou ou sessão deletada
+            CONNECTED = false;
+            localStorage.removeItem('n3sk_linked_token');
+            LINKED_TOKEN = null;
+            document.getElementById('app').style.display = 'none';
+            document.getElementById('waiting').style.display = 'block';
+            document.getElementById('status').textContent = 'PC OFFLINE';
+            document.getElementById('sub').textContent = 'O Loader foi fechado.';
+            setTimeout(init, 3000);
             return;
         }
-        localStorage.setItem('n3sk_linked_token', token);
-        LINKED_TOKEN = token;
-        await bindDevice(token);
-        connect(session);
-        setInterval(poll, 500);
-    } else {
-        alert('Token inválido ou Loader não está rodando.');
-    }
+        // Mantém conectado
+    }, 500);
 }
 
 init();
