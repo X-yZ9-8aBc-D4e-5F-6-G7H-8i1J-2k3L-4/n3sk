@@ -135,6 +135,7 @@ function getParam(name) {
     return results ? decodeURIComponent(results[1]) : null;
 }
 
+// Tenta pegar da URL (QR Scan) ou do LocalStorage (Reconexão Automática)
 let SESSION_ID = getParam('id') || localStorage.getItem('n3sk_session_id');
 let SESSION_TOKEN = getParam('token') || localStorage.getItem('n3sk_session_token');
 let currentState = null;
@@ -260,26 +261,6 @@ async function init() {
 
     // Sem ID salvo e sem QR: Fica aguardando (segurança máxima)
     updateStatus("Aguardando Loader...", "Inicie o C# neste PC para conectar automaticamente.");
-    
-    // Opcional: Buscar sessão ativa recente para auto-vinculação na PRIMEIRA vez
-    // Descomente as linhas abaixo se quiser que o site conecte sozinho na primeira vez
-    /*
-    try {
-        const res = await fetch(`${SUPA_URL}/rest/v1/${TABLE}?select=id,token,state&order=created_at.desc&limit=1`, {
-            headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}` }
-        });
-        const sessions = await res.json();
-        if (sessions.length > 0) {
-            SESSION_ID = sessions[0].id;
-            SESSION_TOKEN = sessions[0].token;
-            updateStatus("Sessão detectada! Conectando...", SESSION_ID);
-            applyState(sessions[0]);
-            setInterval(poll, 200);
-            return;
-        }
-    } catch(e) {}
-    */
-    
     setTimeout(init, 2000);
 }
 
