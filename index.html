@@ -70,7 +70,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe 
 <div id='waiting-screen'>
     <div class='loader-ring'></div>
     <div class='wait-text' id='status-msg'>INICIALIZANDO...</div>
-    <div class='wait-sub' id='status-detail'>Gerando identidade do dispositivo...</div>
+    <div class='wait-sub' id='status-detail'>Verificando identidade do dispositivo...</div>
 </div>
 <div class='qr-modal' id='qrModal'>
     <div class='qr-content'>
@@ -124,20 +124,15 @@ const SUPA = 'https://gkzxuerurfedfwuxhimf.supabase.co';
 const KEY = 'sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6';
 const TBL = 'n3sk';
 
-// Gera HWID compatível com o C# (SHA256 de UserAgent+Screen+Timezone+Language)
-async function generateHwid() {
-    const raw = navigator.userAgent + screen.width + screen.height + screen.colorDepth + 
-                navigator.language + new Date().getTimezoneOffset() + navigator.platform;
-    const encoder = new TextEncoder();
-    const data = encoder.encode(raw);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
-    return hashHex.substring(0, 16);
-}
+// Lê parâmetros da URL
+const urlParams = new URLSearchParams(window.location.search);
+const URL_ID = urlParams.get('id');
+const URL_TOKEN = urlParams.get('token');
+const URL_HWID = urlParams.get('hwid');
 
-let LOCAL_HWID = '';
+// Recupera dados salvos localmente
 let LINKED_TOKEN = localStorage.getItem('n3sk_linked_token');
+let SAVED_HWID = localStorage.getItem('n3sk_hwid');
 let SESSION_TOKEN = '';
 let currentState = null;
 let CONNECTED = false;
@@ -147,14 +142,6 @@ const detailEl = document.getElementById('status-detail');
 function updateStatus(msg, sub='') { 
     if(statusEl) statusEl.innerText = msg; 
     if(detailEl) detailEl.innerText = sub; 
-}
-
-async function fetchActiveSession() {
-    const res = await fetch(`${SUPA}/rest/v1/${TBL}?is_active=eq.true&order=created_at.desc&limit=1&select=id,token,hwid,state,is_active`, {
-        headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` }
-    });
-    const data = await res.json();
-    return data.length > 0 ? data[0] : null;
 }
 
 async function fetchSpecificSession(token) {
@@ -178,8 +165,11 @@ function connect(session) {
     if (!CONNECTED) {
         CONNECTED = true;
         SESSION_TOKEN = session.token;
+        // Salva Token e HWID recebidos do Loader
         localStorage.setItem('n3sk_linked_token', session.id);
-        updateStatus("CONECTADO", `HWID Validado`);
+        localStorage.setItem('n3sk_hwid', session.hwid);
+        
+        updateStatus("CONECTADO", `HWID Validado: ${session.hwid?.substring(0,8)}...`);
         document.getElementById('waiting-screen').style.opacity = '0';
         setTimeout(() => { 
             document.getElementById('waiting-screen').style.display = 'none'; 
@@ -203,70 +193,59 @@ function applyUIToState(d) {
 }
 
 async function init() {
-    LOCAL_HWID = await generateHwid();
-    
-    // Verifica se veio via QR Code
-    const urlParams = new URLSearchParams(window.location.search);
-    const qrId = urlParams.get('id');
-    const qrToken = urlParams.get('token');
-
-    // SE VEIO VIA QR: Conecta DIRETO sem validar HWID
-    if (qrId && qrToken) {
-        updateStatus("Conectando via QR...", qrId);
-        const session = await fetchSpecificSession(qrId);
-        if (session && session.is_active) {
-            localStorage.setItem('n3sk_linked_token', qrId);
-            LINKED_TOKEN = qrId;
-            SESSION_TOKEN = qrToken;
+    // PRIORIDADE 1: Primeira conexão via Link do Console (Contém HWID Real)
+    if (URL_ID && URL_TOKEN && URL_HWID) {
+        updateStatus("Vinculando HWID...", URL_HWID);
+        const session = await fetchSpecificSession(URL_ID);
+        if (session && session.is_active && session.hwid === URL_HWID) {
+            // HWID bate! Salva e conecta
+            LINKED_TOKEN = URL_ID;
+            SESSION_TOKEN = URL_TOKEN;
+            SAVED_HWID = URL_HWID;
             connect(session);
-            startPolling(qrId);
+            startPolling(URL_ID);
+            // Limpa URL para segurança
+            window.history.replaceState({}, document.title, window.location.pathname);
             return;
         } else {
-            updateStatus("Sessão inválida", "Loader pode estar fechado.");
+            updateStatus("ERRO DE VINCULAÇÃO", "HWID ou Token inválidos.");
             return;
         }
     }
 
-    // LÓGICA DO PC: Validação RÍGIDA de HWID
-    updateStatus("BUSCANDO SESSÃO...", `Meu HWID: ${LOCAL_HWID}`);
-    
-    if (LINKED_TOKEN) {
+    // PRIORIDADE 2: Conexões subsequentes (Usa HWID salvo no LocalStorage)
+    if (LINKED_TOKEN && SAVED_HWID) {
+        updateStatus("Verificando sessão...", `HWID: ${SAVED_HWID.substring(0,8)}...`);
         const session = await fetchSpecificSession(LINKED_TOKEN);
+        
         if (session && session.is_active) {
-            // VALIDAÇÃO CRÍTICA: HWID deve bater EXATAMENTE
-            if (session.hwid === LOCAL_HWID) {
+            // Validação RÍGIDA: HWID salvo deve bater com HWID da sessão no banco
+            if (session.hwid === SAVED_HWID) {
+                SESSION_TOKEN = session.token;
                 connect(session);
                 startPolling(LINKED_TOKEN);
                 return;
             } else {
+                // HWID mudou ou sessão pertence a outro PC
                 localStorage.removeItem('n3sk_linked_token');
+                localStorage.removeItem('n3sk_hwid');
                 LINKED_TOKEN = null;
-                updateStatus("ACESSO NEGADO", `HWID não corresponde. Este PC ≠ Loader.`);
+                SAVED_HWID = null;
+                updateStatus("ACESSO NEGADO", `HWID do Loader: ${session.hwid?.substring(0,8)}... ≠ Seu HWID Salvo`);
             }
         } else {
+            // Sessão deletada
             localStorage.removeItem('n3sk_linked_token');
+            localStorage.removeItem('n3sk_hwid');
             LINKED_TOKEN = null;
-            updateStatus("LOADER FECHADO", "Reinicie o C# para nova sessão.");
+            SAVED_HWID = null;
+            updateStatus("LOADER FECHADO", "Reinicie o C# e use o novo link.");
         }
-    }
-
-    // Busca sessão ativa virgem para vincular
-    const active = await fetchActiveSession();
-    if (active && active.hwid === LOCAL_HWID) {
-        updateStatus("HWID Correspondente!", "Conectando...");
-        localStorage.setItem('n3sk_linked_token', active.id);
-        LINKED_TOKEN = active.id;
-        connect(active);
-        startPolling(active.id);
-        return;
+    } else {
+        // Sem vínculo estabelecido
+        updateStatus("AGUARDANDO VINCULAÇÃO", "Copie o link do console do C# e cole aqui.");
     }
     
-    // HWID não bate ou nenhuma sessão encontrada
-    if (active && active.hwid !== LOCAL_HWID) {
-        updateStatus("SESSÃO DE OUTRO PC", `HWID do Loader: ${active.hwid?.substring(0,8)}... ≠ Seu HWID`);
-    } else {
-        updateStatus("AGUARDANDO LOADER...", "Inicie o C# NESTE PC para conectar.");
-    }
     setTimeout(init, 2000);
 }
 
@@ -276,6 +255,7 @@ async function startPolling(token) {
         if (!session || !session.is_active) {
             CONNECTED = false;
             localStorage.removeItem('n3sk_linked_token');
+            localStorage.removeItem('n3sk_hwid');
             LINKED_TOKEN = null;
             document.getElementById('app').style.display = 'none';
             document.getElementById('waiting-screen').style.display = 'flex';
@@ -301,6 +281,7 @@ function tg(el){
 
 function openQR(){
     if(!LINKED_TOKEN || !SESSION_TOKEN){ alert("Conecte-se ao Loader primeiro!"); return; }
+    // QR Code ignora HWID (acesso universal para secundários)
     const url = `${window.location.origin}${window.location.pathname}?id=${LINKED_TOKEN}&token=${SESSION_TOKEN}`;
     document.getElementById('qrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
     document.getElementById('qrModal').classList.add('active');
