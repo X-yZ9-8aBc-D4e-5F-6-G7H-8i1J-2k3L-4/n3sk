@@ -20,10 +20,12 @@
         }
         *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 
-        /* CURSOR ORIGINAL */
+        /* CURSOR PERSONALIZADO GLOBAL */
         html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;cursor:none}
+        
+        /* Força cursor none em tudo, exceto mobile */
         @media(hover:hover){ 
-            body { cursor: none; }
+            body, a, button, .tgl, .sw-container, input, select, textarea { cursor: none !important; }
             #cur{position:fixed;width:18px;height:18px;border:2px solid rgba(199,48,48,.9);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:transform .12s ease,border-color .15s ease} 
             #cur.ck{transform:translate(-50%,-50%) scale(.65);border-color:#ff6b6b} 
         }
@@ -645,17 +647,14 @@ function renderPreview() {
 
   if (isHp) {
     var bw = 6, bx = bX - 12; 
-    hpAnimTime += 0.05; 
-    var pulse = 0.5 + 0.5 * Math.sin(hpAnimTime * 2 * Math.PI * 0.3);
-    var currentHpHeight = bH * pulse;
+    // REMOVIDO O EFEITO DE PULSO (hpAnimTime)
+    // Agora a barra é fixa (100%)
     ctx.fillStyle = 'rgba(15,15,15,0.8)'; ctx.fillRect(bx, bY, bw, bH);
-    ctx.fillStyle = hC; ctx.fillRect(bx, bY + (bH - currentHpHeight), bw, currentHpHeight);
+    ctx.fillStyle = hC; ctx.fillRect(bx, bY, bw, bH);
   }
   ctx.restore();
-  if (Math.abs(boxOpacity - targetBoxOpacity) > 0.01 || isHp) scheduleRender();
+  if (Math.abs(boxOpacity - targetBoxOpacity) > 0.01) scheduleRender();
 }
 </script>
 </body>
 </html>
-
-quero que arrume esse e mande compelto
