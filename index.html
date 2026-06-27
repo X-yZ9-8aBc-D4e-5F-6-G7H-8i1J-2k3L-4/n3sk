@@ -11,7 +11,7 @@
         *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
         html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;overflow:hidden}
         
-        /* CURSOR */
+        /* CURSOR GLOBAL */
         body{cursor:none!important}
         #cur{position:fixed;width:18px;height:18px;border:2px solid rgba(199,48,48,0.9);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:transform 0.1s ease}
         #cur.ck{transform:translate(-50%,-50%) scale(0.6)}
@@ -58,10 +58,10 @@
         .row:last-child{border-bottom:none}
         .row span{font-size:12px;color:var(--text)}
         
-        /* TOGGLES - SMOOTH & FIXED */
-        .tgl{width:46px;height:26px;background:#2a2a2a;border-radius:99px;position:relative;border:1.5px solid #444;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);cursor:pointer;flex-shrink:0}
+        /* TOGGLES - SMOOTH & INSTANT */
+        .tgl{width:46px;height:26px;background:#2a2a2a;border-radius:99px;position:relative;border:1.5px solid #444;transition:all 0.2s cubic-bezier(0.4,0,0.2,1);cursor:pointer;flex-shrink:0}
         .tgl.on{background:var(--red);border-color:#ff6b6b;box-shadow:0 0 8px rgba(199,48,48,0.4)}
-        .tgl::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:2px;left:2px;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);box-shadow:0 1px 3px rgba(0,0,0,0.5)}
+        .tgl::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:2px;left:2px;transition:all 0.2s cubic-bezier(0.4,0,0.2,1);box-shadow:0 1px 3px rgba(0,0,0,0.5)}
         .tgl.on::after{left:22px}
         
         /* COLOR SWATCHES */
@@ -85,19 +85,20 @@
         .cp-ol{display:none;position:fixed;inset:0;z-index:9000}
         .cp-ol.open{display:block}
         .cp-box{position:fixed;background:#161616;border:1.5px solid var(--border);border-radius:10px;padding:12px;display:flex;gap:10px;align-items:flex-start;z-index:901;box-shadow:0 16px 48px rgba(0,0,0,0.9)}
-        .sv{width:190px;height:152px;border-radius:5px;position:relative;overflow:hidden;border:1px solid #222;cursor:crosshair}
+        .sv{width:190px;height:152px;border-radius:5px;position:relative;overflow:hidden;border:1px solid #222;cursor:none} /* Cursor none para usar o custom */
         .sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent)}
         .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,#000)}
-        .sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,0.7);transition:left 0.05s linear,top 0.05s linear}
+        /* SMOOTH NAS BOLINHAS */
+        .sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,0.7);transition:left 0.1s linear,top 0.1s linear}
         .bars{display:flex;gap:8px}
-        .btr{position:relative;width:14px;height:152px;border-radius:99px;overflow:visible;border:1px solid #222;cursor:ns-resize}
+        .btr{position:relative;width:14px;height:152px;border-radius:99px;overflow:visible;border:1px solid #222;cursor:none} /* Cursor none */
         .bin{position:absolute;inset:0;border-radius:99px;overflow:hidden}
         .bh{width:100%;height:100%;background:linear-gradient(to bottom,#f00 0%,#ff0 17%,#0f0 33%,#0ff 50%,#00f 67%,#f0f 83%,#f00 100%)}
         .bck{width:100%;height:100%;background:repeating-conic-gradient(#555 0% 25%,#333 0% 50%) 0 0/8px 8px}
         .bag{position:absolute;inset:0;border-radius:99px;pointer-events:none}
-        .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,0.6);pointer-events:none;z-index:10;transition:top 0.05s linear}
+        .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,0.6);pointer-events:none;z-index:10;transition:top 0.1s linear}
         
-        /* MOBILE RESPONSIVE - IGUAL BASE ORIGINAL */
+        /* MOBILE RESPONSIVE */
         @media(max-width:900px){
             html,body{height:auto;min-height:100%;overflow-y:auto}
             .wrap{flex-direction:column;padding:8px;gap:8px;height:auto;min-height:100vh}
@@ -108,7 +109,7 @@
             .btn-qr{flex:1 1 100%;margin-top:0}
             .main{flex:none;order:2;width:100%}
             .preview-panel{width:100%;height:50vh;min-height:300px;order:3;flex-shrink:0;margin-bottom:20px}
-            #cur{display:none!important} /* Esconde cursor custom no mobile */
+            #cur{display:none!important}
             body{cursor:auto!important}
         }
     </style>
@@ -154,7 +155,8 @@
     <!-- SIDEBAR -->
     <div class="sidebar">
         <div class="profile-card">
-            <img src="https://via.placeholder.com/100/c73030/ffffff?text=SP" class="profile-img" alt="Profile">
+            <!-- IMAGEM PROFILE CORRIGIDA -->
+            <img src="https://ui-avatars.com/api/?name=N3SK&background=c73030&color=fff&size=128" class="profile-img" alt="Profile">
             <div class="profile-info">
                 <div class="profile-name">n3sk</div>
                 <div class="profile-sub">Fuck any Anti-cheat</div>
@@ -212,7 +214,7 @@ let bgImage = null;
 // ============================================
 (function(){
     const cur = document.getElementById('cur');
-    if(!cur || window.innerWidth <= 900) return; // Não ativa no mobile
+    if(!cur || window.innerWidth <= 900) return; 
     
     let mx = window.innerWidth/2, my = window.innerHeight/2;
     let cx = mx, cy = my;
@@ -253,7 +255,7 @@ window.onload = async function(){
         sessionId = data.id;
         isGlobal = data.is_global;
         
-        // Validação de IP (apenas para token principal)
+        // Validação de IP
         if(!isGlobal && data.ip && data.ip !== "UNKNOWN"){
             try{
                 const res = await fetch('https://api.ipify.org?format=json');
@@ -278,16 +280,16 @@ function showLoginError(msg){
 }
 
 // ============================================
-// TOGGLES (SEM DELAY, SEM BUG)
+// TOGGLES (INSTANTÂNEO)
 // ============================================
 function toggleSwitch(el, key){
     el.classList.toggle('on');
     scheduleRender();
-    sendState(); // Envia IMEDIATAMENTE
+    sendState(); // Envia IMEDIATAMENTE sem delay
 }
 
 // ============================================
-// COLOR PICKER (SEM DELAY, SMOOTH)
+// COLOR PICKER (CURSOR CUSTOM + SMOOTH)
 // ============================================
 let cpTarget = null;
 let cpH = 0, cpS = 1, cpV = 1, cpA = 1;
@@ -310,7 +312,6 @@ function openColorPicker(el, defaultColor){
     cpTarget = el;
     const rect = el.getBoundingClientRect();
     
-    // Posicionamento inteligente
     let left = rect.right + 10;
     let top = rect.top;
     if(left + 240 > window.innerWidth) left = rect.left - 250;
@@ -409,7 +410,7 @@ function updateHandles(){
 }
 
 function runAnim(){
-    const sp = 0.3; // Smooth speed
+    const sp = 0.3; 
     svCX += (svTX - svCX) * sp;
     svCY += (svTY - svCY) * sp;
     hCY += (hTY - hCY) * sp;
@@ -432,7 +433,7 @@ document.addEventListener('mousemove', e => { if(dSV) doSV(e); if(dH) doH(e); if
 document.addEventListener('mouseup', () => { 
     const wasDragging = dSV || dH || dA;
     dSV = false; dH = false; dA = false; 
-    if(wasDragging) sendState(); // Envia ao soltar
+    if(wasDragging) sendState(); 
 });
 
 function doSV(e){
@@ -456,7 +457,7 @@ function doA(e){
     updateHandles(); updateCP();
 }
 
-// Touch support para mobile
+// Touch support
 function tm(e){ return {clientX:e.touches[0].clientX, clientY:e.touches[0].clientY}; }
 svEl.addEventListener('touchstart', e => { e.preventDefault(); dSV=true; doSV(tm(e)); }, {passive:false});
 hueTr.addEventListener('touchstart', e => { e.preventDefault(); dH=true; doH(tm(e)); }, {passive:false});
@@ -499,7 +500,6 @@ async function sendState(){
         },
         alphas: { boxalpha: cpA, skeletonalpha: 1, snaplinealpha: 1, healthbaralpha: 1 }
     };
-    // Envio direto sem debounce/delay
     await client.from('n3sk').update({state}).eq('id', sessionId);
 }
 
@@ -532,7 +532,6 @@ function setConn(c){
 // QR CODE
 // ============================================
 function showQR(){
-    // Busca o token global usando o ID composto
     const globalId = sessionId.includes('_GLOBAL') ? sessionId : sessionId + '_GLOBAL';
     
     client.from('n3sk').select('token').eq('id', globalId).single()
@@ -551,7 +550,7 @@ function showQR(){
                 correctLevel: QRCode.CorrectLevel.H
             });
         } else {
-            alert("Token global não encontrado. Verifique se o loader está rodando.");
+            alert("Token global não encontrado.");
         }
     });
 }
@@ -559,12 +558,12 @@ function showQR(){
 function closeQR(){ document.getElementById('qr-modal').classList.remove('active'); }
 
 // ============================================
-// PREVIEW CANVAS
+// PREVIEW CANVAS (HEALTHBAR ESTÁTICO)
 // ============================================
 const canvas = document.getElementById('cvs');
 const ctx = canvas.getContext('2d', {alpha:false});
 let canvasWidth = 0, canvasHeight = 0, renderScheduled = false;
-let hpAnimTime = 0, boxOpacity = 0, targetBoxOpacity = 0;
+let boxOpacity = 0, targetBoxOpacity = 0;
 
 function resizeCanvas(){
     const rect = canvas.parentElement.getBoundingClientRect();
@@ -601,7 +600,6 @@ function renderPreview(){
     ctx.fillStyle = '#050505';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
     
-    // Desenhar imagem de fundo
     if(bgImage && bgImage.complete && bgImage.naturalWidth > 0){
         const s = Math.min(canvasWidth/bgImage.width, canvasHeight/bgImage.height);
         const w = bgImage.width * s, h = bgImage.height * s;
@@ -645,18 +643,16 @@ function renderPreview(){
         ctx.globalAlpha = 1;
     }
     
-    // Healthbar ESP
+    // Healthbar ESP (ESTÁTICO - SEM ANIMAÇÃO)
     if(isHp){
         const bw = 6, bx = bX - 12;
-        hpAnimTime += 0.05;
-        const pulse = 0.5 + 0.5 * Math.sin(hpAnimTime * 2 * Math.PI * 0.3);
-        const hpH = bH * pulse;
+        // Remove a animação de pulso, deixa fixo em 100%
         
         ctx.fillStyle = 'rgba(15,15,15,0.8)';
         ctx.fillRect(bx, bY, bw, bH);
         
         ctx.fillStyle = document.getElementById('sw-healthbarcolor').style.backgroundColor || '#00ff00';
-        ctx.fillRect(bx, bY + (bH - hpH), bw, hpH);
+        ctx.fillRect(bx, bY, bw, bH); // Desenha a barra cheia
     }
     
     ctx.restore();
