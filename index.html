@@ -3,6 +3,7 @@
 <head>
     <meta charset='utf-8'>
     <meta name='viewport' content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no'>
+    <meta name='color-scheme' content='light dark'>
     <title>n3sk</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
@@ -11,9 +12,11 @@
         *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
         html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;overflow:hidden}
         
-        /* CURSOR - SEMPRE VISÍVEL */
-        body{cursor:none!important}
-        #cur{position:fixed;width:18px;height:18px;border:2px solid rgba(199,48,48,0.9);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:transform 0.12s ease}
+        /* CURSOR - só aparece no app */
+        body{cursor:auto}
+        #app body,#app *{cursor:none!important}
+        #cur{display:none;position:fixed;width:18px;height:18px;border:2px solid rgba(199,48,48,0.9);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:transform 0.12s ease}
+        #cur.visible{display:block}
         #cur.ck{transform:translate(-50%,-50%) scale(0.65)}
         
         /* LOGIN SCREEN */
@@ -47,7 +50,7 @@
         .wrap{display:flex;height:100%;gap:12px;padding:12px;animation:fadeIn 0.5s ease}
         .sidebar{width:240px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:14px}
         .profile-card{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px}
-        .profile-img{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--red);box-shadow:0 0 10px rgba(199,48,48,0.3)}
+        .profile-img{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--red);box-shadow:0 0 10px rgba(199,48,48,0.3);background:var(--bg3)}
         .profile-info{display:flex;flex-direction:column;gap:2px}
         .profile-name{font-size:14px;font-weight:700;color:#fff}
         .profile-sub{font-size:10px;color:var(--muted)}
@@ -80,7 +83,7 @@
         #qr-modal.active{display:flex}
         .qr-box{background:#111;padding:40px;border-radius:20px;border:1.5px solid var(--red);text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.8)}
         .qr-box h2{color:var(--red);margin-bottom:10px;letter-spacing:2px}
-        .qr-box #qrcode{background:#fff;padding:15px;border-radius:12px;margin:20px auto;display:inline-block;min-height:200px;min-width:200px}
+        .qr-box #qrcode{background:#fff;padding:15px;border-radius:12px;margin:20px auto;display:inline-block}
         .qr-close{background:var(--red);color:#fff;border:none;padding:10px 30px;border-radius:8px;font-weight:700;cursor:pointer;margin-top:15px}
         .qr-close:hover{background:#ff6b6b}
         
@@ -91,14 +94,14 @@
         .sv{width:190px;height:152px;border-radius:5px;position:relative;overflow:hidden;border:1px solid #222}
         .sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent)}
         .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,#000)}
-        .sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,0.7);transition:left 0.05s linear,top 0.05s linear}
+        .sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,0.7);transition:all 0.15s ease-out}
         .bars{display:flex;gap:8px}
         .btr{position:relative;width:14px;height:152px;border-radius:99px;overflow:visible;border:1px solid #222}
         .bin{position:absolute;inset:0;border-radius:99px;overflow:hidden}
         .bh{width:100%;height:100%;background:linear-gradient(to bottom,#f00 0%,#ff0 17%,#0f0 33%,#0ff 50%,#00f 67%,#f0f 83%,#f00 100%)}
         .bck{width:100%;height:100%;background:repeating-conic-gradient(#555 0% 25%,#333 0% 50%) 0 0/8px 8px}
         .bag{position:absolute;inset:0;border-radius:99px;pointer-events:none}
-        .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,0.6);pointer-events:none;z-index:10;transition:top 0.05s linear}
+        .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,0.6);pointer-events:none;z-index:10;transition:all 0.15s ease-out}
     </style>
 </head>
 <body>
@@ -141,7 +144,7 @@
 <div class="wrap">
     <div class="sidebar">
         <div class="profile-card">
-            <img src="https://via.placeholder.com/100/c73030/ffffff?text=SP" class="profile-img">
+            <img src="" class="profile-img" onerror="this.style.background='var(--red)'; this.style.display='block';">
             <div class="profile-info"><div class="profile-name">n3sk</div><div class="profile-sub">Fuck any Anti-cheat</div></div>
         </div>
         <div class="logo"></div>
@@ -158,10 +161,10 @@
         </div>
         <div class="panel">
             <div class="ph">ESP COLORS</div>
-            <div class="row"><span>Box color</span><div class="sw" id="sw-boxcolor" onclick="openColorPicker(this,'#ff0000')" style="background:#ff0000"></div></div>
-            <div class="row"><span>Skeleton color</span><div class="sw" id="sw-skeletoncolor" onclick="openColorPicker(this,'#ffffff')" style="background:#ffffff"></div></div>
-            <div class="row"><span>Snapline color</span><div class="sw" id="sw-snaplinecolor" onclick="openColorPicker(this,'#00ff00')" style="background:#00ff00"></div></div>
-            <div class="row"><span>Healthbar color</span><div class="sw" id="sw-healthbarcolor" onclick="openColorPicker(this,'#00ff00')" style="background:#00ff00"></div></div>
+            <div class="row"><span>Box color</span><div class="sw" id="sw-boxcolor" data-hex="#ff0000" onclick="openColorPicker(this,'#ff0000')" style="background:#ff0000"></div></div>
+            <div class="row"><span>Skeleton color</span><div class="sw" id="sw-skeletoncolor" data-hex="#ffffff" onclick="openColorPicker(this,'#ffffff')" style="background:#ffffff"></div></div>
+            <div class="row"><span>Snapline color</span><div class="sw" id="sw-snaplinecolor" data-hex="#00ff00" onclick="openColorPicker(this,'#00ff00')" style="background:#00ff00"></div></div>
+            <div class="row"><span>Healthbar color</span><div class="sw" id="sw-healthbarcolor" data-hex="#00ff00" onclick="openColorPicker(this,'#00ff00')" style="background:#00ff00"></div></div>
         </div>
     </div>
     <div class="preview"><div class="ph">Preview</div><canvas id="cvs"></canvas></div>
@@ -170,19 +173,20 @@
 
 <script>
 // ============================================
-// CURSOR - INICIA IMEDIATAMENTE
+// CURSOR - só ativo no app
 // ============================================
 (function(){
     const cur = document.getElementById('cur');
-    if(!cur){
-        console.error("[CURSOR] Elemento #cur não encontrado!");
-        return;
-    }
+    if(!cur) return;
     
     let mx = window.innerWidth/2, my = window.innerHeight/2;
     let cx = mx, cy = my;
     
-    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; }, {passive:true});
+    document.addEventListener('mousemove', e => { 
+        mx = e.clientX; 
+        my = e.clientY; 
+    }, {passive:true});
+    
     document.addEventListener('mousedown', () => cur.classList.add('ck'));
     document.addEventListener('mouseup', () => cur.classList.remove('ck'));
     
@@ -194,7 +198,16 @@
         requestAnimationFrame(loop);
     }
     loop();
-    console.log("[CURSOR] Ativado com sucesso");
+    
+    // Mostrar cursor apenas quando app estiver visível
+    const observer = new MutationObserver(() => {
+        if(document.getElementById('app').style.display !== 'none'){
+            cur.classList.add('visible');
+        } else {
+            cur.classList.remove('visible');
+        }
+    });
+    observer.observe(document.getElementById('app'), {attributes: true, attributeFilter: ['style']});
 })();
 
 // ============================================
@@ -206,6 +219,7 @@ const client = supabase.createClient(SUPA_URL, SUPA_KEY);
 
 let sessionId = null;
 let isGlobal = false;
+let globalSessionId = null; // ID da sessão global
 
 // ============================================
 // INICIALIZAÇÃO
@@ -220,6 +234,7 @@ window.onload = async function(){
     }
     
     try{
+        // Buscar sessão principal
         const {data, error} = await client.from('n3sk').select('*').eq('token', token).eq('is_active', true).eq('is_global', false).single();
         console.log("[INIT] Dados:", data, "Erro:", error);
         
@@ -230,6 +245,13 @@ window.onload = async function(){
         
         sessionId = data.id;
         isGlobal = data.is_global;
+        
+        // Buscar sessão global associada
+        const globalId = `${sessionId}_GLOBAL`;
+        const {data: globalData} = await client.from('n3sk').select('id,token').eq('id', globalId).eq('is_global', true).single();
+        if(globalData){
+            globalSessionId = globalData.id;
+        }
         
         // Validação de IP
         if(!isGlobal && data.ip && data.ip !== "UNKNOWN"){
@@ -288,11 +310,15 @@ const aTh = document.getElementById('aTh');
 function openColorPicker(el, defaultColor){
     cpTarget = el;
     const rect = el.getBoundingClientRect();
-    cpBox.style.left = (rect.right + 10) + 'px';
-    cpBox.style.top = rect.top + 'px';
+    cpBox.style.left = Math.min(rect.right + 10, window.innerWidth - 250) + 'px';
+    cpBox.style.top = Math.min(rect.top, window.innerHeight - 200) + 'px';
     
-    const currentColor = el.style.backgroundColor || defaultColor;
-    const hex = rgbToHex(currentColor);
+    // Pegar cor atual do atributo data-hex ou converter
+    let hex = el.getAttribute('data-hex') || defaultColor;
+    if(!hex.startsWith('#')){
+        hex = rgbToHex(el.style.backgroundColor || defaultColor);
+    }
+    
     const hsv = hexToHsv(hex);
     cpH = hsv[0]; cpS = hsv[1]; cpV = hsv[2]; cpA = 1;
     
@@ -304,20 +330,20 @@ function openColorPicker(el, defaultColor){
     updateCP();
     updateHandles();
     cpOl.classList.add('open');
-    console.log("[CP] Aberto com cor:", hex);
 }
 
 function rgbToHex(rgb){
     if(rgb.startsWith('#')) return rgb;
     const values = rgb.match(/\d+/g);
-    if(!values) return '#ff0000';
+    if(!values || values.length < 3) return '#ff0000';
     return '#' + values.slice(0,3).map(x => parseInt(x).toString(16).padStart(2,'0')).join('');
 }
 
 function hexToHsv(hex){
-    const r = parseInt(hex.slice(1,3),16)/255;
-    const g = parseInt(hex.slice(3,5),16)/255;
-    const b = parseInt(hex.slice(5,7),16)/255;
+    hex = hex.replace('#','');
+    const r = parseInt(hex.substring(0,2),16)/255;
+    const g = parseInt(hex.substring(2,4),16)/255;
+    const b = parseInt(hex.substring(4,6),16)/255;
     const max = Math.max(r,g,b), min = Math.min(r,g,b);
     const d = max - min;
     let h = 0;
@@ -362,34 +388,42 @@ function updateCP(){
     
     svEl.style.background = hHex;
     svTh.style.background = hex;
-    aGr.style.background = 'linear-gradient(to bottom,'+hHex+',transparent)';
+    aGr.style.background = `linear-gradient(to bottom,${hHex},transparent)`;
     hueTh.style.background = hHex;
-    aTh.style.background = 'rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+','+cpA+')';
+    aTh.style.background = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${cpA})`;
     
     if(cpTarget){
         cpTarget.style.background = hex;
+        cpTarget.setAttribute('data-hex', hex); // Salvar HEX para referência
         scheduleRender();
     }
 }
 
 function updateHandles(){
-    svTh.style.left = (svCX*100)+'%';
-    svTh.style.top = (svCY*100)+'%';
-    const hH = hueTr.getBoundingClientRect().height || 152;
-    const aH = aTr.getBoundingClientRect().height || 152;
-    hueTh.style.top = (hCY*hH)+'px';
-    aTh.style.top = (aCY*aH)+'px';
+    // Atualizar posições com base nas dimensões reais
+    const svRect = svEl.getBoundingClientRect();
+    svTh.style.left = (svCX * svRect.width) + 'px';
+    svTh.style.top = (svCY * svRect.height) + 'px';
+    
+    const hueRect = hueTr.getBoundingClientRect();
+    hueTh.style.top = (hCY * hueRect.height) + 'px';
+    
+    const aRect = aTr.getBoundingClientRect();
+    aTh.style.top = (aCY * aRect.height) + 'px';
 }
 
 function runAnim(){
     const sp = 0.28;
-    svCX += (svTX - svCX) * sp;
-    svCY += (svTY - svCY) * sp;
-    hCY += (hTY - hCY) * sp;
+    const prevCX = svCX, prevCY = svCY, prevH = hCY;
+    
+    svCX = lerp(svCX, svTX, sp);
+    svCY = lerp(svCY, svTY, sp);
+    hCY = lerp(hCY, hTY, sp);
     
     updateHandles();
     
-    if(Math.abs(svCX-svTX)>0.0005 || Math.abs(svCY-svTY)>0.0005 || Math.abs(hCY-hTY)>0.0005)
+    // Continuar animação se ainda houver diferença significativa
+    if(Math.abs(svCX-prevCX)>0.0005 || Math.abs(svCY-prevCY)>0.0005 || Math.abs(hCY-prevH)>0.0005)
         requestAnimationFrame(runAnim);
     else animRun = false;
 }
@@ -401,6 +435,7 @@ function startAnim(){
 function lerp(a,b,t){ return a + (b-a)*t; }
 function clamp(v,a,b){ return Math.max(a, Math.min(b,v)); }
 
+// Event listeners do color picker
 cpOl.addEventListener('mousedown', e => {
     if(e.target === cpOl){
         cpOl.classList.remove('open');
@@ -448,12 +483,12 @@ function doA(e){
     const height = r.height || 152;
     cpA = clamp(1 - (e.clientY - r.top)/height, 0, 1);
     aCY = 1 - cpA;
-    updateHandles();
     updateCP();
+    startAnim();
 }
 
 // ============================================
-// SYNC E ESTADO
+// SYNC E ESTADO - CORRIGIDO PARA ENVIAR HEX
 // ============================================
 async function startSync(){
     setInterval(async () => {
@@ -466,6 +501,8 @@ async function startSync(){
 
 async function sendState(){
     if(!sessionId) return;
+    
+    // Converter cores RGB para HEX antes de enviar
     const state = {
         toggles: {
             box: document.getElementById('tgl-box').classList.contains('on'),
@@ -474,19 +511,14 @@ async function sendState(){
             healthbar: document.getElementById('tgl-healthbar').classList.contains('on')
         },
         colors: {
-            boxcolor: rgbToHex(document.getElementById('sw-boxcolor').style.backgroundColor),
-            skeletoncolor: rgbToHex(document.getElementById('sw-skeletoncolor').style.backgroundColor),
-            snaplinecolor: rgbToHex(document.getElementById('sw-snaplinecolor').style.backgroundColor),
-            healthbarcolor: rgbToHex(document.getElementById('sw-healthbarcolor').style.backgroundColor)
+            boxcolor: document.getElementById('sw-boxcolor').getAttribute('data-hex') || '#ff0000',
+            skeletoncolor: document.getElementById('sw-skeletoncolor').getAttribute('data-hex') || '#ffffff',
+            snaplinecolor: document.getElementById('sw-snaplinecolor').getAttribute('data-hex') || '#00ff00',
+            healthbarcolor: document.getElementById('sw-healthbarcolor').getAttribute('data-hex') || '#00ff00'
         },
-        alphas: { 
-            boxalpha: cpA, 
-            skeletonalpha: 1, 
-            snaplinealpha: 1, 
-            healthbaralpha: 1 
-        }
+        alphas: { boxalpha: cpA, skeletonalpha: 1, snaplinealpha: 1, healthbaralpha: 1 }
     };
-    console.log("[STATE] Enviando:", state);
+    
     await client.from('n3sk').update({state}).eq('id', sessionId);
 }
 
@@ -497,12 +529,25 @@ function applyState(s){
         const el = document.getElementById(toggles[k]);
         if(el && s.toggles) el.classList.toggle('on', !!s.toggles[k]);
     }
-    const colors = {boxcolor:'sw-boxcolor', skeletoncolor:'sw-skeletoncolor', snaplinecolor:'sw-snaplinecolor', healthbarcolor:'sw-healthbarcolor'};
-    for(let k in colors){
-        const el = document.getElementById(colors[k]);
-        if(el && s.colors && s.colors[k]) el.style.background = s.colors[k];
+    
+    // Aplicar cores se vierem do servidor
+    if(s.colors){
+        const colorMap = {
+            boxcolor: 'sw-boxcolor',
+            skeletoncolor: 'sw-skeletoncolor',
+            snaplinecolor: 'sw-snaplinecolor',
+            healthbarcolor: 'sw-healthbarcolor'
+        };
+        for(let key in colorMap){
+            if(s.colors[key]){
+                const el = document.getElementById(colorMap[key]);
+                if(el){
+                    el.style.background = s.colors[key];
+                    el.setAttribute('data-hex', s.colors[key]);
+                }
+            }
+        }
     }
-    scheduleRender();
 }
 
 function setConn(c){
@@ -516,16 +561,24 @@ function setConn(c){
 // ============================================
 function showQR(){
     console.log("[QR] Gerando QR...");
-    client.from('n3sk').select('token').eq('id', sessionId + '_GLOBAL').single()
+    
+    // Usar o globalSessionId que foi salvo durante init
+    if(!globalSessionId){
+        alert("Sessão global não encontrada");
+        return;
+    }
+    
+    client.from('n3sk').select('token').eq('id', globalSessionId).single()
     .then(({data, error}) => {
         console.log("[QR] Dados:", data, "Erro:", error);
         if(data && data.token){
             const globalLink = `https://n3sk.xyz/?token=${data.token}`;
             document.getElementById('qr-modal').classList.add('active');
-            const qrDiv = document.getElementById('qrcode');
-            qrDiv.innerHTML = '';
-            try{
-                new QRCode(qrDiv, {
+            document.getElementById('qrcode').innerHTML = '';
+            
+            // Pequeno delay para garantir que o elemento está pronto
+            setTimeout(() => {
+                new QRCode(document.getElementById("qrcode"), {
                     text: globalLink,
                     width: 200,
                     height: 200,
@@ -533,13 +586,9 @@ function showQR(){
                     colorLight: "#ffffff",
                     correctLevel: QRCode.CorrectLevel.H
                 });
-                console.log("[QR] Gerado com sucesso!");
-            }catch(e){
-                console.error("[QR] Erro ao gerar:", e);
-                qrDiv.innerHTML = '<p style="color:red">Erro ao gerar QR</p>';
-            }
+            }, 100);
         } else {
-            console.error("[QR] Token global não encontrado");
+            alert("Erro ao buscar token global");
         }
     });
 }
@@ -551,10 +600,24 @@ function closeQR(){
 // ============================================
 // PREVIEW CANVAS
 // ============================================
+const PREVIEW_IMG = 'https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png';
 const canvas = document.getElementById('cvs');
 const ctx = canvas.getContext('2d', {alpha:false});
-let canvasWidth = 0, canvasHeight = 0, renderScheduled = false;
+let canvasWidth = 0, canvasHeight = 0, renderScheduled = false, bgImage = null;
 let hpAnimTime = 0, boxOpacity = 0, targetBoxOpacity = 0;
+
+if(PREVIEW_IMG){
+    bgImage = new Image();
+    bgImage.crossOrigin = "Anonymous";
+    bgImage.src = PREVIEW_IMG;
+    bgImage.onload = () => scheduleRender();
+    bgImage.onerror = () => {
+        console.warn("[Preview] Imagem não carregou, usando fallback");
+        // Criar um gradiente como fallback
+        bgImage = null;
+        scheduleRender();
+    };
+}
 
 function resizeCanvas(){
     const rect = canvas.parentElement.getBoundingClientRect();
@@ -588,6 +651,12 @@ function renderPreview(){
     ctx.fillStyle = '#050505';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
     
+    if(bgImage && bgImage.complete && bgImage.naturalWidth > 0){
+        const s = Math.min(canvasWidth/bgImage.width, canvasHeight/bgImage.height);
+        const w = bgImage.width * s, h = bgImage.height * s;
+        ctx.drawImage(bgImage, (canvasWidth-w)/2, (canvasHeight-h)/2, w, h);
+    }
+    
     const isBox = document.getElementById('tgl-box').classList.contains('on');
     const isHp = document.getElementById('tgl-healthbar').classList.contains('on');
     
@@ -601,7 +670,7 @@ function renderPreview(){
     
     if(boxOpacity > 0.01){
         ctx.globalAlpha = boxOpacity;
-        ctx.strokeStyle = document.getElementById('sw-boxcolor').style.backgroundColor || '#ff0000';
+        ctx.strokeStyle = document.getElementById('sw-boxcolor').getAttribute('data-hex') || '#ff0000';
         ctx.lineWidth = 2;
         const l = bW * 0.25;
         ctx.beginPath();
@@ -626,7 +695,7 @@ function renderPreview(){
         const hpH = bH * pulse;
         ctx.fillStyle = 'rgba(15,15,15,0.8)';
         ctx.fillRect(bx, bY, bw, bH);
-        ctx.fillStyle = document.getElementById('sw-healthbarcolor').style.backgroundColor || '#00ff00';
+        ctx.fillStyle = document.getElementById('sw-healthbarcolor').getAttribute('data-hex') || '#00ff00';
         ctx.fillRect(bx, bY + (bH - hpH), bw, hpH);
     }
     
