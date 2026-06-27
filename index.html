@@ -240,48 +240,35 @@
 
 <script>
 // ============================================
-// CONFIGURAÇÃO SUPABASE OTIMIZADA
+// CONFIGURAÇÃO SUPABASE
 // ============================================
 const SUPA_URL = "https://gkzxuerurfedfwuxhimf.supabase.co";
 const SUPA_KEY = "sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6";
-
-// Configuração para máxima velocidade
-const client = supabase.createClient(SUPA_URL, SUPA_KEY, {
-    auth: { persistSession: false }, // Não salva sessão no localStorage (mais rápido/seguro para tools)
-    global: {
-        headers: { 'x-client-info': 'n3sk-fast' }
-    },
-    db: {
-        schema: 'public'
-    },
-    realtime: {
-        params: {
-            eventsPerSecond: 10 // Limita eventos para não travar
-        }
-    }
-});
-
+const client = supabase.createClient(SUPA_URL, SUPA_KEY);
 const PREVIEW_IMG_URL = 'https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png?ex=6a3dcbea&is=6a3c7a6a&hm=95ab23192fdc65d73e612fadc773aac107802e9a93602097a289073aabc498b2&=&format=webp&quality=lossless&width=800&height=968';
 
 let sessionId = null;
 let isGlobal = false;
 let bgImage = null;
-let lastSentState = ""; // Para evitar enviar dados iguais
+let isUpdatingLocally = false; // TRAVA PARA EVITAR BUG DE TOGGLE
 
 // ============================================
-// CURSOR (OTIMIZADO)
+// CURSOR (INICIA IMEDIATAMENTE)
 // ============================================
 (function(){
     const cur = document.getElementById('cur');
     if(!cur || window.innerWidth <= 900) return; 
+    
     let mx = window.innerWidth/2, my = window.innerHeight/2;
     let cx = mx, cy = my;
+    
     document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; }, {passive:true});
     document.addEventListener('mousedown', () => cur.classList.add('ck'));
     document.addEventListener('mouseup', () => cur.classList.remove('ck'));
+    
     function loop(){
-        cx += (mx-cx)*0.2; // Levemente mais rápido
-        cy += (my-cy)*0.2;
+        cx += (mx-cx)*0.13;
+        cy += (my-cy)*0.13;
         cur.style.left = cx+'px';
         cur.style.top = cy+'px';
         requestAnimationFrame(loop);
@@ -304,29 +291,23 @@ window.onload = async function(){
     if(!token){ showLoginError("Token não encontrado"); return; }
     
     try{
-        // Busca única e rápida
         const {data, error} = await client.from('n3sk').select('*').eq('token', token).eq('is_active', true).single();
         if(error || !data){ showLoginError("Token inválido ou expirado"); return; }
         
         sessionId = data.id;
         isGlobal = data.is_global;
         
-        // Verificação de IP apenas se não for global
         if(!isGlobal && data.ip && data.ip !== "UNKNOWN"){
             try{
                 const res = await fetch('https://api.ipify.org?format=json');
                 const ipData = await res.json();
                 if(ipData.ip !== data.ip){ showLoginError("Acesso negado - Dispositivo diferente"); return; }
-            }catch(e){ console.warn("IP check skipped", e); }
+            }catch(e){ console.warn("IP check failed", e); }
         }
         
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app').style.display = 'block';
         setConn(true);
-        
-        // Aplica estado inicial imediatamente
-        if(data.state) applyState(data.state);
-        
         startSync();
         resizeCanvas();
         scheduleRender();
@@ -340,32 +321,26 @@ function showLoginError(msg){
 }
 
 // ============================================
-// TOGGLES (RESPOSTA INSTANTÂNEA)
+// TOGGLES (BLINDADO CONTRA BUG)
 // ============================================
 function tg(el){
-    // 1. Atualiza visual IMEDIATAMENTE
     el.classList.toggle('on'); 
-    
-    // 2. Atualiza preview IMEDIATAMENTE
     scheduleRender();
-    
-    // 3. Envia para o servidor em background (sem esperar)
-    sendStateDebounced(); 
+    sendState(); // Envia imediatamente sem debounce
 }
 
 // ============================================
-// COLOR PICKER (ZERO LAG NO DRAG)
+// COLOR PICKER ORIGINAL (TEMPO REAL + SMOOTH)
 // ============================================
-var cpTarget=null, cpH=0, cpS=1, cpV=1, cpA=1;
-var svTX=1, svTY=0, svCX=1, svCY=0;
-var hTY=0, hCY=0, aCY=0; 
+var cpTarget=null,cpH=0,cpS=1,cpV=1,cpA=1;
+var svTX=1,svTY=0,svCX=1,svCY=0;
+var hTY=0,hCY=0,aCY=0; 
 var animRun=false;
 var cpOl=document.getElementById('cpOl'), cpBox=document.getElementById('cpBox');
 var svEl=document.getElementById('sv'), svTh=document.getElementById('svTh');
 var hueTr=document.getElementById('hueTr'), hueTh=document.getElementById('hueTh');
 var aTr=document.getElementById('aTr'), aGr=document.getElementById('aGr'), aTh=document.getElementById('aTh');
 
-// Funções matemáticas rápidas
 function h2r(h,s,v){
   var r,g,b,i=Math.floor(h*6),f=h*6-i,p=v*(1-s),q=v*(1-f*s),t=v*(1-(1-f)*s);
   switch(i%6){case 0:r=v;g=t;b=p;break;case 1:r=q;g=v;b=p;break;case 2:r=p;g=v;b=t;break;case 3:r=p;g=q;b=v;break;case 4:r=t;g=p;b=v;break;case 5:r=v;g=p;b=q;break;}
@@ -381,7 +356,7 @@ function hex2hsv(hex){
 function lerp(a,b,t){return a+(b-a)*t}
 
 function runAnim(){
-  var sp=0.35; // Animação um pouco mais rápida
+  var sp=0.28;
   svCX=lerp(svCX,svTX,sp);svCY=lerp(svCY,svTY,sp);
   hCY=lerp(hCY,hTY,sp);
   svTh.style.left=(svCX*100)+'%';svTh.style.top=(svCY*100)+'%';
@@ -389,7 +364,7 @@ function runAnim(){
   var aH=aTr.getBoundingClientRect().height||152;
   hueTh.style.top=(hCY*hH)+'px';
   aTh.style.top=(aCY*aH)+'px';
-  if(Math.abs(svCX-svTX)>.001||Math.abs(svCY-svTY)>.001||Math.abs(hCY-hTY)>.001)
+  if(Math.abs(svCX-svTX)>.0005||Math.abs(svCY-svTY)>.0005||Math.abs(hCY-hTY)>.0005)
     requestAnimationFrame(runAnim);
   else animRun=false;
 }
@@ -402,13 +377,11 @@ function updateCP(){
   aGr.style.background='linear-gradient(to bottom,'+hHex+',transparent)';
   hueTh.style.background=hHex;
   aTh.style.background='rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+','+cpA+')';
-  
   if(cpTarget){
     var hex=r2h(rgb[0],rgb[1],rgb[2]);
+    // Atualiza o atributo 'fill' do SVG igual ao original
     var rect = cpTarget.querySelector('rect');
     if(rect) rect.setAttribute('fill', hex);
-    
-    // Preview atualiza em tempo real enquanto arrasta
     scheduleRender();
   }
 }
@@ -422,6 +395,7 @@ function openCP(el){
   if(left<4)left=4;if(top<4)top=4;
   cpBox.style.left=left+'px';cpBox.style.top=top+'px';
 
+  // Pega a cor atual do SVG
   var svgRect = el.querySelector('rect');
   var currentColor = svgRect ? svgRect.getAttribute('fill') : '#ff0000';
 
@@ -441,10 +415,10 @@ function openCP(el){
 }
 
 cpOl.addEventListener('mousedown',function(e){
-  if(e.target===cpOl){cpOl.classList.remove('open');sendStateDebounced();}
+  if(e.target===cpOl){cpOl.classList.remove('open');sendState();}
 });
 cpOl.addEventListener('touchstart',function(e){
-  if(e.target===cpOl){cpOl.classList.remove('open');sendStateDebounced();}
+  if(e.target===cpOl){cpOl.classList.remove('open');sendState();}
 },{passive:true});
 
 var dSV=false,dH=false,dA=false;
@@ -454,14 +428,28 @@ svEl.addEventListener('mousedown',function(e){e.preventDefault();dSV=true;doSV(e
 hueTr.addEventListener('mousedown',function(e){e.preventDefault();dH=true;doH(e)});
 aTr.addEventListener('mousedown',function(e){e.preventDefault();dA=true;doA(e)});
 
-// EVENTOS DE MOUSE/TUCH OTIMIZADOS PARA TEMPO REAL
+// MODIFICAÇÃO 1: Mousemove enviando em tempo real
 document.addEventListener('mousemove',function(e){
-    if(dSV){ doSV(e); sendStateDebounced(); }
-    if(dH){ doH(e); sendStateDebounced(); }
-    if(dA){ doA(e); sendStateDebounced(); }
+    if(dSV){
+        doSV(e);
+        sendState();
+    }
+    if(dH){
+        doH(e);
+        sendState();
+    }
+    if(dA){
+        doA(e);
+        sendState();
+    }
 });
 
-document.addEventListener('mouseup',function(){ dSV=false; dH=false; dA=false; });
+// MODIFICAÇÃO 2: Mouseup apenas parando o drag (sem enviar de novo)
+document.addEventListener('mouseup',function(){ 
+    dSV=false;
+    dH=false;
+    dA=false;
+});
 
 function doSV(e){var r=svEl.getBoundingClientRect();cpS=cl((e.clientX-r.left)/r.width,0,1);cpV=cl(1-(e.clientY-r.top)/r.height,0,1);svTX=cpS;svTY=1-cpV;updateCP();startAnim();}
 function doH(e){var r=hueTr.getBoundingClientRect();cpH=cl((e.clientY-r.top)/r.height,0,.9999);hTY=cpH;updateCP();startAnim();}
@@ -479,47 +467,47 @@ svEl.addEventListener('touchstart',function(e){e.preventDefault();dSV=true;doSV(
 hueTr.addEventListener('touchstart',function(e){e.preventDefault();dH=true;doH(tm(e))},{passive:false});
 aTr.addEventListener('touchstart',function(e){e.preventDefault();dA=true;doA(tm(e))},{passive:false});
 
+// MODIFICAÇÃO 3: Touchmove enviando em tempo real
 document.addEventListener('touchmove',function(e){
   if(dSV||dH||dA){
     e.preventDefault();
     var m=tm(e);
-    if(dSV){ doSV(m); sendStateDebounced(); }
-    if(dH){ doH(m); sendStateDebounced(); }
-    if(dA){ doA(m); sendStateDebounced(); }
+    if(dSV){
+        doSV(m);
+        sendState();
+    }
+    if(dH){
+        doH(m);
+        sendState();
+    }
+    if(dA){
+        doA(m);
+        sendState();
+    }
   }
 },{passive:false});
 
-document.addEventListener('touchend',function(){ dSV=false;dH=false;dA=false; sendStateDebounced(); });
+document.addEventListener('touchend',function(){ dSV=false;dH=false;dA=false; sendState(); });
 
 // ============================================
-// SYNC & STATE (DEBOUNCE INTELIGENTE)
+// SYNC & STATE (ZERO DELAY + PROTEÇÃO)
 // ============================================
-
-let syncInterval;
-let debounceTimer;
-
 async function startSync(){
-    // Sincronização mais rápida (200ms)
-    syncInterval = setInterval(async () => {
+    setInterval(async () => {
         if(!sessionId) return;
-        // Usa select mínimo para ser mais rápido
         const {data, error} = await client.from('n3sk').select('state, is_active').eq('id', sessionId).single();
         if(error || !data || !data.is_active){ location.reload(); return; }
         if(data.state) applyState(data.state);
-    }, 200);
-}
-
-// Função Debounce: Espera 100ms após parar de mexer para enviar
-// Isso evita travar a internet enviando 100 requisições por segundo enquanto arrasta
-function sendStateDebounced() {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(sendState, 100);
+    }, 500);
 }
 
 async function sendState(){
     if(!sessionId) return;
     
-    const currentState = JSON.stringify({
+    isUpdatingLocally = true;
+    setTimeout(() => { isUpdatingLocally = false; }, 300);
+
+    const state = {
         toggles: {
             box: document.getElementById('tgl-box').classList.contains('on'),
             skeleton: document.getElementById('tgl-skeleton').classList.contains('on'),
@@ -533,16 +521,8 @@ async function sendState(){
             healthbarcolor: getSvgColor('sw-healthbarcolor')
         },
         alphas: { boxalpha: cpA, skeletonalpha: 1, snaplinealpha: 1, healthbaralpha: 1 }
-    });
-
-    // Só envia se o estado mudou realmente
-    if(currentState === lastSentState) return;
-    lastSentState = currentState;
-
-    // Envio assíncrono (não bloqueia a UI)
-    client.from('n3sk').update({state: JSON.parse(currentState)}).eq('id', sessionId).then(res => {
-        if(res.error) console.error("Sync error", res.error);
-    });
+    };
+    await client.from('n3sk').update({state}).eq('id', sessionId);
 }
 
 function getSvgColor(id) {
@@ -552,41 +532,29 @@ function getSvgColor(id) {
 }
 
 function applyState(s){
-    // Aplica visualmente sem verificar lock local para garantir sincronia
+    if(isUpdatingLocally) return;
+
     setConn(true);
-    
-    // Toggles
     var tm={box:'tgl-box',skeleton:'tgl-skeleton',snapline:'tgl-snapline',healthbar:'tgl-healthbar'};
     for(var k in tm){
         var el=document.getElementById(tm[k]);
-        if(el && s.toggles) {
-            const isActive = !!s.toggles[k];
-            if(el.classList.contains('on') !== isActive) {
-                el.classList.toggle('on', isActive);
-            }
-        }
+        if(el && s.toggles) el.classList.toggle('on', !!s.toggles[k]);
     }
-    
-    // Colors
     var cm={boxcolor:'sw-boxcolor',skeletoncolor:'sw-skeletoncolor',snaplinecolor:'sw-snaplinecolor',healthbarcolor:'sw-healthbarcolor'};
     for(var k in cm){
         var el=document.getElementById(cm[k]);
         if(el && s.colors && s.colors[k]){ 
+            // Atualiza o SVG com a cor recebida igual ao original
             var rect = el.querySelector('rect');
-            if(rect && rect.getAttribute('fill') !== s.colors[k]) {
-                rect.setAttribute('fill', s.colors[k]);
-            }
+            if(rect) rect.setAttribute('fill', s.colors[k]);
         }
     }
-    
-    // Alphas
-    if(s.alphas && s.alphas.boxalpha !== undefined) {
-        cpA = s.alphas.boxalpha;
+    if(s.alphas) {
+        if(s.alphas.boxalpha !== undefined) cpA = s.alphas.boxalpha;
         aCY = 1 - cpA;
         var aH=aTr.getBoundingClientRect().height||152;
         if(aTh) aTh.style.top=(aCY*aH)+'px';
     }
-    
     scheduleRender();
 }
 
@@ -618,7 +586,7 @@ function showGlobalQr(){
 function closeGlobalQr(){ document.getElementById('qr-modal').classList.remove('active'); }
 
 // ============================================
-// PREVIEW CANVAS
+// PREVIEW CANVAS ORIGINAL
 // ============================================
 var canvas = document.getElementById('espCanvas');
 var ctx = canvas.getContext('2d', { alpha: false });
@@ -663,7 +631,7 @@ function renderPreview() {
   var bX = (canvasWidth - bW) / 2, bY = (canvasHeight - bH) / 2 + 20;
 
   targetBoxOpacity = isBox ? 1 : 0;
-  boxOpacity = lerp(boxOpacity, targetBoxOpacity, 0.15); // Transição mais rápida
+  boxOpacity = lerp(boxOpacity, targetBoxOpacity, 0.05);
 
   if (boxOpacity > 0.01) {
     ctx.globalAlpha = boxOpacity;
@@ -677,7 +645,7 @@ function renderPreview() {
 
   if (isHp) {
     var bw = 6, bx = bX - 12; 
-    hpAnimTime += 0.08; 
+    hpAnimTime += 0.05; 
     var pulse = 0.5 + 0.5 * Math.sin(hpAnimTime * 2 * Math.PI * 0.3);
     var currentHpHeight = bH * pulse;
     ctx.fillStyle = 'rgba(15,15,15,0.8)'; ctx.fillRect(bx, bY, bw, bH);
@@ -689,3 +657,5 @@ function renderPreview() {
 </script>
 </body>
 </html>
+
+quero que arrume esse e mande compelto
