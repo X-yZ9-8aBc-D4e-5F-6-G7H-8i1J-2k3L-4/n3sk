@@ -3,182 +3,259 @@
 <head>
     <meta charset='utf-8'>
     <meta name='viewport' content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no'>
+    <meta name='color-scheme' content='light dark'>
+    <meta name='supported-color-schemes' content='light dark'>
     <title>n3sk</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <style>
-        :root{--red:#c73030;--bg:#0a0a0a;--bg2:#111;--bg3:#1a1a1a;--border:#8b2e2e;--text:#e0e0e0;--muted:#888}
+        :root{ 
+            --red:#c73030;
+            --bg:#0a0a0a;
+            --bg2:#111;
+            --bg3:#1a1a1a;
+            --border:#8b2e2e;
+            --text:#e0e0e0;
+            --muted:#888; 
+            color-scheme: light dark;
+        }
         *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-        html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;overflow:hidden}
-        body{cursor:none!important}
-        #cur{position:fixed;width:18px;height:18px;border:2px solid rgba(199,48,48,0.9);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:transform 0.12s ease}
-        #cur.ck{transform:translate(-50%,-50%) scale(0.65)}
+
+        html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;cursor:none}
+        @media(hover:hover){ 
+            body { cursor: none; }
+            #cur{position:fixed;width:18px;height:18px;border:2px solid rgba(199,48,48,.9);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:transform .12s ease,border-color .15s ease} 
+            #cur.ck{transform:translate(-50%,-50%) scale(.65);border-color:#ff6b6b} 
+        }
+        @media(hover:none), (max-width: 900px){ 
+            * { cursor: auto !important; } 
+            #cur{display:none !important} 
+        }
+
         #app{display:none;height:100%}
         @keyframes fadeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-        @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(74,222,128,0.7)}70%{box-shadow:0 0 0 8px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
-        .wrap{display:flex;height:100%;gap:12px;padding:12px;animation:fadeIn 0.5s ease}
-        .sidebar{width:240px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:14px}
+        @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(74,222,128,.7)}70%{box-shadow:0 0 0 8px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
+        @keyframes floatUp { from { opacity: 0; transform: translateY(40px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .wrap{display:flex;height:100%;gap:12px;padding:12px;animation:fadeIn .5s ease}
+        .sidebar{width:240px;flex-shrink:0;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:14px;}
         .profile-card{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px}
-        .profile-img{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--red)}
+        .profile-img{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--red);box-shadow:0 0 10px rgba(199,48,48,0.3)}
         .profile-info{display:flex;flex-direction:column;gap:2px}
         .profile-name{font-size:14px;font-weight:700;color:#fff}
-        .profile-sub{font-size:10px;color:var(--muted)}
+        .profile-sub{font-size:10px;color:var(--muted);letter-spacing:0.5px}
         .logo{text-align:center;padding:10px 0 16px;border-bottom:1.5px solid var(--border)}
-        .stat-box{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;background:var(--bg3);border-radius:6px}
-        .stat-dot{width:10px;height:10px;border-radius:50%;background:#444}
+        .stat-box{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;background:var(--bg3);border-radius:6px;border:1.5px solid #333}
+        .stat-dot{width:10px;height:10px;border-radius:50%;background:#444;transition:all .3s}
         .stat-dot.on{background:#4ade80;box-shadow:0 0 8px #4ade80;animation:pulse 2s infinite}
-        .stat-txt{font-size:10px;font-weight:700;color:var(--muted)}
+        .stat-txt{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1px;transition:color .3s}
         .stat-txt.on{color:#4ade80}
-        .btn-qr{width:100%;padding:12px;background:transparent;border:1.5px solid var(--red);color:var(--red);font-weight:700;border-radius:8px;cursor:pointer;margin-top:10px}
-        .btn-qr:hover{background:var(--red);color:#fff}
+
+        .btn-global-qr {
+            width: 100%; padding: 12px; background: transparent; border: 1.5px solid #c73030;
+            color: #c73030; font-weight: bold; letter-spacing: 1px; border-radius: 8px;
+            cursor: pointer; transition: all 0.3s; font-size: 11px; text-transform: uppercase;
+            margin-top: 10px;
+        }
+        .btn-global-qr:hover { background: #c73030; color: white; box-shadow: 0 0 15px rgba(199,48,48,0.4); }
+
         .main{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+        .main::-webkit-scrollbar{width:3px} .main::-webkit-scrollbar-thumb{background:#333;border-radius:99px}
+
         .panel{background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;overflow:hidden}
         .ph{background:var(--border);padding:8px 14px;font-size:10px;font-weight:700;letter-spacing:2px;color:#fff}
+        .pgrid{display:grid;gap:0}
         .row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid #1c1c1c}
-        .row:last-child{border-bottom:none}
-        .tgl{width:46px;height:26px;background:#2a2a2a;border-radius:99px;position:relative;border:1.5px solid #444;transition:all 0.3s;cursor:pointer}
-        .tgl.on{background:var(--red);border-color:#ff6b6b}
-        .tgl::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:2px;left:2px;transition:all 0.3s}
+        .row:last-child{border-bottom:none} .row span{font-size:12px;color:var(--text)}
+
+        .preview-panel{width:420px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;flex-shrink:0}
+        .preview-canvas{flex:1;background:#050505;width:100%;height:100%;display:block}
+
+        .tgl{width:46px;height:26px;background:#2a2a2a;border-radius:99px;position:relative;border:1.5px solid #444;transition:all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);user-select:none;flex-shrink:0}
+        .tgl.on{background:var(--red);border-color:#ff6b6b;box-shadow:0 0 8px rgba(199,48,48,.4)}
+        .tgl::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#ffffff;top:2px;left:2px;transition:all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);box-shadow:0 1px 4px rgba(0,0,0,.5)}
         .tgl.on::after{left:22px}
-        .sw{width:36px;height:24px;border-radius:4px;border:1.5px solid #555;cursor:pointer}
-        .preview{width:420px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
-        .preview canvas{flex:1;background:#050505}
-        #login{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,#1a0505,#000);z-index:99999}
-        .card{background:rgba(20,20,20,0.8);backdrop-filter:blur(12px);padding:50px 40px;border-radius:30px;border:1px solid rgba(255,255,255,0.08);text-align:center;animation:fadeIn 0.8s}
-        .card h1{font-size:32px;margin-bottom:15px;letter-spacing:3px}
-        .card h1 span{color:var(--red)}
-        .card p{color:#aaa;margin-bottom:20px}
-        .loader{width:40px;height:40px;margin:0 auto;border:4px solid #333;border-top-color:var(--red);border-radius:50%;animation:spin 1s linear infinite}
-        @keyframes spin{to{transform:rotate(360deg)}}
-        #qr-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;z-index:99998}
-        #qr-modal.active{display:flex}
-        .qr-box{background:#111;padding:40px;border-radius:20px;border:1.5px solid var(--red);text-align:center}
-        .qr-box h2{color:var(--red);margin-bottom:10px}
-        .qr-box #qrcode{background:#fff;padding:15px;border-radius:12px;margin:20px auto;display:inline-block}
-        .qr-close{background:var(--red);color:#fff;border:none;padding:10px 30px;border-radius:8px;font-weight:700;cursor:pointer}
+
+        .sw-container {
+            width: 36px;
+            height: 24px;
+            flex-shrink: 0;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1.5px solid #555;
+            position: relative;
+            cursor: pointer;
+            isolation: isolate; 
+        }
+        .sw-svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+            mix-blend-mode: normal !important;
+        }
+
+        .cp-ol{display:none;position:fixed;inset:0;z-index:9000} .cp-ol.open{display:block}
+        .cp-box{position:fixed;background:#161616;border:1.5px solid var(--border);border-radius:10px;padding:12px;display:flex;gap:10px;align-items:flex-start;z-index:901;box-shadow:0 16px 48px rgba(0,0,0,.9);user-select:none;touch-action:none}
+        .sv{width:190px;height:152px;border-radius:5px;position:relative;overflow:hidden;flex-shrink:0;border:1px solid #222}
+        .sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent)}
+        .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,#000)}
+        .sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,.7),0 2px 5px rgba(0,0,0,.8)}
+        .bars{display:flex;gap:8px}
+        .btr{position:relative;width:14px;height:152px;border-radius:99px;overflow:visible;flex-shrink:0;border:1px solid #222}
+        .bin{position:absolute;inset:0;border-radius:99px;overflow:hidden}
+        .bh{width:100%;height:100%;background:linear-gradient(to bottom,#f00 0%,#ff0 17%,#0f0 33%,#0ff 50%,#00f 67%,#f0f 83%,#f00 100%)}
+        .bck{width:100%;height:100%;background:repeating-conic-gradient(#555 0% 25%,#333 0% 50%) 0 0/8px 8px}
+        .bag{position:absolute;inset:0;border-radius:99px;pointer-events:none}
+        .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,.6),0 2px 5px rgba(0,0,0,.7);pointer-events:none;z-index:10; transition: top 0.1s linear, background 0.1s linear;}
+
+        /* LOGIN SCREEN */
+        #login-screen {
+            position: fixed; inset: 0; z-index: 99999;
+            display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(circle at center, #1a0505 0%, #000000 100%);
+            font-family: 'Segoe UI', sans-serif; color: white;
+        }
+        .login-card {
+            background: rgba(20, 20, 20, 0.8); backdrop-filter: blur(12px);
+            padding: 50px 40px; border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 80px rgba(0, 0, 0, 0.6); text-align: center; max-width: 340px; width: 100%;
+            animation: floatUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .login-card h1 { font-size: 32px; margin: 0 0 15px; letter-spacing: 3px; text-transform: uppercase; font-weight: 800; }
+        .login-card h1 span { color: var(--red); text-shadow: 0 0 20px rgba(199, 48, 48, 0.4); }
+        .login-card p { color: #aaa; font-size: 14px; margin-bottom: 20px; }
+        .login-card.error { border-color: var(--red); }
+        .loader {
+            width: 40px; height: 40px; margin: 0 auto;
+            border: 4px solid #333; border-top: 4px solid var(--red); border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* QR MODAL */
+        #qr-modal {
+            position: fixed; inset: 0; z-index: 99998;
+            display: none; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+        }
+        #qr-modal.active { display: flex; }
+        .qr-modal-content {
+            background: #111; padding: 40px; border-radius: 20px; border: 1.5px solid var(--red);
+            text-align: center; color: white; box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+        }
+        .qr-modal-content h2 { margin: 0 0 10px; color: var(--red); letter-spacing: 2px; }
+        .qr-modal-content p { color: #aaa; font-size: 13px; margin-bottom: 20px; }
+        #qrcode-global { display: inline-block; padding: 15px; background: white; border-radius: 12px; margin-bottom: 20px; }
+        #qrcode-global img, #qrcode-global canvas { display: block; margin: 0 auto; }
+        .qr-close-btn {
+            background: var(--red); color: white; border: none; padding: 10px 30px;
+            border-radius: 8px; font-weight: bold; cursor: pointer; letter-spacing: 1px;
+            transition: background 0.2s;
+        }
+        .qr-close-btn:hover { background: #ff6b6b; }
+
+        @media(max-width:900px){
+            html, body { height: auto; min-height: 100%; overflow-y: auto; }
+            .wrap{flex-direction:column;padding:8px;gap:8px; height: auto; min-height: 100%;}
+            .sidebar{width:100%;flex-direction:row;flex-wrap:wrap;gap:10px;padding:12px; order: 1;}
+            .profile-card{flex:1 1 100%;}
+            .logo{padding:8px 0 10px;flex:1 1 100%;}
+            .stat-box{flex:1}
+            .main{flex:none; order: 2; width: 100%;}
+            .preview-panel{width:100%; height: 60vh; min-height: 500px; order: 3; flex-shrink: 0; margin-bottom: 20px;}
+        }
     </style>
 </head>
 <body>
 
-<div id="login"><div class="card"><h1>N3SK <span></span></h1><p id="msg">Validando...</p><div class="loader"></div></div></div>
-<div id="qr-modal"><div class="qr-box"><h2>QR GLOBAL</h2><div id="qrcode"></div><button class="qr-close" onclick="closeQR()">FECHAR</button></div></div>
-<div id="cur"></div>
+<!-- CURSOR - AGORA NO TOPO PARA FUNCIONAR EM TODA A PÁGINA -->
+<div id='cur'></div>
 
-<div id="app" style="display:none">
-<div class="wrap">
-  <div class="sidebar">
-    <div class="profile-card">
-      <img src="https://via.placeholder.com/100/c73030/ffffff?text=SP" class="profile-img">
-      <div class="profile-info"><div class="profile-name">n3sk</div><div class="profile-sub">Fuck any Anti-cheat</div></div>
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+    <div class="login-card">
+        <h1>n3sk <span></span></h1>
+        <p id="login-msg">Validando acesso...</p>
+        <div class="loader" id="login-loader"></div>
     </div>
-    <div class="logo"></div>
-    <div class="stat-box"><div class="stat-dot" id="dot"></div><div class="stat-txt" id="txt">OFFLINE</div></div>
-    <button class="btn-qr" onclick="showQR()">GERAR QR GLOBAL</button>
-  </div>
-  <div class="main">
-    <div class="panel">
-      <div class="ph">ESP TOGGLES</div>
-      <div class="row"><span>Draw box</span><div class="tgl on" id="tgl-box" onclick="tg(this)"></div></div>
-      <div class="row"><span>Draw skeleton</span><div class="tgl on" id="tgl-skeleton" onclick="tg(this)"></div></div>
-      <div class="row"><span>Draw snapline</span><div class="tgl" id="tgl-snapline" onclick="tg(this)"></div></div>
-      <div class="row"><span>Draw healthbar</span><div class="tgl on" id="tgl-healthbar" onclick="tg(this)"></div></div>
+</div>
+
+<!-- QR MODAL -->
+<div id="qr-modal">
+    <div class="qr-modal-content">
+        <h2>ACESSO GLOBAL</h2>
+        <p>Escaneie para acessar de qualquer dispositivo</p>
+        <div id="qrcode-global"></div>
+        <button class="qr-close-btn" onclick="closeGlobalQr()">FECHAR</button>
     </div>
-    <div class="panel">
-      <div class="ph">ESP COLORS</div>
-      <div class="row"><span>Box color</span><div class="sw" id="sw-boxcolor" onclick="alert('Color picker')" style="background:#ff0000"></div></div>
-      <div class="row"><span>Skeleton color</span><div class="sw" id="sw-skeletoncolor" onclick="alert('Color picker')" style="background:#ffffff"></div></div>
-      <div class="row"><span>Snapline color</span><div class="sw" id="sw-snaplinecolor" onclick="alert('Color picker')" style="background:#00ff00"></div></div>
-      <div class="row"><span>Healthbar color</span><div class="sw" id="sw-healthbarcolor" onclick="alert('Color picker')" style="background:#00ff00"></div></div>
+</div>
+
+<!-- COLOR PICKER OVERLAY -->
+<div class='cp-ol' id='cpOl'>
+    <div class='cp-box' id='cpBox'>
+        <div class='sv' id='sv'><div class='sv-w'></div><div class='sv-b'></div><div class='sv-th' id='svTh'></div></div>
+        <div class='bars'>
+            <div class='btr' id='hueTr'><div class='bin'><div class='bh'></div></div><div class='bth' id='hueTh'></div></div>
+            <div class='btr' id='aTr'><div class='bin'><div class='bck'></div></div><div class='bag' id='aGr'></div><div class='bth' id='aTh'></div></div>
+        </div>
     </div>
-  </div>
-  <div class="preview"><div class="ph">Preview</div><canvas id="cvs"></canvas></div>
+</div>
+
+<!-- APP -->
+<div id='app' style='display:none'>
+<div class='wrap'>
+    <div class='sidebar'>
+        <div class='profile-card'>
+            <img src='https://via.placeholder.com/100/c73030/ffffff?text=SP' class='profile-img' alt='Profile' onerror="this.src='https://i.pinimg.com/474x/ff/c1/a5/ffc1a5f503e31b814ff8953ec6f50c7c.jpg'" />
+            <div class='profile-info'>
+                <div class='profile-name'>n3sk</div>
+                <div class='profile-sub'>Fuck any Anti-cheat</div>
+            </div>
+        </div>
+        <div class='logo'></div>
+        <div class='stat-box'><div class='stat-dot' id='dot'></div><div class='stat-txt' id='txt'>OFFLINE</div></div>
+        <button id="btnGlobalQr" class="btn-global-qr" onclick="showGlobalQr()">GERAR QR GLOBAL</button>
+    </div>
+
+    <div class='main'>
+        <div class='panel'>
+            <div class='ph'>ESP TOGGLES</div>
+            <div class='pgrid'>
+                <div class='row'><span>Draw box</span><div class='tgl on' id='tgl-box' data-k='box' onclick='tg(this)'></div></div>
+                <div class='row'><span>Draw skeleton</span><div class='tgl on' id='tgl-skeleton' data-k='skeleton' onclick='tg(this)'></div></div>
+                <div class='row'><span>Draw snapline</span><div class='tgl' id='tgl-snapline' data-k='snapline' onclick='tg(this)'></div></div>
+                <div class='row'><span>Draw healthbar</span><div class='tgl on' id='tgl-healthbar' data-k='healthbar' onclick='tg(this)'></div></div>
+            </div>
+        </div>
+        <div class='panel'>
+            <div class='ph'>ESP COLORS</div>
+            <div class='pgrid'>
+                <div class='row'><span>Box color</span><div class='sw-container' id='sw-boxcolor' data-k='boxcolor' onclick='openCP(this)'><svg class='sw-svg' viewBox='0 0 100 100' preserveAspectRatio='none'><rect width='100' height='100' fill='#ffffff'/></svg></div></div>
+                <div class='row'><span>Skeleton color</span><div class='sw-container' id='sw-skeletoncolor' data-k='skeletoncolor' onclick='openCP(this)'><svg class='sw-svg' viewBox='0 0 100 100' preserveAspectRatio='none'><rect width='100' height='100' fill='#ff0000'/></svg></div></div>
+                <div class='row'><span>Snapline color</span><div class='sw-container' id='sw-snaplinecolor' data-k='snaplinecolor' onclick='openCP(this)'><svg class='sw-svg' viewBox='0 0 100 100' preserveAspectRatio='none'><rect width='100' height='100' fill='#00ff00'/></svg></div></div>
+                <div class='row'><span>Healthbar color</span><div class='sw-container' id='sw-healthbarcolor' data-k='healthbarcolor' onclick='openCP(this)'><svg class='sw-svg' viewBox='0 0 100 100' preserveAspectRatio='none'><rect width='100' height='100' fill='#00ff00'/></svg></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class='preview-panel'>
+        <div class='ph'>Preview</div>
+        <canvas id='espCanvas' class='preview-canvas'></canvas>
+    </div>
 </div>
 </div>
 
 <script>
-// CONFIGURAÇÃO SUPABASE - SEM REDECLARAR!
-const SUPA_URL = "https://gkzxuerurfedfwuxhimf.supabase.co";
-const SUPA_KEY = "sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6";
-const client = supabase.createClient(SUPA_URL, SUPA_KEY);
-
-let sessionId = null;
-let isGlobal = false;
-
-console.log("[INIT] Página carregada");
-
-// INICIALIZAÇÃO
-window.onload = async function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
-    console.log("[INIT] Token:", token);
-    
-    if (!token) {
-        document.getElementById('msg').textContent = "Token não encontrado";
-        return;
-    }
-    
-    try {
-        const { data, error } = await client
-            .from('n3sk')
-            .select('*')
-            .eq('token', token)
-            .eq('is_active', true)
-            .eq('is_global', false)
-            .single();
-        
-        console.log("[INIT] Dados:", data);
-        console.log("[INIT] Erro:", error);
-        
-        if (error || !data) {
-            document.getElementById('msg').textContent = "Token inválido";
-            return;
-        }
-        
-        sessionId = data.id;
-        isGlobal = data.is_global;
-        
-        console.log("[INIT] Session ID:", sessionId);
-        console.log("[INIT] HWID:", data.hwid);
-        console.log("[INIT] IP:", data.ip);
-        
-        // Validação de IP
-        if (!isGlobal && data.ip && data.ip !== "UNKNOWN") {
-            try {
-                const res = await fetch('https://api.ipify.org?format=json');
-                const ipData = await res.json();
-                console.log("[INIT] Meu IP:", ipData.ip);
-                if (ipData.ip !== data.ip) {
-                    document.getElementById('msg').textContent = "Acesso negado - IP diferente";
-                    return;
-                }
-            } catch (e) {
-                console.warn("Não validou IP");
-            }
-        }
-        
-        // Mostrar app
-        document.getElementById('login').style.display = 'none';
-        document.getElementById('app').style.display = 'block';
-        setConn(true);
-        
-        // Iniciar cursor
-        initCursor();
-        
-        // Iniciar sync
-        startSync();
-        
-        console.log("[INIT] App iniciado!");
-    } catch (e) {
-        console.error("[INIT] Erro:", e);
-        document.getElementById('msg').textContent = "Erro: " + e.message;
-    }
-};
-
-// CURSOR - CORRIGIDO
-function initCursor() {
+// ============================================
+// CURSOR - INICIA IMEDIATAMENTE (ANTES DO LOGIN)
+// ============================================
+(function initCursor() {
     const cur = document.getElementById('cur');
-    if (!cur) {
-        console.log("[CURSOR] Elemento não encontrado");
+    if (!cur) return;
+    
+    // Só ativa em dispositivos com hover (desktop)
+    if (!window.matchMedia("(hover: hover)").matches) {
+        cur.style.display = 'none';
         return;
     }
     
@@ -187,35 +264,131 @@ function initCursor() {
     let cx = mx;
     let cy = my;
     
-    console.log("[CURSOR] Ativado");
-    
     document.addEventListener('mousemove', function(e) {
         mx = e.clientX;
         my = e.clientY;
-    });
+    }, { passive: true });
     
     document.addEventListener('mousedown', function() {
-        cur.classList.add('ck');
+        if(cur) cur.classList.add('ck');
     });
     
     document.addEventListener('mouseup', function() {
-        cur.classList.remove('ck');
+        if(cur) cur.classList.remove('ck');
     });
     
-    function loop() {
+    function cursorLoop() {
         cx += (mx - cx) * 0.13;
         cy += (my - cy) * 0.13;
-        cur.style.left = cx + 'px';
-        cur.style.top = cy + 'px';
-        requestAnimationFrame(loop);
+        if(cur) {
+            cur.style.left = cx + 'px';
+            cur.style.top = cy + 'px';
+        }
+        requestAnimationFrame(cursorLoop);
     }
+    cursorLoop();
+})();
+
+// ============================================
+// SUPABASE CONFIG
+// ============================================
+const SUPA_URL = "https://gkzxuerurfedfwuxhimf.supabase.co";
+const SUPA_KEY = "sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6";
+const client = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+let sessionId = null;
+let isGlobal = false;
+
+console.log("[DEBUG] Página carregada");
+
+// ============================================
+// INICIALIZAÇÃO
+// ============================================
+window.onload = function() {
+    init();
+    resizeCanvas(); 
+    scheduleRender();
+};
+
+async function init() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
     
-    loop();
+    console.log("[DEBUG] Token da URL:", token);
+    
+    if (!token) {
+        showLoginError("Nenhum token fornecido na URL.");
+        return;
+    }
+
+    try {
+        console.log("[DEBUG] Buscando token no Supabase...");
+        const { data, error } = await client
+            .from('n3sk')
+            .select('*')
+            .eq('token', token)
+            .eq('is_active', true)
+            .single();
+
+        console.log("[DEBUG] Resposta Supabase:", data, error);
+
+        if (error || !data) {
+            console.error("[DEBUG] Erro na busca:", error);
+            showLoginError("Token inválido ou sessão expirada.");
+            return;
+        }
+
+        sessionId = data.id;
+        isGlobal = data.is_global;
+        
+        console.log("[DEBUG] Session ID:", sessionId);
+        console.log("[DEBUG] Is Global:", isGlobal);
+        console.log("[DEBUG] IP salvo:", data.ip);
+        console.log("[DEBUG] HWID salvo:", data.hwid);
+
+        if (!isGlobal && data.ip && data.ip !== "UNKNOWN") {
+            try {
+                console.log("[DEBUG] Validando IP público...");
+                const ipRes = await fetch('https://api.ipify.org?format=json');
+                const ipData = await ipRes.json();
+                console.log("[DEBUG] Meu IP:", ipData.ip, "IP salvo:", data.ip);
+                
+                if (ipData.ip !== data.ip) {
+                    showLoginError("Acesso negado. Este link é exclusivo para o dispositivo original.");
+                    return;
+                }
+            } catch (e) {
+                console.warn("[DEBUG] Não conseguiu validar IP, continuando...");
+            }
+        }
+
+        showApp();
+        startStateSync();
+    } catch (e) {
+        console.error("[DEBUG] Erro na init:", e);
+        showLoginError("Erro ao conectar com o servidor: " + e.message);
+    }
 }
 
-// SYNC COM SUPABASE
-async function startSync() {
-    console.log("[SYNC] Iniciando...");
+function showLoginError(msg) {
+    console.error("[DEBUG] Erro login:", msg);
+    document.getElementById('login-msg').textContent = msg;
+    document.getElementById('login-loader').style.display = 'none';
+    document.querySelector('.login-card').classList.add('error');
+}
+
+function showApp() {
+    console.log("[DEBUG] Mostrando app");
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    if (isGlobal) {
+        document.getElementById('btnGlobalQr').style.display = 'none';
+    }
+    setConn(true);
+}
+
+async function startStateSync() {
+    console.log("[DEBUG] Iniciando sync de estado...");
     setInterval(async () => {
         if (!sessionId) return;
         try {
@@ -226,28 +399,33 @@ async function startSync() {
                 .single();
             
             if (error) {
-                console.error("[SYNC] Erro:", error);
+                console.error("[DEBUG] Erro no sync:", error);
                 return;
             }
             
             if (!data || !data.is_active) {
-                console.log("[SYNC] Sessão inativa");
-                location.reload();
+                console.log("[DEBUG] Sessão inativa");
+                showLoginError("Sessão encerrada pelo loader.");
+                document.getElementById('app').style.display = 'none';
+                document.getElementById('login-screen').style.display = 'flex';
+                document.getElementById('login-msg').textContent = "Sessão encerrada.";
+                document.getElementById('login-loader').style.display = 'none';
                 return;
             }
-            
+
             if (data.state) {
                 applyState(data.state);
             }
         } catch (e) {
-            console.error("[SYNC] Exceção:", e);
+            console.error("[DEBUG] Erro no setInterval:", e);
         }
     }, 500);
 }
 
-// ENVIAR ESTADO
-async function sendState() {
+let updateTimeout;
+async function sendStateUpdate() {
     if (!sessionId) return;
+    
     const state = {
         toggles: {
             box: document.getElementById('tgl-box').classList.contains('on'),
@@ -256,58 +434,287 @@ async function sendState() {
             healthbar: document.getElementById('tgl-healthbar').classList.contains('on')
         },
         colors: {
-            boxcolor: "#ff0000",
-            skeletoncolor: "#ffffff",
-            snaplinecolor: "#00ff00",
-            healthbarcolor: "#00ff00"
+            boxcolor: getSvgColor('sw-boxcolor'),
+            skeletoncolor: getSvgColor('sw-skeletoncolor'),
+            snaplinecolor: getSvgColor('sw-snaplinecolor'),
+            healthbarcolor: getSvgColor('sw-healthbarcolor')
         },
-        alphas: { boxalpha: 1, skeletonalpha: 1, snaplinealpha: 1, healthbaralpha: 1 }
+        alphas: {
+            boxalpha: cpA,
+            skeletonalpha: 1.0,
+            snaplinealpha: 1.0,
+            healthbaralpha: 1.0
+        }
     };
     
-    try {
-        await client.from('n3sk').update({ state: state }).eq('id', sessionId);
-    } catch (e) {
-        console.error("[SEND] Erro:", e);
-    }
+    clearTimeout(updateTimeout);
+    updateTimeout = setTimeout(async () => {
+        try {
+            console.log("[DEBUG] Enviando estado:", state);
+            const { data, error } = await client.from('n3sk').update({ state: state }).eq('id', sessionId);
+            if (error) console.error("[DEBUG] Erro ao salvar:", error);
+        } catch (e) {
+            console.error("[DEBUG] Erro ao enviar estado:", e);
+        }
+    }, 150);
 }
 
-function tg(el) {
-    el.classList.toggle('on');
-    sendState();
+function getSvgColor(id) {
+    var el = document.getElementById(id);
+    var rect = el ? el.querySelector('rect') : null;
+    return rect ? rect.getAttribute('fill') : '#ffffff';
 }
 
-function setConn(c) {
-    document.getElementById('dot').classList.toggle('on', c);
-    document.getElementById('txt').classList.toggle('on', c);
-    document.getElementById('txt').textContent = c ? 'CONECTADO' : 'OFFLINE';
-}
-
-function applyState(s) {
-    console.log("[STATE]", s);
-    setConn(true);
-}
-
-function showQR() {
+function showGlobalQr() {
     client.from('n3sk').select('token').eq('id', sessionId).eq('is_global', true).single()
-    .then(({ data, error }) => {
+    .then(({data, error}) => {
         if (data && data.token) {
             const globalLink = `https://n3sk.xyz/?token=${data.token}`;
             document.getElementById('qr-modal').classList.add('active');
-            document.getElementById('qrcode').innerHTML = '';
-            new QRCode(document.getElementById("qrcode"), {
+            document.getElementById('qrcode-global').innerHTML = ''; 
+            new QRCode(document.getElementById("qrcode-global"), {
                 text: globalLink,
                 width: 200,
                 height: 200,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
             });
         }
     });
 }
 
-function closeQR() {
+function closeGlobalQr() {
     document.getElementById('qr-modal').classList.remove('active');
+}
+
+// ============================================
+// PREVIEW CANVAS
+// ============================================
+const PREVIEW_IMG_URL = 'https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png?ex=6a3dcbea&is=6a3c7a6a&hm=95ab23192fdc65d73e612fadc773aac107802e9a93602097a289073aabc498b2&=&format=webp&quality=lossless&width=800&height=968';
+var canvas = document.getElementById('espCanvas');
+var ctx = canvas.getContext('2d', { alpha: false });
+var canvasWidth = 0, canvasHeight = 0, renderScheduled = false, bgImage = null;
+var hpAnimTime = 0;
+var boxOpacity = 0;
+var targetBoxOpacity = 0;
+
+if (PREVIEW_IMG_URL && PREVIEW_IMG_URL.length > 5) {
+    bgImage = new Image(); bgImage.crossOrigin = "Anonymous"; bgImage.src = PREVIEW_IMG_URL;
+    bgImage.onload = function() { scheduleRender(); };
+}
+
+function resizeCanvas() {
+    var rect = canvas.parentElement.getBoundingClientRect();
+    var nw = rect.width, nh = rect.height - 35; 
+    var dpr = window.devicePixelRatio || 1;
+    if (canvasWidth !== nw || canvasHeight !== nh) { 
+        canvas.width = nw * dpr; canvas.height = nh * dpr; 
+        canvas.style.width = nw + 'px'; canvas.style.height = nh + 'px';
+        ctx.scale(dpr, dpr); canvasWidth = nw; canvasHeight = nh; scheduleRender(); 
+    }
+}
+window.addEventListener('resize', resizeCanvas);
+function scheduleRender() { if (!renderScheduled) { renderScheduled = true; requestAnimationFrame(renderPreview); } }
+function lerp(start, end, t) { return start * (1 - t) + end * t; }
+
+function renderPreview() {
+    renderScheduled = false;
+    if (!canvasWidth || !canvasHeight) return;
+    ctx.save();
+    ctx.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0);
+    ctx.fillStyle = '#050505'; ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    
+    if (bgImage && bgImage.complete && bgImage.naturalWidth > 0) {
+        var s = Math.min(canvasWidth / bgImage.width, canvasHeight / bgImage.height);
+        var w = bgImage.width * s, h = bgImage.height * s;
+        ctx.drawImage(bgImage, (canvasWidth - w)/2, (canvasHeight - h)/2, w, h);
+    }
+    
+    var isBox = document.getElementById('tgl-box').classList.contains('on');
+    var isHp = document.getElementById('tgl-healthbar').classList.contains('on');
+    
+    var bC = getSvgColor('sw-boxcolor');
+    var hC = getSvgColor('sw-healthbarcolor');
+    
+    var bH = canvasHeight * 0.75, bW = bH * 0.45;
+    var bX = (canvasWidth - bW) / 2, bY = (canvasHeight - bH) / 2 + 20;
+    
+    targetBoxOpacity = isBox ? 1 : 0;
+    boxOpacity = lerp(boxOpacity, targetBoxOpacity, 0.05);
+    
+    if (boxOpacity > 0.01) {
+        ctx.globalAlpha = boxOpacity;
+        ctx.strokeStyle = bC; ctx.lineWidth = 2; var l = bW * 0.25;
+        ctx.beginPath(); ctx.moveTo(bX, bY + l); ctx.lineTo(bX, bY); ctx.lineTo(bX + l, bY); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(bX + bW - l, bY); ctx.lineTo(bX + bW, bY); ctx.lineTo(bX + bW, bY + l); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(bX, bY + bH - l); ctx.lineTo(bX, bY + bH); ctx.lineTo(bX + l, bY + bH); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(bX + bW - l, bY + bH); ctx.lineTo(bX + bW, bY + bH); ctx.lineTo(bX + bW, bY + bH - l); ctx.stroke();
+        ctx.globalAlpha = 1.0;
+    }
+    
+    if (isHp) {
+        var bw = 6, bx = bX - 12; 
+        hpAnimTime += 0.05; 
+        var pulse = 0.5 + 0.5 * Math.sin(hpAnimTime * 2 * Math.PI * 0.3);
+        var currentHpHeight = bH * pulse;
+        ctx.fillStyle = 'rgba(15,15,15,0.8)'; ctx.fillRect(bx, bY, bw, bH);
+        ctx.fillStyle = hC; ctx.fillRect(bx, bY + (bH - currentHpHeight), bw, currentHpHeight);
+    }
+    ctx.restore();
+    if (Math.abs(boxOpacity - targetBoxOpacity) > 0.01 || isHp) scheduleRender();
+}
+
+// ============================================
+// COLOR PICKER
+// ============================================
+var cpTarget=null,cpH=0,cpS=1,cpV=1,cpA=1;
+var svTX=1,svTY=0,svCX=1,svCY=0;
+var hTY=0,hCY=0,aCY=0; 
+var animRun=false;
+var cpOl=document.getElementById('cpOl'), cpBox=document.getElementById('cpBox');
+var svEl=document.getElementById('sv'), svTh=document.getElementById('svTh');
+var hueTr=document.getElementById('hueTr'), hueTh=document.getElementById('hueTh');
+var aTr=document.getElementById('aTr'), aGr=document.getElementById('aGr'), aTh=document.getElementById('aTh');
+
+function h2r(h,s,v){
+    var r,g,b,i=Math.floor(h*6),f=h*6-i,p=v*(1-s),q=v*(1-f*s),t=v*(1-(1-f)*s);
+    switch(i%6){case 0:r=v;g=t;b=p;break;case 1:r=q;g=v;b=p;break;case 2:r=p;g=v;b=t;break;case 3:r=p;g=q;b=v;break;case 4:r=t;g=p;b=v;break;case 5:r=v;g=p;b=q;break;}
+    return[Math.round(r*255),Math.round(g*255),Math.round(b*255)];
+}
+function r2h(r,g,b){return'#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('')}
+function hex2hsv(hex){
+    var r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255;
+    var mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn,h,s=mx===0?0:d/mx,v=mx;
+    if(d===0)h=0;else if(mx===r)h=((g-b)/d)%6;else if(mx===g)h=(b-r)/d+2;else h=(r-g)/d+4;
+    return[h/6,s,v];
+}
+
+function runAnim(){
+    var sp=0.28;
+    svCX=lerp(svCX,svTX,sp);svCY=lerp(svCY,svTY,sp);
+    hCY=lerp(hCY,hTY,sp);
+    svTh.style.left=(svCX*100)+'%';svTh.style.top=(svCY*100)+'%';
+    var hH=hueTr.getBoundingClientRect().height||152;
+    var aH=aTr.getBoundingClientRect().height||152;
+    hueTh.style.top=(hCY*hH)+'px';
+    aTh.style.top=(aCY*aH)+'px';
+    if(Math.abs(svCX-svTX)>.0005||Math.abs(svCY-svTY)>.0005||Math.abs(hCY-hTY)>.0005)
+        requestAnimationFrame(runAnim);
+    else animRun=false;
+}
+function startAnim(){if(!animRun){animRun=true;requestAnimationFrame(runAnim);}}
+
+function updateCP(){
+    var rgb=h2r(cpH,cpS,cpV),hRgb=h2r(cpH,1,1),hHex=r2h(hRgb[0],hRgb[1],hRgb[2]);
+    svEl.style.background=hHex;
+    svTh.style.background=r2h(rgb[0],rgb[1],rgb[2]);
+    aGr.style.background='linear-gradient(to bottom,'+hHex+',transparent)';
+    hueTh.style.background=hHex;
+    aTh.style.background='rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+','+cpA+')';
+    if(cpTarget){
+        var hex=r2h(rgb[0],rgb[1],rgb[2]);
+        var rect = cpTarget.querySelector('rect');
+        if(rect) rect.setAttribute('fill', hex);
+        scheduleRender();
+    }
+}
+
+function openCP(el){
+    cpTarget=el;
+    var rect=el.getBoundingClientRect(),popW=240,popH=190;
+    var left=rect.right+10,top=rect.top;
+    if(left+popW>innerWidth)left=rect.left-popW-10;
+    if(top+popH>innerHeight)top=innerHeight-popH-10;
+    if(left<4)left=4;if(top<4)top=4;
+    cpBox.style.left=left+'px';cpBox.style.top=top+'px';
+    
+    var svgRect = el.querySelector('rect');
+    var currentColor = svgRect ? svgRect.getAttribute('fill') : '#ff0000';
+    
+    if(currentColor){
+        var hsv=hex2hsv(currentColor);
+        cpH=hsv[0];cpS=hsv[1];cpV=hsv[2];cpA=1;
+    }
+    
+    svCX=cpS;svTX=cpS;svCY=1-cpV;svTY=1-cpV;hCY=cpH;hTY=cpH;aCY=1-cpA;
+    updateCP();
+    svTh.style.left=(svCX*100)+'%';svTh.style.top=(svCY*100)+'%';
+    var hH=hueTr.getBoundingClientRect().height||152;
+    var aH=aTr.getBoundingClientRect().height||152;
+    hueTh.style.top=(hCY*hH)+'px';
+    aTh.style.top=(aCY*aH)+'px';
+    cpOl.classList.add('open');
+}
+
+cpOl.addEventListener('mousedown',function(e){
+    if(e.target===cpOl){cpOl.classList.remove('open');if(cpTarget){sendStateUpdate();}}
+});
+cpOl.addEventListener('touchstart',function(e){
+    if(e.target===cpOl){cpOl.classList.remove('open');if(cpTarget){sendStateUpdate();}}
+},{passive:true});
+
+var dSV=false,dH=false,dA=false;
+function cl(v,a,b){return Math.max(a,Math.min(b,v))}
+
+svEl.addEventListener('mousedown',function(e){e.preventDefault();dSV=true;doSV(e)});
+hueTr.addEventListener('mousedown',function(e){e.preventDefault();dH=true;doH(e)});
+aTr.addEventListener('mousedown',function(e){e.preventDefault();dA=true;doA(e)});
+document.addEventListener('mousemove',function(e){if(dSV)doSV(e);if(dH)doH(e);if(dA)doA(e)});
+document.addEventListener('mouseup',function(){ dSV=false;dH=false;dA=false; sendStateUpdate(); });
+
+function doSV(e){var r=svEl.getBoundingClientRect();cpS=cl((e.clientX-r.left)/r.width,0,1);cpV=cl(1-(e.clientY-r.top)/r.height,0,1);svTX=cpS;svTY=1-cpV;updateCP();startAnim();sendStateUpdate();}
+function doH(e){var r=hueTr.getBoundingClientRect();cpH=cl((e.clientY-r.top)/r.height,0,.9999);hTY=cpH;updateCP();startAnim();sendStateUpdate();}
+function doA(e){
+    var r=aTr.getBoundingClientRect();
+    var height = r.height || 152;
+    cpA = cl(1 - ((e.clientY - r.top) / height), 0, 1);
+    aCY = 1 - cpA; 
+    updateCP();
+    startAnim();
+    sendStateUpdate();
+}
+
+function tm(e){return{clientX:e.touches[0].clientX,clientY:e.touches[0].clientY}}
+svEl.addEventListener('touchstart',function(e){e.preventDefault();dSV=true;doSV(tm(e))},{passive:false});
+hueTr.addEventListener('touchstart',function(e){e.preventDefault();dH=true;doH(tm(e))},{passive:false});
+aTr.addEventListener('touchstart',function(e){e.preventDefault();dA=true;doA(tm(e))},{passive:false});
+document.addEventListener('touchmove',function(e){
+    if(dSV||dH||dA){e.preventDefault();var m=tm(e);if(dSV)doSV(m);if(dH)doH(m);if(dA)doA(m);}
+},{passive:false});
+document.addEventListener('touchend',function(){ dSV=false;dH=false;dA=false; sendStateUpdate(); });
+
+function tg(el){
+    el.classList.toggle('on'); scheduleRender();
+    sendStateUpdate();
+}
+
+function applyState(state){
+    console.log("[DEBUG] Aplicando estado:", state);
+    setConn(true);
+    var tm={box:'tgl-box',skeleton:'tgl-skeleton',snapline:'tgl-snapline',healthbar:'tgl-healthbar'};
+    for(var k in tm){var el=document.getElementById(tm[k]);if(el && state.toggles)el.classList.toggle('on',!!state.toggles[k]);}
+    var cm={boxcolor:'sw-boxcolor',skeletoncolor:'sw-skeletoncolor',snaplinecolor:'sw-snaplinecolor',healthbarcolor:'sw-healthbarcolor'};
+    for(var k in cm){
+        var el=document.getElementById(cm[k]);
+        if(el && state.colors && state.colors[k]){ 
+            var rect = el.querySelector('rect');
+            if(rect) rect.setAttribute('fill', state.colors[k]);
+        }
+    }
+    if(state.alphas) {
+        if(state.alphas.boxalpha !== undefined) cpA = state.alphas.boxalpha;
+        aCY = 1 - cpA;
+        var aH=aTr.getBoundingClientRect().height||152;
+        if(aTh) aTh.style.top=(aCY*aH)+'px';
+    }
+    scheduleRender();
+}
+
+function setConn(c){
+    var d=document.getElementById('dot'),t=document.getElementById('txt');
+    if(c){d.classList.add('on');t.classList.add('on');t.textContent='CONECTADO';}
+    else{d.classList.remove('on');t.classList.remove('on');t.textContent='OFFLINE';}
 }
 </script>
 </body>
