@@ -17,13 +17,18 @@
         #cur.ck{transform:translate(-50%,-50%) scale(0.6)}
         
         /* LOGIN */
-        #login-screen{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center,#1a0505 0%,#000000 100%);color:white}
-        .login-card{background:rgba(20,20,20,0.8);backdrop-filter:blur(12px);padding:50px 40px;border-radius:30px;border:1px solid rgba(255,255,255,0.08);box-shadow:0 20px 80px rgba(0,0,0,0.6);text-align:center;max-width:340px;width:90%;animation:floatUp 0.8s cubic-bezier(0.2,0.8,0.2,1)}
-        @keyframes floatUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
-        .login-card h1{font-size:32px;margin-bottom:15px;letter-spacing:3px;text-transform:uppercase;font-weight:800}
-        .login-card h1 span{color:var(--red);text-shadow:0 0 20px rgba(199,48,48,0.4)}
-        .login-card p{color:#aaa;font-size:14px;margin-bottom:20px}
-        .loader{width:40px;height:40px;margin:0 auto;border:4px solid #333;border-top-color:var(--red);border-radius:50%;animation:spin 1s linear infinite}
+        #login-screen{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg, #0a0a0a 0%, #1a0505 50%, #0f0f0f 100%);color:white;overflow:hidden}
+        #login-screen::before{content:'';position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(199,48,48,0.15) 0%,transparent 70%);border-radius:50%;top:-150px;right:-150px;animation:floatOrb 6s ease-in-out infinite}
+        #login-screen::after{content:'';position:absolute;width:350px;height:350px;background:radial-gradient(circle,rgba(199,48,48,0.1) 0%,transparent 70%);border-radius:50%;bottom:-100px;left:-100px;animation:floatOrb 8s ease-in-out infinite reverse}
+        @keyframes floatOrb{0%,100%{transform:translate(0,0)}50%{transform:translate(40px,40px)}}
+        .login-card{background:linear-gradient(135deg, rgba(25,25,25,0.92) 0%, rgba(30,15,15,0.92) 100%);backdrop-filter:blur(25px);padding:70px 50px;border-radius:28px;border:1.5px solid rgba(199,48,48,0.35);box-shadow:0 40px 150px rgba(199,48,48,0.18),0 0 80px rgba(199,48,48,0.12),inset 0 1px 0 rgba(255,255,255,0.08);text-align:center;max-width:380px;width:90%;animation:floatUpCard 0.9s cubic-bezier(0.34,1.56,0.64,1);position:relative;z-index:10}
+        @keyframes floatUpCard{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:translateY(0)}}
+        .login-card h1{font-size:40px;margin-bottom:12px;letter-spacing:4px;text-transform:uppercase;font-weight:900;background:linear-gradient(135deg, #ffffff 0%, #e8e8e8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .login-card h1 span{background:linear-gradient(135deg, #ff5555 0%, #ff8888 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 20px rgba(199,48,48,0.5))}
+        .login-card p{color:#aaa;font-size:13px;margin-bottom:35px;letter-spacing:1.5px;font-weight:500}
+        .loader{width:60px;height:60px;margin:0 auto;position:relative}
+        .loader::before{content:'';position:absolute;inset:0;border:3px solid transparent;border-top-color:var(--red);border-right-color:var(--red);border-radius:50%;animation:spin 1.5s cubic-bezier(0.68,-0.55,0.265,1.55) infinite;box-shadow:0 0 25px rgba(199,48,48,0.4)}
+        .loader::after{content:'';position:absolute;inset:8px;border:2px solid transparent;border-bottom-color:var(--red);border-left-color:var(--red);border-radius:50%;animation:spin 2s cubic-bezier(0.68,-0.55,0.265,1.55) infinite reverse}
         @keyframes spin{to{transform:rotate(360deg)}}
         
         /* APP LAYOUT */
@@ -92,14 +97,14 @@
         .sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent)}
         .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,#000)}
         /* SMOOTH NAS BOLINHAS DO COLOR PICKER */
-        .sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,0.7);transition:all 0.08s cubic-bezier(0.25,0.46,0.45,0.94)}
+        .sv-th{position:absolute;width:14px;height:14px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 2px rgba(0,0,0,0.8),0 4px 15px rgba(0,0,0,0.4);transition:all 0.12s cubic-bezier(0.34,1.56,0.64,1);z-index:15}
         .bars{display:flex;gap:8px}
         .btr{position:relative;width:14px;height:152px;border-radius:99px;overflow:visible;border:1px solid #222;cursor:none}
         .bin{position:absolute;inset:0;border-radius:99px;overflow:hidden}
         .bh{width:100%;height:100%;background:linear-gradient(to bottom,#f00 0%,#ff0 17%,#0f0 33%,#0ff 50%,#00f 67%,#f0f 83%,#f00 100%)}
         .bck{width:100%;height:100%;background:repeating-conic-gradient(#555 0% 25%,#333 0% 50%) 0 0/8px 8px}
         .bag{position:absolute;inset:0;border-radius:99px;pointer-events:none}
-        .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,0.6);pointer-events:none;z-index:10;transition:all 0.08s cubic-bezier(0.25,0.46,0.45,0.94)}
+        .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 2px rgba(0,0,0,0.8),0 4px 15px rgba(0,0,0,0.4);pointer-events:none;z-index:15;transition:all 0.12s cubic-bezier(0.34,1.56,0.64,1)}
         
         /* MOBILE RESPONSIVE */
         @media(max-width:900px){
@@ -302,6 +307,7 @@ let svTX = 1, svTY = 0, svCX = 1, svCY = 0;
 let hTY = 0, hCY = 0, aCY = 0;
 let animRun = false;
 let dSV = false, dH = false, dA = false;
+let sendStateDebounce = null; // Para enviar estado em tempo real
 
 const cpOl = document.getElementById('cpOl');
 const cpBox = document.getElementById('cpBox');
@@ -451,6 +457,7 @@ function doSV(e){
     cpV = clamp(1 - (e.clientY - r.top)/r.height, 0, 1);
     svTX = cpS; svTY = 1 - cpV;
     updateCP(); // Atualiza EM TEMPO REAL enquanto arrasta
+    sendRealTimeState(); // Envia estado em tempo real
     startAnim();
 }
 
@@ -459,6 +466,7 @@ function doH(e){
     cpH = clamp((e.clientY - r.top)/r.height, 0, 0.9999);
     hTY = cpH;
     updateCP(); // Atualiza EM TEMPO REAL
+    sendRealTimeState(); // Envia estado em tempo real
     startAnim();
 }
 
@@ -469,6 +477,15 @@ function doA(e){
     aCY = 1 - cpA;
     updateHandles(); 
     updateCP(); // Atualiza EM TEMPO REAL
+    sendRealTimeState(); // Envia estado em tempo real
+}
+
+// Função para enviar estado em tempo real com debounce
+function sendRealTimeState(){
+    clearTimeout(sendStateDebounce);
+    sendStateDebounce = setTimeout(() => {
+        sendState();
+    }, 60);
 }
 
 // Touch support
