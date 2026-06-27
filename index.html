@@ -12,62 +12,59 @@
         *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
         html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;overflow:hidden}
         
-        /* CURSOR - agora aparece em todo lugar */
-        body{cursor:none}
+        /* CURSOR GLOBAL - Z-INDEX MÁXIMO */
+        body{cursor:none !important}
         *{cursor:none !important}
-        #cur{display:block;position:fixed;width:18px;height:18px;border:2px solid rgba(199,48,48,0.9);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:transform 0.08s ease}
+        #cur{position:fixed;width:18px;height:18px;border:2px solid rgba(199,48,48,0.9);border-radius:50%;pointer-events:none;z-index:9999999;transform:translate(-50%,-50%);transition:transform 0.08s ease;display:block !important}
         #cur.ck{transform:translate(-50%,-50%) scale(0.65)}
         
-        /* LOGIN SCREEN - MODERNA */
+        /* LOGIN SCREEN - SUPER MODERNA */
         #login-screen{
-            position:fixed;inset:0;z-index:99999;
+            position:fixed;inset:0;z-index:99998;
             display:flex;align-items:center;justify-content:center;
             background:linear-gradient(135deg,#0a0a0a 0%,#1a0505 50%,#0a0a0a 100%);
             font-family:'Segoe UI',sans-serif;color:white;
-            animation:bgShift 15s ease infinite;
         }
-        @keyframes bgShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
         
         .login-card{
-            background:rgba(15,15,15,0.95);backdrop-filter:blur(20px);
-            padding:60px 50px;border-radius:20px;
-            border:1.5px solid rgba(199,48,48,0.3);
-            box-shadow:0 25px 100px rgba(0,0,0,0.7),inset 0 1px 0 rgba(199,48,48,0.2);
-            text-align:center;max-width:380px;width:100%;
-            animation:floatIn 0.8s cubic-bezier(0.34,1.56,0.64,1);
+            background:rgba(15,15,15,0.98);backdrop-filter:blur(25px);
+            padding:70px 55px;border-radius:25px;
+            border:1px solid rgba(199,48,48,0.25);
+            box-shadow:0 30px 120px rgba(0,0,0,0.8),inset 0 1px 0 rgba(199,48,48,0.15),0 0 60px rgba(199,48,48,0.1);
+            text-align:center;max-width:420px;width:95%;
+            animation:popIn 0.6s cubic-bezier(0.34,1.56,0.64,1);
         }
-        @keyframes floatIn{
-            0%{opacity:0;transform:translateY(50px) scale(0.9)}
+        @keyframes popIn{
+            0%{opacity:0;transform:translateY(60px) scale(0.85)}
             100%{opacity:1;transform:translateY(0) scale(1)}
         }
         
         .login-card h1{
-            font-size:48px;margin:0 0 10px;letter-spacing:4px;text-transform:uppercase;font-weight:900;
-            background:linear-gradient(135deg,#ff6b6b,var(--red),#ff4444);
+            font-size:56px;margin:0 0 8px;letter-spacing:5px;text-transform:uppercase;font-weight:900;
+            background:linear-gradient(135deg,#ff8888,var(--red),#ff5555);
             -webkit-background-clip:text;
             -webkit-text-fill-color:transparent;
             background-clip:text;
-            text-shadow:0 0 30px rgba(199,48,48,0.3);
         }
         
         .login-status{
-            display:flex;align-items:center;justify-content:center;gap:8px;margin:30px 0 20px;
+            display:flex;align-items:center;justify-content:center;gap:10px;margin:40px 0 25px;
         }
         
         .status-dot{
-            width:8px;height:8px;border-radius:50%;background:#444;animation:pulse-status 1.5s ease-in-out infinite;
+            width:9px;height:9px;border-radius:50%;background:#444;animation:pulse-status 1.3s ease-in-out infinite;
         }
-        .status-dot.checking{background:#ffa500;box-shadow:0 0 10px #ffa500}
+        .status-dot.checking{background:#ffa500;box-shadow:0 0 12px #ffa500}
         
         @keyframes pulse-status{
-            0%,100%{opacity:0.5;transform:scale(1)}
-            50%{opacity:1;transform:scale(1.2)}
+            0%,100%{opacity:0.4;transform:scale(1)}
+            50%{opacity:1;transform:scale(1.3)}
         }
         
-        .login-card p{color:#aaa;font-size:14px;margin-bottom:15px;letter-spacing:0.5px}
+        .login-card p{color:#999;font-size:13px;margin-bottom:20px;letter-spacing:0.8px;font-weight:500}
         
         .loader{
-            width:40px;height:40px;margin:0 auto 15px;
+            width:45px;height:45px;margin:0 auto 20px;
             border:3px solid #2a2a2a;
             border-top-color:var(--red);
             border-radius:50%;
@@ -80,79 +77,81 @@
         @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(74,222,128,0.7)}70%{box-shadow:0 0 0 8px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
         
         .wrap{display:flex;height:100%;gap:12px;padding:12px;animation:fadeIn 0.5s ease}
-        .sidebar{width:240px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:14px}
+        .sidebar{width:240px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:14px;overflow-y:auto}
         .profile-card{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px}
-        .profile-img{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--red);box-shadow:0 0 10px rgba(199,48,48,0.3);background:var(--bg3)}
+        .profile-img{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--red);box-shadow:0 0 10px rgba(199,48,48,0.3);background:var(--bg3);flex-shrink:0}
         .profile-info{display:flex;flex-direction:column;gap:2px}
         .profile-name{font-size:14px;font-weight:700;color:#fff}
         .profile-sub{font-size:10px;color:var(--muted)}
         .logo{text-align:center;padding:10px 0 16px;border-bottom:1.5px solid var(--border)}
         .stat-box{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;background:var(--bg3);border-radius:6px}
-        .stat-dot{width:10px;height:10px;border-radius:50%;background:#444}
-        .stat-dot.on{background:#4ade80;box-shadow:0 0 8px #4ade80;animation:pulse 2s infinite}
-        .stat-txt{font-size:10px;font-weight:700;color:var(--muted)}
+        .stat-dot{width:10px;height:10px;border-radius:50%;background:#444;transition:all 0.3s}
+        .stat-dot.on{background:#4ade80;box-shadow:0 0 10px #4ade80;animation:pulse 2s infinite}
+        .stat-txt{font-size:10px;font-weight:700;color:var(--muted);transition:all 0.3s}
         .stat-txt.on{color:#4ade80}
         
-        .btn-qr{width:100%;padding:12px;background:transparent;border:1.5px solid var(--red);color:var(--red);font-weight:700;border-radius:8px;cursor:pointer;margin-top:10px;transition:all 0.3s}
-        .btn-qr:hover{background:var(--red);color:#fff;box-shadow:0 0 15px rgba(199,48,48,0.4)}
+        .btn-qr{width:100%;padding:12px;background:transparent;border:1.5px solid var(--red);color:var(--red);font-weight:700;border-radius:8px;cursor:pointer;margin-top:10px;transition:all 0.25s;user-select:none}
+        .btn-qr:hover{background:var(--red);color:#fff;box-shadow:0 0 20px rgba(199,48,48,0.5)}
+        .btn-qr:active{transform:scale(0.98)}
         
         .main{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
         .panel{background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;overflow:hidden}
         .ph{background:var(--border);padding:8px 14px;font-size:10px;font-weight:700;letter-spacing:2px;color:#fff}
-        .row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid #1c1c1c}
+        .row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid #1c1c1c;user-select:none}
         .row:last-child{border-bottom:none}
         
         .tgl{
-            width:48px;height:26px;background:#2a2a2a;border-radius:99px;position:relative;
-            border:1.5px solid #444;transition:all 0.2s ease;cursor:pointer;
+            width:50px;height:28px;background:#2a2a2a;border-radius:99px;position:relative;
+            border:1.5px solid #444;transition:all 0.15s ease;cursor:pointer;flex-shrink:0;
         }
-        .tgl.on{background:var(--red);border-color:#ff6b6b;box-shadow:0 0 12px rgba(199,48,48,0.4)}
+        .tgl.on{background:var(--red);border-color:#ff6b6b;box-shadow:0 0 15px rgba(199,48,48,0.5)}
         .tgl::after{
-            content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;
-            top:2px;left:2px;transition:all 0.2s ease;box-shadow:0 2px 4px rgba(0,0,0,0.3)
+            content:'';position:absolute;width:22px;height:22px;border-radius:50%;background:#fff;
+            top:2px;left:2px;transition:all 0.15s ease;box-shadow:0 2px 5px rgba(0,0,0,0.3)
         }
-        .tgl.on::after{left:24px;box-shadow:0 2px 8px rgba(0,0,0,0.4)}
+        .tgl.on::after{left:26px;box-shadow:0 2px 8px rgba(0,0,0,0.4)}
         
-        .sw{width:36px;height:24px;border-radius:4px;border:1.5px solid #555;cursor:pointer;transition:all 0.15s}
-        .sw:hover{border-color:var(--red);box-shadow:0 0 8px rgba(199,48,48,0.2)}
+        .sw{width:38px;height:26px;border-radius:5px;border:1.5px solid #555;cursor:pointer;transition:all 0.15s;flex-shrink:0}
+        .sw:hover{border-color:var(--red);box-shadow:0 0 10px rgba(199,48,48,0.25)}
         
         .preview{width:420px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
         .preview canvas{flex:1;background:#050505}
         
-        /* QR MODAL - MELHORADO */
-        #qr-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);align-items:center;justify-content:center;z-index:99998;backdrop-filter:blur(12px)}
-        #qr-modal.active{display:flex}
+        /* QR MODAL - ELEGANTE */
+        #qr-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.96);align-items:center;justify-content:center;z-index:99997;backdrop-filter:blur(15px)}
+        #qr-modal.active{display:flex;animation:fadeIn 0.3s ease}
         .qr-box{
-            background:rgba(15,15,15,0.98);padding:50px;border-radius:20px;border:1.5px solid var(--red);
-            text-align:center;box-shadow:0 25px 100px rgba(0,0,0,0.9),0 0 40px rgba(199,48,48,0.2);
+            background:rgba(15,15,15,0.99);padding:55px;border-radius:25px;border:1px solid rgba(199,48,48,0.25);
+            text-align:center;box-shadow:0 30px 120px rgba(0,0,0,0.9),0 0 60px rgba(199,48,48,0.15);
             animation:slideUp 0.4s cubic-bezier(0.34,1.56,0.64,1);
         }
-        @keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
-        .qr-box h2{color:var(--red);margin-bottom:10px;letter-spacing:2px;font-size:24px}
-        .qr-box #qrcode{background:#fff;padding:20px;border-radius:15px;margin:25px auto;display:inline-block;box-shadow:0 10px 40px rgba(199,48,48,0.2)}
-        .qr-close{background:var(--red);color:#fff;border:none;padding:12px 35px;border-radius:8px;font-weight:700;cursor:pointer;margin-top:20px;transition:all 0.3s}
-        .qr-close:hover{background:#ff6b6b;box-shadow:0 0 15px rgba(199,48,48,0.4);transform:translateY(-2px)}
+        @keyframes slideUp{from{opacity:0;transform:translateY(40px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+        .qr-box h2{color:var(--red);margin-bottom:12px;letter-spacing:2px;font-size:26px;font-weight:900}
+        .qr-box #qrcode{background:#fff;padding:25px;border-radius:18px;margin:30px auto;display:inline-block;box-shadow:0 15px 50px rgba(199,48,48,0.25)}
+        .qr-close{background:var(--red);color:#fff;border:none;padding:14px 40px;border-radius:8px;font-weight:700;cursor:pointer;margin-top:25px;transition:all 0.25s;font-size:14px;user-select:none}
+        .qr-close:hover{background:#ff6b6b;box-shadow:0 0 20px rgba(199,48,48,0.5);transform:translateY(-2px)}
+        .qr-close:active{transform:translateY(0)}
         
-        /* COLOR PICKER */
+        /* COLOR PICKER - RESPONSIVO */
         .cp-ol{display:none;position:fixed;inset:0;z-index:9000}
         .cp-ol.open{display:block}
-        .cp-box{position:fixed;background:#161616;border:1.5px solid var(--border);border-radius:10px;padding:12px;display:flex;gap:10px;align-items:flex-start;z-index:901;box-shadow:0 16px 48px rgba(0,0,0,0.9)}
-        .sv{width:190px;height:152px;border-radius:5px;position:relative;overflow:hidden;border:1px solid #222;cursor:crosshair}
+        .cp-box{position:fixed;background:#161616;border:1.5px solid var(--border);border-radius:12px;padding:14px;display:flex;gap:12px;align-items:flex-start;z-index:9001;box-shadow:0 20px 60px rgba(0,0,0,0.95);user-select:none}
+        .sv{width:200px;height:160px;border-radius:6px;position:relative;overflow:hidden;border:1px solid #222;cursor:crosshair}
         .sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent)}
         .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,#000)}
-        .sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,0.7)}
-        .bars{display:flex;gap:8px}
-        .btr{position:relative;width:14px;height:152px;border-radius:99px;overflow:visible;border:1px solid #222;cursor:pointer}
+        .sv-th{position:absolute;width:14px;height:14px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,0.8)}
+        .bars{display:flex;gap:10px}
+        .btr{position:relative;width:16px;height:160px;border-radius:99px;overflow:visible;border:1px solid #222;cursor:pointer}
         .bin{position:absolute;inset:0;border-radius:99px;overflow:hidden}
         .bh{width:100%;height:100%;background:linear-gradient(to bottom,#f00 0%,#ff0 17%,#0f0 33%,#0ff 50%,#00f 67%,#f0f 83%,#f00 100%)}
         .bck{width:100%;height:100%;background:repeating-conic-gradient(#555 0% 25%,#333 0% 50%) 0 0/8px 8px}
         .bag{position:absolute;inset:0;border-radius:99px;pointer-events:none}
-        .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,0.6);pointer-events:none;z-index:10}
+        .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,0.7);pointer-events:none;z-index:10}
     </style>
 </head>
 <body>
 
-<!-- CURSOR -->
+<!-- CURSOR GLOBAL -->
 <div id="cur"></div>
 
 <!-- LOGIN SCREEN -->
@@ -161,7 +160,7 @@
         <h1>N3SK</h1>
         <div class="login-status">
             <div class="status-dot checking"></div>
-            <span id="login-msg" style="font-size:13px;color:#aaa">Validando acesso...</span>
+            <span id="login-msg" style="font-size:13px;color:#999">Validando acesso...</span>
         </div>
         <div class="loader" id="login-loader"></div>
         <p>Aguarde...</p>
@@ -172,7 +171,7 @@
 <div id="qr-modal">
     <div class="qr-box">
         <h2>QR GLOBAL</h2>
-        <p style="color:#aaa;font-size:13px;margin-bottom:20px">Escaneie para acessar de qualquer dispositivo</p>
+        <p style="color:#999;font-size:13px;margin-bottom:20px">Escaneie para acessar</p>
         <div id="qrcode"></div>
         <button class="qr-close" onclick="closeQR()">FECHAR</button>
     </div>
@@ -190,31 +189,31 @@
 </div>
 
 <!-- APP -->
-<div id="app" style="display:none">
+<div id="app">
 <div class="wrap">
     <div class="sidebar">
         <div class="profile-card">
-            <img src="https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png" class="profile-img" onerror="this.style.background='var(--red)'; this.style.display='block';">
-            <div class="profile-info"><div class="profile-name">n3sk</div><div class="profile-sub">Fuck any Anti-cheat</div></div>
+            <img src="https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png" class="profile-img" onerror="this.style.background='var(--red)';">
+            <div class="profile-info"><div class="profile-name">n3sk</div><div class="profile-sub">Anti-cheat</div></div>
         </div>
         <div class="logo"></div>
         <div class="stat-box"><div class="stat-dot" id="dot"></div><div class="stat-txt" id="txt">OFFLINE</div></div>
-        <button class="btn-qr" onclick="showQR()">GERAR QR GLOBAL</button>
+        <button class="btn-qr" onclick="showQR()">GERAR QR</button>
     </div>
     <div class="main">
         <div class="panel">
             <div class="ph">ESP TOGGLES</div>
-            <div class="row"><span>Draw box</span><div class="tgl on" id="tgl-box" onclick="toggleSwitch(this,'box')"></div></div>
-            <div class="row"><span>Draw skeleton</span><div class="tgl on" id="tgl-skeleton" onclick="toggleSwitch(this,'skeleton')"></div></div>
-            <div class="row"><span>Draw snapline</span><div class="tgl" id="tgl-snapline" onclick="toggleSwitch(this,'snapline')"></div></div>
-            <div class="row"><span>Draw healthbar</span><div class="tgl on" id="tgl-healthbar" onclick="toggleSwitch(this,'healthbar')"></div></div>
+            <div class="row"><span>Draw box</span><div class="tgl on" id="tgl-box" data-key="box" onclick="quickToggle(this)"></div></div>
+            <div class="row"><span>Draw skeleton</span><div class="tgl on" id="tgl-skeleton" data-key="skeleton" onclick="quickToggle(this)"></div></div>
+            <div class="row"><span>Draw snapline</span><div class="tgl" id="tgl-snapline" data-key="snapline" onclick="quickToggle(this)"></div></div>
+            <div class="row"><span>Draw healthbar</span><div class="tgl on" id="tgl-healthbar" data-key="healthbar" onclick="quickToggle(this)"></div></div>
         </div>
         <div class="panel">
             <div class="ph">ESP COLORS</div>
-            <div class="row"><span>Box color</span><div class="sw" id="sw-boxcolor" data-hex="#ff0000" onclick="openColorPicker(this,'#ff0000')" style="background:#ff0000"></div></div>
-            <div class="row"><span>Skeleton color</span><div class="sw" id="sw-skeletoncolor" data-hex="#ffffff" onclick="openColorPicker(this,'#ffffff')" style="background:#ffffff"></div></div>
-            <div class="row"><span>Snapline color</span><div class="sw" id="sw-snaplinecolor" data-hex="#00ff00" onclick="openColorPicker(this,'#00ff00')" style="background:#00ff00"></div></div>
-            <div class="row"><span>Healthbar color</span><div class="sw" id="sw-healthbarcolor" data-hex="#00ff00" onclick="openColorPicker(this,'#00ff00')" style="background:#00ff00"></div></div>
+            <div class="row"><span>Box</span><div class="sw" id="sw-boxcolor" data-hex="#ff0000" onclick="openColorPicker(this)" style="background:#ff0000"></div></div>
+            <div class="row"><span>Skeleton</span><div class="sw" id="sw-skeletoncolor" data-hex="#ffffff" onclick="openColorPicker(this)" style="background:#ffffff"></div></div>
+            <div class="row"><span>Snapline</span><div class="sw" id="sw-snaplinecolor" data-hex="#00ff00" onclick="openColorPicker(this)" style="background:#00ff00"></div></div>
+            <div class="row"><span>Healthbar</span><div class="sw" id="sw-healthbarcolor" data-hex="#00ff00" onclick="openColorPicker(this)" style="background:#00ff00"></div></div>
         </div>
     </div>
     <div class="preview"><div class="ph">Preview</div><canvas id="cvs"></canvas></div>
@@ -223,7 +222,7 @@
 
 <script>
 // ============================================
-// CURSOR GLOBAL
+// CURSOR GLOBAL - SEMPRE VISÍVEL
 // ============================================
 (function(){
     const cur = document.getElementById('cur');
@@ -235,12 +234,12 @@
         my = e.clientY; 
     }, {passive:true});
     
-    document.addEventListener('mousedown', () => cur.classList.add('ck'));
-    document.addEventListener('mouseup', () => cur.classList.remove('ck'));
+    document.addEventListener('mousedown', () => cur.classList.add('ck'), {passive:true});
+    document.addEventListener('mouseup', () => cur.classList.remove('ck'), {passive:true});
     
     function loop(){
-        cx += (mx-cx)*0.15;
-        cy += (my-cy)*0.15;
+        cx += (mx-cx)*0.16;
+        cy += (my-cy)*0.16;
         cur.style.left = cx+'px';
         cur.style.top = cy+'px';
         requestAnimationFrame(loop);
@@ -256,9 +255,7 @@ const SUPA_KEY = "sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6";
 const client = supabase.createClient(SUPA_URL, SUPA_KEY);
 
 let sessionId = null;
-let mainToken = null;
 let globalSessionId = null;
-let globalToken = null;
 let syncInterval = null;
 
 // ============================================
@@ -270,60 +267,42 @@ window.onload = async function(){
     
     if(!token){
         document.getElementById('login-msg').textContent = "Token não encontrado";
-        document.querySelector('.status-dot').style.background = '#ff4444';
         return;
     }
     
     try{
-        // Buscar sessão (main ou global)
         const {data, error} = await client.from('n3sk').select('*').eq('token', token).eq('is_active', true).single();
-        console.log("[INIT] Dados:", data, "Erro:", error);
         
         if(error || !data){
             document.getElementById('login-msg').textContent = "Token inválido";
-            document.querySelector('.status-dot').style.background = '#ff4444';
             return;
         }
         
         sessionId = data.id;
-        mainToken = data.token;
         
-        // Se é uma sessão global, buscar a main correspondente
+        // Se é global, buscar main
         if(data.is_global){
             const mainId = data.id.replace('_GLOBAL', '');
-            const {data: mainData} = await client.from('n3sk').select('*').eq('id', mainId).eq('is_global', false).single();
-            if(mainData){
-                globalSessionId = data.id;
-                globalToken = data.token;
-                sessionId = mainId;
-            } else {
-                document.getElementById('login-msg').textContent = "Sessão main não encontrada";
-                return;
-            }
+            globalSessionId = data.id;
+            sessionId = mainId;
         } else {
-            // É uma main, buscar a global correspondente
+            // Se é main, buscar/esperar global
             globalSessionId = `${data.id}_GLOBAL`;
-            const {data: globalData} = await client.from('n3sk').select('token').eq('id', globalSessionId).eq('is_global', true).single();
-            if(globalData){
-                globalToken = globalData.token;
-            }
         }
         
-        // Validação de IP para main sessions
+        // Validação IP
         if(!data.is_global && data.ip && data.ip !== "UNKNOWN"){
             try{
                 const res = await fetch('https://api.ipify.org?format=json');
                 const ipData = await res.json();
                 if(ipData.ip !== data.ip){
-                    document.getElementById('login-msg').textContent = "Acesso negado - IP diferente";
-                    document.querySelector('.status-dot').style.background = '#ff4444';
+                    document.getElementById('login-msg').textContent = "IP diferente";
                     return;
                 }
             }catch(e){}
         }
         
-        // Marcar como a origem desta sessão
-        localStorage.setItem('n3sk_session_owner', sessionId);
+        localStorage.setItem('n3sk_session', sessionId);
         
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app').style.display = 'block';
@@ -331,31 +310,38 @@ window.onload = async function(){
         startSync();
         resizeCanvas();
         scheduleRender();
-        console.log("[INIT] App iniciado!");
+        console.log("[INIT] Pronto!");
+        
     }catch(e){
-        console.error("[INIT] Erro:", e);
-        document.getElementById('login-msg').textContent = "Erro: "+e.message;
-        document.querySelector('.status-dot').style.background = '#ff4444';
+        console.error(e);
+        document.getElementById('login-msg').textContent = "Erro";
     }
 };
 
 // ============================================
-// TOGGLES - CORRIGIDO
+// TOGGLE - SEM BUGS
 // ============================================
-function toggleSwitch(el, key){
+let toggleDebounce = {};
+
+function quickToggle(el){
+    const key = el.getAttribute('data-key');
+    if(toggleDebounce[key]) return;
+    
+    toggleDebounce[key] = true;
     el.classList.toggle('on');
     scheduleRender();
     sendState();
+    
+    setTimeout(() => delete toggleDebounce[key], 50);
 }
 
 // ============================================
-// COLOR PICKER - REAL-TIME UPDATE
+// COLOR PICKER - REAL-TIME
 // ============================================
 let cpTarget = null;
 let cpH = 0, cpS = 1, cpV = 1, cpA = 1;
-let svTX = 1, svTY = 0, svCX = 1, svCY = 0;
-let hTY = 0, hCY = 0, aCY = 0;
 let dSV = false, dH = false, dA = false;
+let lastSendTime = 0;
 
 const cpOl = document.getElementById('cpOl');
 const cpBox = document.getElementById('cpBox');
@@ -367,35 +353,19 @@ const aTr = document.getElementById('aTr');
 const aGr = document.getElementById('aGr');
 const aTh = document.getElementById('aTh');
 
-function openColorPicker(el, defaultColor){
+function openColorPicker(el){
     cpTarget = el;
     const rect = el.getBoundingClientRect();
-    cpBox.style.left = Math.min(rect.right + 10, window.innerWidth - 250) + 'px';
-    cpBox.style.top = Math.min(rect.top, window.innerHeight - 200) + 'px';
+    cpBox.style.left = Math.min(rect.right + 15, window.innerWidth - 270) + 'px';
+    cpBox.style.top = Math.min(rect.top, window.innerHeight - 220) + 'px';
     
-    let hex = el.getAttribute('data-hex') || defaultColor;
-    if(!hex.startsWith('#')){
-        hex = rgbToHex(el.style.backgroundColor || defaultColor);
-    }
-    
+    let hex = el.getAttribute('data-hex') || '#ff0000';
     const hsv = hexToHsv(hex);
     cpH = hsv[0]; cpS = hsv[1]; cpV = hsv[2]; cpA = 1;
-    
-    svCX = cpS; svTX = cpS;
-    svCY = 1 - cpV; svTY = 1 - cpV;
-    hCY = cpH; hTY = cpH;
-    aCY = 1 - cpA;
     
     updateCP();
     updateHandles();
     cpOl.classList.add('open');
-}
-
-function rgbToHex(rgb){
-    if(rgb.startsWith('#')) return rgb;
-    const values = rgb.match(/\d+/g);
-    if(!values || values.length < 3) return '#ff0000';
-    return '#' + values.slice(0,3).map(x => parseInt(x).toString(16).padStart(2,'0')).join('');
 }
 
 function hexToHsv(hex){
@@ -435,15 +405,15 @@ function hsvToRgb(h,s,v){
     return [Math.round(r*255), Math.round(g*255), Math.round(b*255)];
 }
 
-function rgbToHex2(r,g,b){
+function rgbToHex(r,g,b){
     return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
 }
 
 function updateCP(){
     const rgb = hsvToRgb(cpH, cpS, cpV);
-    const hex = rgbToHex2(rgb[0], rgb[1], rgb[2]);
+    const hex = rgbToHex(rgb[0], rgb[1], rgb[2]);
     const hRgb = hsvToRgb(cpH, 1, 1);
-    const hHex = rgbToHex2(hRgb[0], hRgb[1], hRgb[2]);
+    const hHex = rgbToHex(hRgb[0], hRgb[1], hRgb[2]);
     
     svEl.style.background = hHex;
     svTh.style.background = hex;
@@ -455,29 +425,32 @@ function updateCP(){
         cpTarget.style.background = hex;
         cpTarget.setAttribute('data-hex', hex);
         scheduleRender();
-        // Enviar estado imediatamente enquanto arrasta
-        sendState();
+        
+        // Throttle sendState para não sobrecarregar
+        const now = Date.now();
+        if(now - lastSendTime > 30){
+            sendState();
+            lastSendTime = now;
+        }
     }
 }
 
 function updateHandles(){
     const svRect = svEl.getBoundingClientRect();
-    svTh.style.left = (svCX * svRect.width) + 'px';
-    svTh.style.top = (svCY * svRect.height) + 'px';
+    svTh.style.left = (cpS * svRect.width) + 'px';
+    svTh.style.top = ((1-cpV) * svRect.height) + 'px';
     
     const hueRect = hueTr.getBoundingClientRect();
-    hueTh.style.top = (hCY * hueRect.height) + 'px';
+    hueTh.style.top = (cpH * hueRect.height) + 'px';
     
     const aRect = aTr.getBoundingClientRect();
-    aTh.style.top = (aCY * aRect.height) + 'px';
+    aTh.style.top = ((1-cpA) * aRect.height) + 'px';
 }
 
 function clamp(v,a,b){ return Math.max(a, Math.min(b,v)); }
 
 cpOl.addEventListener('mousedown', e => {
-    if(e.target === cpOl){
-        cpOl.classList.remove('open');
-    }
+    if(e.target === cpOl) cpOl.classList.remove('open');
 });
 
 svEl.addEventListener('mousedown', e => { e.preventDefault(); dSV = true; doSV(e); });
@@ -491,15 +464,16 @@ document.addEventListener('mousemove', e => {
 });
 
 document.addEventListener('mouseup', () => {
-    dSV = false; dH = false; dA = false;
+    if(dSV || dH || dA){
+        dSV = false; dH = false; dA = false;
+        sendState();
+    }
 });
 
 function doSV(e){
     const r = svEl.getBoundingClientRect();
     cpS = clamp((e.clientX - r.left)/r.width, 0, 1);
     cpV = clamp(1 - (e.clientY - r.top)/r.height, 0, 1);
-    svCX = cpS; svTX = cpS;
-    svCY = 1 - cpV; svTY = 1 - cpV;
     updateCP();
     updateHandles();
 }
@@ -507,38 +481,33 @@ function doSV(e){
 function doH(e){
     const r = hueTr.getBoundingClientRect();
     cpH = clamp((e.clientY - r.top)/r.height, 0, 0.9999);
-    hCY = cpH; hTY = cpH;
     updateCP();
     updateHandles();
 }
 
 function doA(e){
     const r = aTr.getBoundingClientRect();
-    const height = r.height || 152;
-    cpA = clamp(1 - (e.clientY - r.top)/height, 0, 1);
-    aCY = 1 - cpA;
+    cpA = clamp(1 - (e.clientY - r.top)/r.height, 0, 1);
     updateCP();
     updateHandles();
 }
 
 // ============================================
-// SYNC E ESTADO
+// SYNC - 60FPS MÁX
 // ============================================
 async function startSync(){
-    // Sync a cada 100ms
     syncInterval = setInterval(async () => {
         if(!sessionId) return;
-        const {data, error} = await client.from('n3sk').select('state, is_active').eq('id', sessionId).single();
+        const {data, error} = await client.from('n3sk').select('state, is_active').eq('id', sessionId).single().catch(() => ({}));
         if(error || !data || !data.is_active){ 
             deleteSession();
             location.reload(); 
             return; 
         }
         if(data.state) applyState(data.state);
-    }, 100);
+    }, 50);
     
-    // Cleanup ao fechar
-    window.addEventListener('beforeunload', deleteSession);
+    window.addEventListener('beforeunload', () => deleteSession());
 }
 
 async function sendState(){
@@ -552,15 +521,15 @@ async function sendState(){
             healthbar: document.getElementById('tgl-healthbar').classList.contains('on')
         },
         colors: {
-            boxcolor: document.getElementById('sw-boxcolor').getAttribute('data-hex') || '#ff0000',
-            skeletoncolor: document.getElementById('sw-skeletoncolor').getAttribute('data-hex') || '#ffffff',
-            snaplinecolor: document.getElementById('sw-snaplinecolor').getAttribute('data-hex') || '#00ff00',
-            healthbarcolor: document.getElementById('sw-healthbarcolor').getAttribute('data-hex') || '#00ff00'
+            boxcolor: document.getElementById('sw-boxcolor').getAttribute('data-hex'),
+            skeletoncolor: document.getElementById('sw-skeletoncolor').getAttribute('data-hex'),
+            snaplinecolor: document.getElementById('sw-snaplinecolor').getAttribute('data-hex'),
+            healthbarcolor: document.getElementById('sw-healthbarcolor').getAttribute('data-hex')
         },
         alphas: { boxalpha: cpA, skeletonalpha: 1, snaplinealpha: 1, healthbaralpha: 1 }
     };
     
-    await client.from('n3sk').update({state}).eq('id', sessionId).select();
+    client.from('n3sk').update({state}).eq('id', sessionId).select().catch(() => {});
 }
 
 function applyState(s){
@@ -597,56 +566,55 @@ function setConn(c){
 }
 
 // ============================================
-// DELETE SESSION - APENAS SUAS PRÓPRIAS SESSÕES
+// DELETE - APENAS PRÓPRIAS SESSÕES
 // ============================================
 async function deleteSession(){
     if(!sessionId) return;
-    
-    const owner = localStorage.getItem('n3sk_session_owner');
-    // Só deleta se esta foi a sessão que criou
+    const owner = localStorage.getItem('n3sk_session');
     if(owner !== sessionId) return;
     
     try{
-        // Deletar main session
-        await client.from('n3sk').delete().eq('id', sessionId);
-        
-        // Deletar global session
+        await client.from('n3sk').delete().eq('id', sessionId).catch(() => {});
         if(globalSessionId){
-            await client.from('n3sk').delete().eq('id', globalSessionId);
+            await client.from('n3sk').delete().eq('id', globalSessionId).catch(() => {});
         }
-        
-        localStorage.removeItem('n3sk_session_owner');
-        console.log("[DELETE] Sessões deletadas");
-    }catch(e){
-        console.error("[DELETE] Erro:", e);
-    }
+        localStorage.removeItem('n3sk_session');
+    }catch(e){}
 }
 
 // ============================================
-// QR CODE
+// QR CODE - CORRIGIDO
 // ============================================
-function showQR(){
-    if(!globalToken){
-        alert("Token global não disponível");
+async function showQR(){
+    if(!globalSessionId){
+        alert("Sessão não pronta");
         return;
     }
     
-    const globalLink = `https://n3sk.xyz/?token=${globalToken}`;
-    document.getElementById('qr-modal').classList.add('active');
-    document.getElementById('qrcode').innerHTML = '';
-    
-    setTimeout(() => {
-        new QRCode(document.getElementById("qrcode"), {
-            text: globalLink,
-            width: 200,
-            height: 200,
-            colorDark: "#000000",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.H
-        });
-    }, 50);
-    
-    console.log("[QR] Link:", globalLink);
+    try{
+        const {data, error} = await client.from('n3sk').select('token').eq('id', globalSessionId).eq('is_global', true).single();
+        
+        if(!error && data && data.token){
+            const link = `https://n3sk.xyz/?token=${data.token}`;
+            document.getElementById('qr-modal').classList.add('active');
+            document.getElementById('qrcode').innerHTML = '';
+            
+            new QRCode(document.getElementById("qrcode"), {
+                text: link,
+                width: 200,
+                height: 200,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            console.log("[QR] Link gerado");
+        } else {
+            alert("Erro ao gerar QR");
+        }
+    }catch(e){
+        console.error(e);
+        alert("Erro ao gerar QR");
+    }
 }
 
 function closeQR(){
@@ -654,16 +622,16 @@ function closeQR(){
 }
 
 // ============================================
-// PREVIEW CANVAS
+// CANVAS PREVIEW
 // ============================================
 const PREVIEW_IMG = 'https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png';
 const canvas = document.getElementById('cvs');
 const ctx = canvas.getContext('2d', {alpha:false});
-let canvasWidth = 0, canvasHeight = 0, renderScheduled = false, bgImage = null;
+let canvasWidth = 0, canvasHeight = 0, renderScheduled = false;
+let bgImage = new Image();
 let hpAnimTime = 0, boxOpacity = 0, targetBoxOpacity = 0;
 
-bgImage = new Image();
-bgImage.crossOrigin = "Anonymous";
+bgImage.crossOrigin = "anonymous";
 bgImage.src = PREVIEW_IMG;
 bgImage.onload = () => scheduleRender();
 
@@ -699,7 +667,7 @@ function renderPreview(){
     ctx.fillStyle = '#050505';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
     
-    if(bgImage && bgImage.complete && bgImage.naturalWidth > 0){
+    if(bgImage.complete && bgImage.naturalWidth > 0){
         const s = Math.min(canvasWidth/bgImage.width, canvasHeight/bgImage.height);
         const w = bgImage.width * s, h = bgImage.height * s;
         ctx.drawImage(bgImage, (canvasWidth-w)/2, (canvasHeight-h)/2, w, h);
@@ -714,11 +682,11 @@ function renderPreview(){
     const bY = (canvasHeight - bH) / 2 + 20;
     
     targetBoxOpacity = isBox ? 1 : 0;
-    boxOpacity = boxOpacity + (targetBoxOpacity - boxOpacity) * 0.1;
+    boxOpacity = boxOpacity + (targetBoxOpacity - boxOpacity) * 0.08;
     
     if(boxOpacity > 0.01){
         ctx.globalAlpha = boxOpacity;
-        ctx.strokeStyle = document.getElementById('sw-boxcolor').getAttribute('data-hex') || '#ff0000';
+        ctx.strokeStyle = document.getElementById('sw-boxcolor').getAttribute('data-hex');
         ctx.lineWidth = 2;
         const l = bW * 0.25;
         ctx.beginPath();
@@ -743,7 +711,7 @@ function renderPreview(){
         const hpH = bH * pulse;
         ctx.fillStyle = 'rgba(15,15,15,0.8)';
         ctx.fillRect(bx, bY, bw, bH);
-        ctx.fillStyle = document.getElementById('sw-healthbarcolor').getAttribute('data-hex') || '#00ff00';
+        ctx.fillStyle = document.getElementById('sw-healthbarcolor').getAttribute('data-hex');
         ctx.fillRect(bx, bY + (bH - hpH), bw, hpH);
     }
     
@@ -751,7 +719,6 @@ function renderPreview(){
     if(Math.abs(boxOpacity - targetBoxOpacity) > 0.01 || isHp) scheduleRender();
 }
 
-// Resize ao iniciar app
 window.addEventListener('resize', resizeCanvas);
 </script>
 </body>
