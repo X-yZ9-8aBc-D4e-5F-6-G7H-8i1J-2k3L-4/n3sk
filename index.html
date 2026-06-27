@@ -96,15 +96,15 @@
         .sv{width:190px;height:152px;border-radius:5px;position:relative;overflow:hidden;border:1px solid #222;cursor:none}
         .sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent)}
         .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,#000)}
-        /* SMOOTH NAS BOLINHAS DO COLOR PICKER */
-        .sv-th{position:absolute;width:14px;height:14px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 2px rgba(0,0,0,0.8),0 4px 15px rgba(0,0,0,0.4);transition:all 0.12s cubic-bezier(0.34,1.56,0.64,1);z-index:15}
+        /* SMOOTH ULTRA SUAVE NAS BOLINHAS DO COLOR PICKER - TODAS AS 3 */
+        .sv-th{position:absolute;width:16px;height:16px;border-radius:50%;border:3px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 2px rgba(0,0,0,0.9),0 6px 20px rgba(0,0,0,0.5);transition:left 0.06s cubic-bezier(0.25,0.46,0.45,0.94),top 0.06s cubic-bezier(0.25,0.46,0.45,0.94);z-index:15}
         .bars{display:flex;gap:8px}
         .btr{position:relative;width:14px;height:152px;border-radius:99px;overflow:visible;border:1px solid #222;cursor:none}
         .bin{position:absolute;inset:0;border-radius:99px;overflow:hidden}
         .bh{width:100%;height:100%;background:linear-gradient(to bottom,#f00 0%,#ff0 17%,#0f0 33%,#0ff 50%,#00f 67%,#f0f 83%,#f00 100%)}
         .bck{width:100%;height:100%;background:repeating-conic-gradient(#555 0% 25%,#333 0% 50%) 0 0/8px 8px}
         .bag{position:absolute;inset:0;border-radius:99px;pointer-events:none}
-        .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 2px rgba(0,0,0,0.8),0 4px 15px rgba(0,0,0,0.4);pointer-events:none;z-index:15;transition:all 0.12s cubic-bezier(0.34,1.56,0.64,1)}
+        .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid #fff;box-shadow:0 0 0 2px rgba(0,0,0,0.9),0 6px 20px rgba(0,0,0,0.5);pointer-events:none;z-index:15;transition:top 0.06s cubic-bezier(0.25,0.46,0.45,0.94)}
         
         /* MOBILE RESPONSIVE */
         @media(max-width:900px){
@@ -480,12 +480,12 @@ function doA(e){
     sendRealTimeState(); // Envia estado em tempo real
 }
 
-// Função para enviar estado em tempo real com debounce
+// Função para enviar estado em tempo real (sem debounce - imediato)
 function sendRealTimeState(){
-    clearTimeout(sendStateDebounce);
-    sendStateDebounce = setTimeout(() => {
-        sendState();
-    }, 60);
+    // Cancela timeout anterior se existir
+    if(sendStateDebounce) clearTimeout(sendStateDebounce);
+    // Envia imediatamente
+    sendState();
 }
 
 // Touch support
@@ -511,15 +511,15 @@ async function startSync(){
         const {data, error} = await client.from('n3sk').select('state, is_active').eq('id', sessionId).single();
         if(error || !data || !data.is_active){ location.reload(); return; }
         if(data.state) applyState(data.state);
-    }, 500);
+    }, 100); // Sincroniza a cada 100ms para update em tempo real
 }
 
 async function sendState(){
     if(!sessionId) return;
     
-    // Bloqueia o sync temporariamente para evitar conflito visual
+    // Bloqueia o sync temporariamente para evitar conflito visual (reduzido para 150ms)
     isUpdatingLocally = true;
-    setTimeout(() => { isUpdatingLocally = false; }, 300);
+    setTimeout(() => { isUpdatingLocally = false; }, 150);
 
     const state = {
         toggles: {
