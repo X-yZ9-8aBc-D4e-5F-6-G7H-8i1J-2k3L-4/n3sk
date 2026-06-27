@@ -3,7 +3,6 @@
 <head>
     <meta charset='utf-8'>
     <meta name='viewport' content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no'>
-    <meta name='color-scheme' content='light dark'>
     <title>n3sk</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
@@ -12,12 +11,12 @@
         *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
         html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;overflow:hidden}
         
-        /* CURSOR */
+        /* CURSOR - SEMPRE VISÍVEL */
         body{cursor:none!important}
         #cur{position:fixed;width:18px;height:18px;border:2px solid rgba(199,48,48,0.9);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:transform 0.12s ease}
         #cur.ck{transform:translate(-50%,-50%) scale(0.65)}
         
-        /* LOGIN SCREEN - MELHORADO */
+        /* LOGIN SCREEN */
         #login-screen{
             position:fixed;inset:0;z-index:99999;
             display:flex;align-items:center;justify-content:center;
@@ -81,7 +80,7 @@
         #qr-modal.active{display:flex}
         .qr-box{background:#111;padding:40px;border-radius:20px;border:1.5px solid var(--red);text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.8)}
         .qr-box h2{color:var(--red);margin-bottom:10px;letter-spacing:2px}
-        .qr-box #qrcode{background:#fff;padding:15px;border-radius:12px;margin:20px auto;display:inline-block}
+        .qr-box #qrcode{background:#fff;padding:15px;border-radius:12px;margin:20px auto;display:inline-block;min-height:200px;min-width:200px}
         .qr-close{background:var(--red);color:#fff;border:none;padding:10px 30px;border-radius:8px;font-weight:700;cursor:pointer;margin-top:15px}
         .qr-close:hover{background:#ff6b6b}
         
@@ -92,14 +91,14 @@
         .sv{width:190px;height:152px;border-radius:5px;position:relative;overflow:hidden;border:1px solid #222}
         .sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent)}
         .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,#000)}
-        .sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,0.7)}
+        .sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,0.7);transition:left 0.05s linear,top 0.05s linear}
         .bars{display:flex;gap:8px}
         .btr{position:relative;width:14px;height:152px;border-radius:99px;overflow:visible;border:1px solid #222}
         .bin{position:absolute;inset:0;border-radius:99px;overflow:hidden}
         .bh{width:100%;height:100%;background:linear-gradient(to bottom,#f00 0%,#ff0 17%,#0f0 33%,#0ff 50%,#00f 67%,#f0f 83%,#f00 100%)}
         .bck{width:100%;height:100%;background:repeating-conic-gradient(#555 0% 25%,#333 0% 50%) 0 0/8px 8px}
         .bag{position:absolute;inset:0;border-radius:99px;pointer-events:none}
-        .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,0.6);pointer-events:none;z-index:10}
+        .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,0.6);pointer-events:none;z-index:10;transition:top 0.05s linear}
     </style>
 </head>
 <body>
@@ -175,7 +174,10 @@
 // ============================================
 (function(){
     const cur = document.getElementById('cur');
-    if(!cur) return;
+    if(!cur){
+        console.error("[CURSOR] Elemento #cur não encontrado!");
+        return;
+    }
     
     let mx = window.innerWidth/2, my = window.innerHeight/2;
     let cx = mx, cy = my;
@@ -192,7 +194,7 @@
         requestAnimationFrame(loop);
     }
     loop();
-    console.log("[CURSOR] Ativado");
+    console.log("[CURSOR] Ativado com sucesso");
 })();
 
 // ============================================
@@ -255,7 +257,7 @@ window.onload = async function(){
 };
 
 // ============================================
-// TOGGLES - CORRIGIDO
+// TOGGLES
 // ============================================
 function toggleSwitch(el, key){
     el.classList.toggle('on');
@@ -264,7 +266,7 @@ function toggleSwitch(el, key){
 }
 
 // ============================================
-// COLOR PICKER - CORRIGIDO
+// COLOR PICKER - CORRIGIDO COM SMOOTH
 // ============================================
 let cpTarget = null;
 let cpH = 0, cpS = 1, cpV = 1, cpA = 1;
@@ -289,7 +291,6 @@ function openColorPicker(el, defaultColor){
     cpBox.style.left = (rect.right + 10) + 'px';
     cpBox.style.top = rect.top + 'px';
     
-    // Converter cor atual para HSV
     const currentColor = el.style.backgroundColor || defaultColor;
     const hex = rgbToHex(currentColor);
     const hsv = hexToHsv(hex);
@@ -303,6 +304,7 @@ function openColorPicker(el, defaultColor){
     updateCP();
     updateHandles();
     cpOl.classList.add('open');
+    console.log("[CP] Aberto com cor:", hex);
 }
 
 function rgbToHex(rgb){
@@ -381,9 +383,9 @@ function updateHandles(){
 
 function runAnim(){
     const sp = 0.28;
-    svCX = lerp(svCX, svTX, sp);
-    svCY = lerp(svCY, svTY, sp);
-    hCY = lerp(hCY, hTY, sp);
+    svCX += (svTX - svCX) * sp;
+    svCY += (svTY - svCY) * sp;
+    hCY += (hTY - hCY) * sp;
     
     updateHandles();
     
@@ -399,7 +401,6 @@ function startAnim(){
 function lerp(a,b,t){ return a + (b-a)*t; }
 function clamp(v,a,b){ return Math.max(a, Math.min(b,v)); }
 
-// Event listeners do color picker
 cpOl.addEventListener('mousedown', e => {
     if(e.target === cpOl){
         cpOl.classList.remove('open');
@@ -446,9 +447,9 @@ function doA(e){
     const r = aTr.getBoundingClientRect();
     const height = r.height || 152;
     cpA = clamp(1 - (e.clientY - r.top)/height, 0, 1);
-    aCY = 1 - cpA;  // CORRIGIDO: Não reseta mais!
+    aCY = 1 - cpA;
+    updateHandles();
     updateCP();
-    startAnim();
 }
 
 // ============================================
@@ -473,13 +474,19 @@ async function sendState(){
             healthbar: document.getElementById('tgl-healthbar').classList.contains('on')
         },
         colors: {
-            boxcolor: document.getElementById('sw-boxcolor').style.backgroundColor,
-            skeletoncolor: document.getElementById('sw-skeletoncolor').style.backgroundColor,
-            snaplinecolor: document.getElementById('sw-snaplinecolor').style.backgroundColor,
-            healthbarcolor: document.getElementById('sw-healthbarcolor').style.backgroundColor
+            boxcolor: rgbToHex(document.getElementById('sw-boxcolor').style.backgroundColor),
+            skeletoncolor: rgbToHex(document.getElementById('sw-skeletoncolor').style.backgroundColor),
+            snaplinecolor: rgbToHex(document.getElementById('sw-snaplinecolor').style.backgroundColor),
+            healthbarcolor: rgbToHex(document.getElementById('sw-healthbarcolor').style.backgroundColor)
         },
-        alphas: { boxalpha: cpA, skeletonalpha: 1, snaplinealpha: 1, healthbaralpha: 1 }
+        alphas: { 
+            boxalpha: cpA, 
+            skeletonalpha: 1, 
+            snaplinealpha: 1, 
+            healthbaralpha: 1 
+        }
     };
+    console.log("[STATE] Enviando:", state);
     await client.from('n3sk').update({state}).eq('id', sessionId);
 }
 
@@ -490,6 +497,12 @@ function applyState(s){
         const el = document.getElementById(toggles[k]);
         if(el && s.toggles) el.classList.toggle('on', !!s.toggles[k]);
     }
+    const colors = {boxcolor:'sw-boxcolor', skeletoncolor:'sw-skeletoncolor', snaplinecolor:'sw-snaplinecolor', healthbarcolor:'sw-healthbarcolor'};
+    for(let k in colors){
+        const el = document.getElementById(colors[k]);
+        if(el && s.colors && s.colors[k]) el.style.background = s.colors[k];
+    }
+    scheduleRender();
 }
 
 function setConn(c){
@@ -503,21 +516,30 @@ function setConn(c){
 // ============================================
 function showQR(){
     console.log("[QR] Gerando QR...");
-    client.from('n3sk').select('token').eq('id', sessionId).eq('is_global', true).single()
+    client.from('n3sk').select('token').eq('id', sessionId + '_GLOBAL').single()
     .then(({data, error}) => {
         console.log("[QR] Dados:", data, "Erro:", error);
         if(data && data.token){
             const globalLink = `https://n3sk.xyz/?token=${data.token}`;
             document.getElementById('qr-modal').classList.add('active');
-            document.getElementById('qrcode').innerHTML = '';
-            new QRCode(document.getElementById("qrcode"), {
-                text: globalLink,
-                width: 200,
-                height: 200,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
+            const qrDiv = document.getElementById('qrcode');
+            qrDiv.innerHTML = '';
+            try{
+                new QRCode(qrDiv, {
+                    text: globalLink,
+                    width: 200,
+                    height: 200,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+                console.log("[QR] Gerado com sucesso!");
+            }catch(e){
+                console.error("[QR] Erro ao gerar:", e);
+                qrDiv.innerHTML = '<p style="color:red">Erro ao gerar QR</p>';
+            }
+        } else {
+            console.error("[QR] Token global não encontrado");
         }
     });
 }
@@ -529,18 +551,10 @@ function closeQR(){
 // ============================================
 // PREVIEW CANVAS
 // ============================================
-const PREVIEW_IMG = 'https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png';
 const canvas = document.getElementById('cvs');
 const ctx = canvas.getContext('2d', {alpha:false});
-let canvasWidth = 0, canvasHeight = 0, renderScheduled = false, bgImage = null;
+let canvasWidth = 0, canvasHeight = 0, renderScheduled = false;
 let hpAnimTime = 0, boxOpacity = 0, targetBoxOpacity = 0;
-
-if(PREVIEW_IMG){
-    bgImage = new Image();
-    bgImage.crossOrigin = "Anonymous";
-    bgImage.src = PREVIEW_IMG;
-    bgImage.onload = () => scheduleRender();
-}
 
 function resizeCanvas(){
     const rect = canvas.parentElement.getBoundingClientRect();
@@ -573,12 +587,6 @@ function renderPreview(){
     ctx.setTransform(window.devicePixelRatio||1, 0, 0, window.devicePixelRatio||1, 0, 0);
     ctx.fillStyle = '#050505';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-    
-    if(bgImage && bgImage.complete && bgImage.naturalWidth > 0){
-        const s = Math.min(canvasWidth/bgImage.width, canvasHeight/bgImage.height);
-        const w = bgImage.width * s, h = bgImage.height * s;
-        ctx.drawImage(bgImage, (canvasWidth-w)/2, (canvasHeight-h)/2, w, h);
-    }
     
     const isBox = document.getElementById('tgl-box').classList.contains('on');
     const isHp = document.getElementById('tgl-healthbar').classList.contains('on');
