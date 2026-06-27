@@ -65,58 +65,114 @@
         .tgl.on::after{left:22px}
         
         /* COLOR SWATCHES */
-        .sw{width:36px;height:24px;border-radius:4px;border:1.5px solid #555;cursor:pointer;transition:transform 0.2s;flex-shrink:0}
+        .sw{width:36px;height:24px;border-radius:4px;border:1.5px solid #555;cursor:pointer;transition:transform 0.2s;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.3)}
         .sw:active{transform:scale(0.9)}
         
         /* PREVIEW PANEL */
         .preview-panel{width:420px;flex-shrink:0;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
         .preview-canvas{flex:1;background:#050505;width:100%;display:block}
         
-        /* QR MODAL - CENTRALIZADO E BONITO */
+        /* QR MODAL - MELHORADO E CENTRALIZADO */
         #qr-modal{
             display:none;
             position:fixed;
             inset:0;
-            background:rgba(0,0,0,0.9);
+            background:rgba(0,0,0,0.95);
             align-items:center;
             justify-content:center;
             z-index:99998;
-            backdrop-filter:blur(8px);
+            backdrop-filter:blur(12px);
         }
         #qr-modal.active{display:flex}
         .qr-box{
-            background:#111;
-            padding:40px;
-            border-radius:20px;
-            border:1.5px solid var(--red);
+            background:linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+            padding:60px;
+            border-radius:25px;
+            border:2px solid var(--red);
             text-align:center;
-            box-shadow:0 0 40px rgba(199,48,48,0.3), 0 20px 60px rgba(0,0,0,0.8);
-            min-width:300px;
-            animation:popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow:0 0 60px rgba(199,48,48,0.5), 0 0 120px rgba(199,48,48,0.2), 0 20px 60px rgba(0,0,0,0.9);
+            min-width:380px;
+            animation:popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position:relative;
+            overflow:hidden;
         }
-        @keyframes popIn{from{transform:scale(0.8);opacity:0}to{transform:scale(1);opacity:1}}
-        .qr-box h2{color:var(--red);margin-bottom:10px;letter-spacing:2px;font-size:24px}
-        .qr-box p{color:#aaa;font-size:13px;margin-bottom:20px}
+        .qr-box::before{
+            content:'';
+            position:absolute;
+            top:-50%;
+            right:-50%;
+            width:300px;
+            height:300px;
+            background:radial-gradient(circle, rgba(199,48,48,0.1) 0%, transparent 70%);
+            pointer-events:none;
+        }
+        .qr-box::after{
+            content:'';
+            position:absolute;
+            bottom:-50%;
+            left:-50%;
+            width:300px;
+            height:300px;
+            background:radial-gradient(circle, rgba(199,48,48,0.1) 0%, transparent 70%);
+            pointer-events:none;
+        }
+        @keyframes popIn{from{transform:scale(0.7);opacity:0}to{transform:scale(1);opacity:1}}
+        .qr-box h2{
+            color:var(--red);
+            margin-bottom:15px;
+            letter-spacing:3px;
+            font-size:28px;
+            font-weight:800;
+            text-transform:uppercase;
+            position:relative;
+            z-index:1;
+        }
+        .qr-box p{
+            color:#aaa;
+            font-size:14px;
+            margin-bottom:30px;
+            position:relative;
+            z-index:1;
+            font-weight:500;
+        }
         .qr-box #qrcode{
             background:#fff;
-            padding:15px;
-            border-radius:12px;
-            margin:0 auto 20px auto;
+            padding:20px;
+            border-radius:15px;
+            margin:0 auto 30px auto;
             display:inline-block;
-            box-shadow:0 4px 15px rgba(0,0,0,0.5);
+            box-shadow:0 8px 32px rgba(199,48,48,0.3), 0 0 20px rgba(199,48,48,0.1);
+            position:relative;
+            z-index:1;
+            border:3px solid var(--red);
+        }
+        .qr-buttons{
+            display:flex;
+            gap:15px;
+            justify-content:center;
+            position:relative;
+            z-index:1;
         }
         .qr-close{
-            background:var(--red);
+            background:linear-gradient(135deg, var(--red) 0%, #ff4444 100%);
             color:#fff;
             border:none;
-            padding:10px 30px;
-            border-radius:8px;
+            padding:12px 40px;
+            border-radius:10px;
             font-weight:700;
             cursor:pointer;
-            transition:all 0.2s;
+            transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
             letter-spacing:1px;
+            text-transform:uppercase;
+            font-size:12px;
+            box-shadow:0 4px 15px rgba(199,48,48,0.3);
         }
-        .qr-close:hover{background:#ff6b6b;transform:translateY(-2px);box-shadow:0 4px 12px rgba(199,48,48,0.4)}
+        .qr-close:hover{
+            background:linear-gradient(135deg, #ff4444 0%, var(--red) 100%);
+            transform:translateY(-3px);
+            box-shadow:0 8px 25px rgba(199,48,48,0.5);
+        }
+        .qr-close:active{transform:translateY(-1px)}
         
         /* COLOR PICKER OVERLAY */
         .cp-ol{display:none;position:fixed;inset:0;z-index:9000}
@@ -126,7 +182,7 @@
         .sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent)}
         .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,#000)}
         
-        /* BOLINHAS DO COLOR PICKER - SEM TRANSITION CSS PARA TEMPO REAL */
+        /* BOLINHAS DO COLOR PICKER - COM SMOOTH TRANSITION */
         .sv-th{
             position:absolute;
             width:13px; height:13px;
@@ -134,8 +190,8 @@
             border:2.5px solid #fff;
             transform:translate(-50%,-50%);
             pointer-events:none;
-            box-shadow:0 0 0 1.5px rgba(0,0,0,0.7);
-            /* REMOVIDO TRANSITION PARA SER INSTANTÂNEO NO MOUSEMOVE */
+            box-shadow:0 0 8px rgba(255,255,255,0.6), 0 0 0 1.5px rgba(0,0,0,0.7);
+            transition:all 0.08s cubic-bezier(0.4,0,0.2,1);
         }
         
         .bars{display:flex;gap:8px}
@@ -145,7 +201,7 @@
         .bck{width:100%;height:100%;background:repeating-conic-gradient(#555 0% 25%,#333 0% 50%) 0 0/8px 8px}
         .bag{position:absolute;inset:0;border-radius:99px;pointer-events:none}
         
-        /* BOLINHA ALPHA/HUE - SEM TRANSITION CSS */
+        /* BOLINHA ALPHA/HUE - COM SMOOTH TRANSITION */
         .bth{
             position:absolute;
             left:50%;
@@ -154,10 +210,10 @@
             border-radius:50%;
             background:#fff;
             border:2.5px solid #fff;
-            box-shadow:0 0 0 1.5px rgba(0,0,0,0.6);
+            box-shadow:0 0 8px rgba(255,255,255,0.6), 0 0 0 1.5px rgba(0,0,0,0.6);
             pointer-events:none;
             z-index:10;
-            /* REMOVIDO TRANSITION PARA SER INSTANTÂNEO NO MOUSEMOVE */
+            transition:all 0.08s cubic-bezier(0.4,0,0.2,1);
         }
         
         /* MOBILE RESPONSIVE */
@@ -173,6 +229,7 @@
             .preview-panel{width:100%;height:50vh;min-height:300px;order:3;flex-shrink:0;margin-bottom:20px}
             #cur{display:none!important}
             body{cursor:auto!important}
+            .qr-box{min-width:90vw;max-width:500px;padding:40px}
         }
     </style>
 </head>
@@ -193,10 +250,12 @@
 <!-- QR MODAL -->
 <div id="qr-modal">
     <div class="qr-box">
-        <h2>QR GLOBAL</h2>
-        <p>Escaneie para acessar de qualquer dispositivo</p>
+        <h2>🔐 QR GLOBAL</h2>
+        <p>Escaneie com seu dispositivo para acessar</p>
         <div id="qrcode"></div>
-        <button class="qr-close" onclick="closeQR()">FECHAR</button>
+        <div class="qr-buttons">
+            <button class="qr-close" onclick="closeQR()">FECHAR</button>
+        </div>
     </div>
 </div>
 
@@ -353,10 +412,8 @@ function toggleSwitch(el, key){
 // ============================================
 let cpTarget = null;
 let cpH = 0, cpS = 1, cpV = 1, cpA = 1;
-let svTX = 1, svTY = 0, svCX = 1, svCY = 0;
-let hTY = 0, hCY = 0, aCY = 0;
-let animRun = false;
-let dSV = false, dH = false, dA = false;
+let svTX = 1, svTY = 0;
+let hTY = 0, aTY = 0;
 
 const cpOl = document.getElementById('cpOl');
 const cpBox = document.getElementById('cpBox');
@@ -387,10 +444,10 @@ function openColorPicker(el, defaultColor){
     const hsv = hexToHsv(hex);
     cpH = hsv[0]; cpS = hsv[1]; cpV = hsv[2]; cpA = 1;
     
-    svCX = cpS; svTX = cpS;
-    svCY = 1 - cpV; svTY = 1 - cpV;
-    hCY = cpH; hTY = cpH;
-    aCY = 1 - cpA;
+    svTX = cpS;
+    svTY = 1 - cpV;
+    hTY = cpH;
+    aTY = 1 - cpA;
     
     updateCP();
     updateHandles();
@@ -461,86 +518,86 @@ function updateCP(){
 }
 
 function updateHandles(){
-    // Aplica posição diretamente sem esperar CSS transition
-    svTh.style.left = (svCX*100)+'%';
-    svTh.style.top = (svCY*100)+'%';
+    svTh.style.left = (svTX*100)+'%';
+    svTh.style.top = (svTY*100)+'%';
     const hH = hueTr.getBoundingClientRect().height || 152;
     const aH = aTr.getBoundingClientRect().height || 152;
-    hueTh.style.top = (hCY*hH)+'px';
-    aTh.style.top = (aCY*aH)+'px';
+    hueTh.style.top = (hTY*hH)+'px';
+    aTh.style.top = (aTY*aH)+'px';
 }
 
-// Loop de animação suave (Lerp) para as bolinhas
-function runAnim(){
-    const sp = 0.4; // Velocidade do smooth (quanto maior, mais rápido)
-    
-    // Interpolação linear para movimento suave
-    svCX += (svTX - svCX) * sp;
-    svCY += (svTY - svCY) * sp;
-    hCY += (hTY - hCY) * sp;
-    
-    updateHandles();
-    
-    if(Math.abs(svCX-svTX)>0.001 || Math.abs(svCY-svTY)>0.001 || Math.abs(hCY-hTY)>0.001)
-        requestAnimationFrame(runAnim);
-    else animRun = false;
-}
-
-function startAnim(){ if(!animRun){ animRun = true; requestAnimationFrame(runAnim); } }
 function clamp(v,a,b){ return Math.max(a, Math.min(b,v)); }
 
 // Event Listeners Color Picker
 cpOl.addEventListener('mousedown', e => { if(e.target === cpOl){ cpOl.classList.remove('open'); sendState(); } });
-svEl.addEventListener('mousedown', e => { e.preventDefault(); dSV = true; doSV(e); });
-hueTr.addEventListener('mousedown', e => { e.preventDefault(); dH = true; doH(e); });
-aTr.addEventListener('mousedown', e => { e.preventDefault(); dA = true; doA(e); });
+svEl.addEventListener('mousedown', e => { e.preventDefault(); doSV(e); });
+hueTr.addEventListener('mousedown', e => { e.preventDefault(); doH(e); });
+aTr.addEventListener('mousedown', e => { e.preventDefault(); doA(e); });
 
 document.addEventListener('mousemove', e => { 
-    if(dSV) doSV(e); 
-    if(dH) doH(e); 
-    if(dA) doA(e); 
+    if(svEl.dataset.dragging) doSV(e); 
+    if(hueTr.dataset.dragging) doH(e); 
+    if(aTr.dataset.dragging) doA(e); 
 });
+
 document.addEventListener('mouseup', () => { 
-    const wasDragging = dSV || dH || dA;
-    dSV = false; dH = false; dA = false; 
+    const wasDragging = svEl.dataset.dragging || hueTr.dataset.dragging || aTr.dataset.dragging;
+    delete svEl.dataset.dragging;
+    delete hueTr.dataset.dragging;
+    delete aTr.dataset.dragging;
     if(wasDragging) sendState(); 
 });
+
+svEl.addEventListener('mousedown', () => { svEl.dataset.dragging = true; });
+hueTr.addEventListener('mousedown', () => { hueTr.dataset.dragging = true; });
+aTr.addEventListener('mousedown', () => { aTr.dataset.dragging = true; });
 
 function doSV(e){
     const r = svEl.getBoundingClientRect();
     cpS = clamp((e.clientX - r.left)/r.width, 0, 1);
     cpV = clamp(1 - (e.clientY - r.top)/r.height, 0, 1);
-    svTX = cpS; svTY = 1 - cpV;
-    updateCP(); // Atualiza cor EM TEMPO REAL enquanto arrasta
-    startAnim(); // Inicia smooth da bolinha
+    svTX = cpS;
+    svTY = 1 - cpV;
+    updateCP();
+    updateHandles();
 }
+
 function doH(e){
     const r = hueTr.getBoundingClientRect();
     cpH = clamp((e.clientY - r.top)/r.height, 0, 0.9999);
     hTY = cpH;
-    updateCP(); // Atualiza cor EM TEMPO REAL
-    startAnim();
+    updateCP();
+    updateHandles();
 }
+
 function doA(e){
     const r = aTr.getBoundingClientRect();
     const height = r.height || 152;
     cpA = clamp(1 - (e.clientY - r.top)/height, 0, 1);
-    aCY = 1 - cpA;
-    updateHandles(); 
-    updateCP(); // Atualiza cor EM TEMPO REAL
+    aTY = 1 - cpA;
+    updateHandles();
+    updateCP();
 }
 
 // Touch support
 function tm(e){ return {clientX:e.touches[0].clientX, clientY:e.touches[0].clientY}; }
-svEl.addEventListener('touchstart', e => { e.preventDefault(); dSV=true; doSV(tm(e)); }, {passive:false});
-hueTr.addEventListener('touchstart', e => { e.preventDefault(); dH=true; doH(tm(e)); }, {passive:false});
-aTr.addEventListener('touchstart', e => { e.preventDefault(); dA=true; doA(tm(e)); }, {passive:false});
+svEl.addEventListener('touchstart', e => { e.preventDefault(); svEl.dataset.dragging=true; doSV(tm(e)); }, {passive:false});
+hueTr.addEventListener('touchstart', e => { e.preventDefault(); hueTr.dataset.dragging=true; doH(tm(e)); }, {passive:false});
+aTr.addEventListener('touchstart', e => { e.preventDefault(); aTr.dataset.dragging=true; doA(tm(e)); }, {passive:false});
 document.addEventListener('touchmove', e => { 
-    if(dSV||dH||dA){ e.preventDefault(); const m=tm(e); if(dSV)doSV(m); if(dH)doH(m); if(dA)doA(m); } 
+    if(svEl.dataset.dragging||hueTr.dataset.dragging||aTr.dataset.dragging){ 
+        e.preventDefault(); 
+        const m=tm(e); 
+        if(svEl.dataset.dragging)doSV(m); 
+        if(hueTr.dataset.dragging)doH(m); 
+        if(aTr.dataset.dragging)doA(m); 
+    } 
 }, {passive:false});
 document.addEventListener('touchend', () => { 
-    const wasDragging = dSV || dH || dA;
-    dSV=false; dH=false; dA=false; 
+    const wasDragging = svEl.dataset.dragging || hueTr.dataset.dragging || aTr.dataset.dragging;
+    delete svEl.dataset.dragging;
+    delete hueTr.dataset.dragging;
+    delete aTr.dataset.dragging;
     if(wasDragging) sendState(); 
 });
 
@@ -622,8 +679,8 @@ function showQR(){
             qrDiv.innerHTML = '';
             new QRCode(qrDiv, {
                 text: globalLink,
-                width: 200,
-                height: 200,
+                width: 240,
+                height: 240,
                 colorDark: "#000000",
                 colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.H
