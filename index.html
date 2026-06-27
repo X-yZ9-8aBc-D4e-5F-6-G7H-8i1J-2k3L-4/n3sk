@@ -2,576 +2,557 @@
 <html lang="pt-BR">
 <head>
     <meta charset='utf-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover'>
-    <meta name='apple-mobile-web-app-capable' content='yes'>
-    <meta name='theme-color' content='#0a0a0a'>
+    <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover'>
+    <meta name='color-scheme' content='light dark'>
     <title>n3sk | Dashboard</title>
+    <!-- Bibliotecas Externas -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    
     <style>
         :root {
-            --primary: #c73030;
-            --primary-glow: rgba(199, 48, 48, 0.4);
+            --red: #c73030;
+            --red-dim: rgba(199, 48, 48, 0.2);
             --bg: #050505;
-            --panel: #0f0f0f;
-            --border: #2a1515;
+            --panel-bg: #0f0f0f;
+            --border: #5a1e1e;
             --text: #e0e0e0;
             --muted: #666;
-            --success: #4ade80;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; font-family: 'Segoe UI', system-ui, sans-serif; }
         
-        body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden; /* Trava scroll no mobile */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
-        /* CURSOR PERSONALIZADO (Apenas Desktop) */
+        /* CURSOR PERSONALIZADO (PC) */
         @media (hover: hover) and (pointer: fine) {
-            body { cursor: none; }
-            #custom-cursor {
-                position: fixed; top: 0; left: 0;
-                width: 20px; height: 20px;
-                border: 2px solid var(--primary);
-                border-radius: 50%;
-                pointer-events: none;
-                z-index: 99999;
-                transform: translate(-50%, -50%);
-                transition: width 0.1s, height 0.1s, border-color 0.1s;
-                mix-blend-mode: difference;
+            body { cursor: none !important; }
+            #cur {
+                position: fixed; width: 20px; height: 20px; border: 2px solid var(--red); border-radius: 50%;
+                pointer-events: none; z-index: 99999; transform: translate(-50%, -50%);
+                transition: transform 0.1s ease-out; display: block !important;
             }
-            #custom-cursor.active { width: 15px; height: 15px; border-color: #fff; background: rgba(199,48,48,0.2); }
+            #cur.click { transform: translate(-50%, -50%) scale(0.8); background: rgba(199, 48, 48, 0.2); }
         }
-        @media (hover: none) { #custom-cursor { display: none !important; } }
+        @media (max-width: 900px) { #cur { display: none !important; } }
+
+        /* TELA DE LOGIN */
+        #login-screen {
+            position: fixed; inset: 0; z-index: 9999; background: #000;
+            display: flex; align-items: center; justify-content: center; flex-direction: column;
+        }
+        .loader { width: 40px; height: 40px; border: 3px solid #222; border-top-color: var(--red); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         /* LAYOUT PRINCIPAL */
-        .app-container {
-            display: grid;
-            grid-template-columns: 280px 1fr 350px;
-            gap: 15px;
-            width: 95vw;
-            height: 90vh;
-            max-width: 1400px;
-        }
-
-        /* SIDEBAR */
-        .sidebar {
-            background: var(--panel);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .profile {
-            display: flex; align-items: center; gap: 15px;
-            padding-bottom: 20px; border-bottom: 1px solid var(--border);
-        }
-        .avatar {
-            width: 50px; height: 50px; border-radius: 50%;
-            background: url('https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg') center/cover;
-            border: 2px solid var(--primary);
-            box-shadow: 0 0 15px var(--primary-glow);
-        }
-        .user-info h2 { font-size: 16px; font-weight: 700; letter-spacing: 1px; }
-        .user-info span { font-size: 11px; color: var(--muted); text-transform: uppercase; }
-
-        .status-card {
-            background: rgba(20,20,20,0.5);
-            border-radius: 8px; padding: 15px;
-            display: flex; align-items: center; justify-content: space-between;
-        }
-        .status-dot {
-            width: 8px; height: 8px; border-radius: 50%;
-            background: #333; transition: all 0.3s ease;
-        }
-        .status-dot.online { background: var(--success); box-shadow: 0 0 10px var(--success); }
-        .status-text { font-size: 12px; font-weight: 600; letter-spacing: 1px; }
-
-        /* PAINÉIS DE CONFIGURAÇÃO */
-        .main-controls {
-            display: flex; flex-direction: column; gap: 15px; overflow-y: auto;
-            padding-right: 5px;
-        }
-        /* Scrollbar fina */
-        .main-controls::-webkit-scrollbar { width: 4px; }
-        .main-controls::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-
+        #app { display: none; height: 100%; width: 100%; padding: 10px; gap: 10px; flex-direction: column; overflow-y: auto; }
+        
+        /* PAINÉIS ESTILO BASE */
         .panel {
-            background: var(--panel);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            overflow: hidden;
+            background: var(--panel-bg); border: 1px solid var(--border); border-radius: 8px;
+            overflow: hidden; display: flex; flex-direction: column;
         }
-        .panel-header {
-            background: linear-gradient(90deg, var(--border), transparent);
-            padding: 10px 15px;
-            font-size: 11px; font-weight: 800; letter-spacing: 2px; color: var(--primary);
-            border-bottom: 1px solid var(--border);
+        .ph {
+            background: linear-gradient(90deg, #3a0e0e, #1a0505); padding: 10px 15px;
+            font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #fff;
+            border-bottom: 1px solid var(--border); text-transform: uppercase;
         }
-        .control-row {
+        .row {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 14px 15px;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-            transition: background 0.2s;
+            padding: 12px 15px; border-bottom: 1px solid #1a1a1a;
         }
-        .control-row:last-child { border-bottom: none; }
-        .control-row:hover { background: rgba(255,255,255,0.02); }
-        .control-label { font-size: 13px; font-weight: 500; }
+        .row:last-child { border-bottom: none; }
+        .row span { font-size: 13px; font-weight: 500; }
 
-        /* TOGGLE SWITCH CORRIGIDO */
-        .toggle {
-            width: 44px; height: 24px;
-            background: #1a1a1a;
-            border-radius: 20px;
-            position: relative;
-            cursor: pointer;
-            transition: background 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-            border: 1px solid #333;
+        /* TOGGLE SWITCH SUAVE E INSTANTÂNEO */
+        .tgl {
+            width: 44px; height: 24px; background: #222; border-radius: 20px;
+            position: relative; border: 1px solid #333; transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+            cursor: pointer; flex-shrink: 0;
         }
-        .toggle::after {
-            content: ''; position: absolute;
-            top: 2px; left: 2px;
-            width: 18px; height: 18px;
-            background: #fff;
-            border-radius: 50%;
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        .tgl.on { background: var(--red); border-color: #ff5555; box-shadow: 0 0 10px rgba(199, 48, 48, 0.4); }
+        .tgl::after {
+            content: ''; position: absolute; width: 18px; height: 18px; background: #fff;
+            border-radius: 50%; top: 2px; left: 2px; transition: transform 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
-        .toggle.active { background: var(--primary); border-color: var(--primary); }
-        .toggle.active::after { transform: translateX(20px); }
+        .tgl.on::after { transform: translateX(20px); }
 
         /* COLOR SWATCH */
-        .color-swatch {
-            width: 32px; height: 20px;
-            border-radius: 4px;
-            border: 1px solid rgba(255,255,255,0.1);
-            cursor: pointer;
-            transition: transform 0.2s;
+        .sw {
+            width: 32px; height: 20px; border-radius: 4px; border: 1px solid #444;
+            cursor: pointer; transition: transform 0.1s;
         }
-        .color-swatch:active { transform: scale(0.9); }
+        .sw:active { transform: scale(0.9); }
 
-        /* PREVIEW AREA */
-        .preview-area {
-            background: var(--panel);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            display: flex; flex-direction: column;
-            overflow: hidden;
-        }
-        .preview-canvas-wrap {
-            flex: 1; position: relative;
-            background: radial-gradient(circle at center, #111 0%, #000 100%);
-            display: flex; align-items: center; justify-content: center;
-        }
+        /* PREVIEW CANVAS */
+        .preview-container { flex: 1; min-height: 300px; background: #000; position: relative; display: flex; align-items: center; justify-content: center; }
         canvas { max-width: 100%; max-height: 100%; object-fit: contain; }
 
         /* COLOR PICKER MODAL */
-        .cp-overlay {
-            position: fixed; inset: 0; z-index: 1000;
-            display: none; backdrop-filter: blur(5px);
-        }
+        .cp-overlay { display: none; position: fixed; inset: 0; z-index: 9000; background: rgba(0,0,0,0.5); }
         .cp-overlay.open { display: block; }
-        .cp-modal {
-            position: absolute;
-            background: #111; border: 1px solid var(--border);
-            border-radius: 10px; padding: 15px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-            display: flex; gap: 15px;
+        .cp-box {
+            position: absolute; background: #111; border: 1px solid var(--border);
+            border-radius: 8px; padding: 10px; display: flex; gap: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
-        .sv-box {
-            width: 200px; height: 160px;
-            position: relative; border-radius: 6px; overflow: hidden;
-            cursor: crosshair; border: 1px solid #333;
-        }
-        .sv-white { position: absolute; inset: 0; background: linear-gradient(to right, #fff, transparent); }
-        .sv-black { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, #000); }
-        .sv-handle {
-            position: absolute; width: 12px; height: 12px;
-            border: 2px solid #fff; border-radius: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none; box-shadow: 0 0 3px #000;
-        }
-        .sliders { display: flex; gap: 10px; }
-        .slider-track {
-            width: 16px; height: 160px;
-            border-radius: 10px; position: relative;
-            cursor: pointer; border: 1px solid #333;
-        }
-        .slider-fill { position: absolute; inset: 0; border-radius: 10px; }
-        .slider-handle {
-            position: absolute; left: 50%; transform: translate(-50%, -50%);
-            width: 20px; height: 8px; background: #fff;
-            border-radius: 4px; pointer-events: none;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
+        .sv { width: 180px; height: 140px; border-radius: 4px; position: relative; overflow: hidden; border: 1px solid #333; cursor: crosshair; }
+        .sv-w { position: absolute; inset: 0; background: linear-gradient(to right, #fff, transparent); }
+        .sv-b { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, #000); }
+        .sv-th { position: absolute; width: 12px; height: 12px; border: 2px solid #fff; border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; box-shadow: 0 0 3px #000; }
+        .bars { display: flex; gap: 8px; }
+        .btr { width: 14px; height: 140px; border-radius: 10px; position: relative; border: 1px solid #333; cursor: pointer; overflow: visible; }
+        .bin { position: absolute; inset: 0; border-radius: 10px; overflow: hidden; }
+        .bh { width: 100%; height: 100%; background: linear-gradient(to bottom, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00); }
+        .bck { width: 100%; height: 100%; background: repeating-conic-gradient(#444 0% 25%, #222 0% 50%) 0 0 / 6px 6px; }
+        .bag { position: absolute; inset: 0; border-radius: 10px; pointer-events: none; }
+        .bth { position: absolute; left: 50%; transform: translate(-50%, -50%); width: 16px; height: 16px; border-radius: 50%; background: #fff; border: 2px solid #fff; box-shadow: 0 0 3px #000; pointer-events: none; z-index: 2; }
 
-        /* RESPONSIVO MOBILE */
-        @media (max-width: 1024px) {
-            .app-container {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto 1fr auto;
-                height: 100vh; width: 100vw;
-                gap: 10px; padding: 10px;
-            }
-            .sidebar { flex-direction: row; padding: 10px; gap: 10px; order: 1; }
-            .profile { border: none; padding: 0; flex: 1; }
-            .status-card { flex: 1; }
-            .main-controls { order: 2; }
-            .preview-area { order: 3; height: 35vh; min-height: 250px; }
+        /* QR MODAL */
+        #qr-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9998; align-items: center; justify-content: center; flex-direction: column; }
+        #qr-modal.active { display: flex; }
+        .qr-box { background: #111; padding: 20px; border-radius: 10px; border: 1px solid var(--border); text-align: center; }
+        .btn-close { margin-top: 15px; padding: 8px 20px; background: var(--red); color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+
+        /* RESPONSIVIDADE MOBILE */
+        @media (min-width: 768px) {
+            #app { flex-direction: row; align-items: flex-start; }
+            .sidebar { width: 250px; flex-shrink: 0; }
+            .main-content { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+            .preview-panel { height: 500px; }
+        }
+        @media (max-width: 767px) {
+            .sidebar { order: 2; }
+            .main-content { order: 1; }
+            .preview-panel { order: 3; height: 40vh; min-height: 300px; }
         }
     </style>
 </head>
 <body>
 
-<div id="custom-cursor"></div>
+<!-- Cursor PC -->
+<div id="cur"></div>
 
-<div class="app-container">
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-        <div class="profile">
-            <div class="avatar"></div>
-            <div class="user-info">
-                <h2>n3sk</h2>
-                <span>Fuck any anticheat</span>
-            </div>
-        </div>
-        <div class="status-card">
-            <div style="display:flex; align-items:center; gap:8px;">
-                <div class="status-dot" id="conn-dot"></div>
-                <span class="status-text" id="conn-text">OFFLINE</span>
-            </div>
-        </div>
+<!-- Login -->
+<div id="login-screen">
+    <div class="loader"></div>
+    <p style="color:#888; font-size:12px;">Conectando ao servidor...</p>
+</div>
+
+<!-- App Principal -->
+<div id="app">
+    <!-- Sidebar / Painel de Controle -->
+    <div class="panel sidebar">
+        <div class="ph">CONFIGURAÇÕES</div>
+        
+        <div class="row"><span>Draw Box</span><div class="tgl on" data-key="box" onclick="toggleSwitch(this)"></div></div>
+        <div class="row"><span>Draw Skeleton</span><div class="tgl on" data-key="skeleton" onclick="toggleSwitch(this)"></div></div>
+        <div class="row"><span>Draw Snapline</span><div class="tgl" data-key="snapline" onclick="toggleSwitch(this)"></div></div>
+        <div class="row"><span>Draw Healthbar</span><div class="tgl on" data-key="healthbar" onclick="toggleSwitch(this)"></div></div>
+        
+        <div class="ph" style="margin-top:10px; border-top:1px solid var(--border);">ESP COLORS</div>
+        <div class="row"><span>Box Color</span><div class="sw" id="sw-boxcolor" data-hex="#c73030" style="background:#c73030" onclick="openCP(this)"></div></div>
+        <div class="row"><span>Skeleton Color</span><div class="sw" id="sw-skeletoncolor" data-hex="#aaaaaa" style="background:#aaaaaa" onclick="openCP(this)"></div></div>
+        <div class="row"><span>Snapline Color</span><div class="sw" id="sw-snaplinecolor" data-hex="#00ff00" style="background:#00ff00" onclick="openCP(this)"></div></div>
+        <div class="row"><span>Healthbar Color</span><div class="sw" id="sw-healthbarcolor" data-hex="#00ff00" style="background:#00ff00" onclick="openCP(this)"></div></div>
     </div>
 
-    <!-- CONTROLS -->
-    <div class="main-controls">
-        <div class="panel">
-            <div class="panel-header">ESP VISUALS</div>
-            <div class="control-row">
-                <span class="control-label">Box ESP</span>
-                <div class="toggle active" data-key="box" onclick="handleToggle(this)"></div>
-            </div>
-            <div class="control-row">
-                <span class="control-label">Skeleton</span>
-                <div class="toggle active" data-key="skeleton" onclick="handleToggle(this)"></div>
-            </div>
-            <div class="control-row">
-                <span class="control-label">Snapline</span>
-                <div class="toggle" data-key="snapline" onclick="handleToggle(this)"></div>
-            </div>
-            <div class="control-row">
-                <span class="control-label">Healthbar</span>
-                <div class="toggle active" data-key="healthbar" onclick="handleToggle(this)"></div>
+    <!-- Conteúdo Principal -->
+    <div class="main-content">
+        <!-- Preview Panel -->
+        <div class="panel preview-panel">
+            <div class="ph">PREVIEW</div>
+            <div class="preview-container">
+                <canvas id="espCanvas"></canvas>
             </div>
         </div>
-
-        <div class="panel">
-            <div class="panel-header">COLORS</div>
-            <div class="control-row">
-                <span class="control-label">Box Color</span>
-                <div class="color-swatch" id="sw-box" style="background:#c73030" data-key="boxcolor" onclick="openPicker(this)"></div>
-            </div>
-            <div class="control-row">
-                <span class="control-label">Skeleton Color</span>
-                <div class="color-swatch" id="sw-skeleton" style="background:#ffffff" data-key="skeletoncolor" onclick="openPicker(this)"></div>
-            </div>
-            <div class="control-row">
-                <span class="control-label">Snapline Color</span>
-                <div class="color-swatch" id="sw-snapline" style="background:#00ff00" data-key="snaplinecolor" onclick="openPicker(this)"></div>
-            </div>
-            <div class="control-row">
-                <span class="control-label">Healthbar Color</span>
-                <div class="color-swatch" id="sw-health" style="background:#00ff00" data-key="healthbarcolor" onclick="openPicker(this)"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- PREVIEW -->
-    <div class="preview-area">
-        <div class="panel-header">LIVE PREVIEW</div>
-        <div class="preview-canvas-wrap">
-            <canvas id="previewCanvas"></canvas>
+        
+        <!-- Status / Info (Opcional, para manter layout mobile balanceado) -->
+        <div class="panel" style="padding:15px; display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-size:12px; color:#888;">Status: <span id="status-text" style="color:#4ade80;">ONLINE</span></div>
+            <button onclick="showQR()" style="background:transparent; border:1px solid var(--red); color:var(--red); padding:5px 10px; border-radius:4px; font-size:10px; cursor:pointer;">GERAR QR</button>
         </div>
     </div>
 </div>
 
-<!-- COLOR PICKER -->
-<div class="cp-overlay" id="cpOverlay" onclick="closePicker(event)">
-    <div class="cp-modal" id="cpModal">
-        <div class="sv-box" id="svBox">
-            <div class="sv-white"></div>
-            <div class="sv-black"></div>
-            <div class="sv-handle" id="svHandle"></div>
+<!-- Color Picker Modal -->
+<div class="cp-overlay" id="cpOverlay">
+    <div class="cp-box" id="cpBox">
+        <div class="sv" id="sv">
+            <div class="sv-w"></div><div class="sv-b"></div>
+            <div class="sv-th" id="svTh"></div>
         </div>
-        <div class="sliders">
-            <div class="slider-track" id="hueTrack">
-                <div class="slider-fill" style="background:linear-gradient(to bottom, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00)"></div>
-                <div class="slider-handle" id="hueHandle"></div>
-            </div>
+        <div class="bars">
+            <div class="btr" id="hueTr"><div class="bin"><div class="bh"></div></div><div class="bth" id="hueTh"></div></div>
+            <div class="btr" id="aTr"><div class="bin"><div class="bck"></div></div><div class="bag" id="aGr"></div><div class="bth" id="aTh"></div></div>
         </div>
+    </div>
+</div>
+
+<!-- QR Modal -->
+<div id="qr-modal">
+    <div class="qr-box">
+        <h3 style="color:#fff; margin-bottom:10px;">SCAN ME</h3>
+        <div id="qrcode" style="background:#fff; padding:10px; border-radius:5px;"></div>
+        <button class="btn-close" onclick="document.getElementById('qr-modal').classList.remove('active')">FECHAR</button>
     </div>
 </div>
 
 <script>
-// --- ESTADO GLOBAL ---
-const state = {
-    toggles: { box: true, skeleton: true, snapline: false, healthbar: true },
-    colors: { boxcolor: '#c73030', skeletoncolor: '#ffffff', snaplinecolor: '#00ff00', healthbarcolor: '#00ff00' }
+// ==========================================
+// CONFIGURAÇÃO E VARIÁVEIS
+// ==========================================
+const SUPA_URL = "https://gkzxuerurfedfwuxhimf.supabase.co";
+const SUPA_KEY = "sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6";
+// URL DA IMAGEM FORNECIDA
+const PREVIEW_IMG_SRC = "https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png?ex=6a3dcbea&is=6a3c7a6a&hm=95ab23192fdc65d73e612fadc773aac107802e9a93602097a289073aabc498b2&=&format=webp&quality=lossless&width=800&height=968";
+
+let client, sessionId;
+let cpTarget = null, cpH=0, cpS=1, cpV=1, cpA=1;
+let dSV=false, dH=false, dA=false;
+
+// Canvas Setup
+const canvas = document.getElementById('espCanvas');
+const ctx = canvas.getContext('2d', { alpha: false });
+let bgImage = new Image();
+bgImage.crossOrigin = "Anonymous";
+bgImage.src = PREVIEW_IMG_SRC;
+let cw=0, ch=0, renderReq=false;
+let hpTime=0, boxOp=0;
+
+// ==========================================
+// INICIALIZAÇÃO
+// ==========================================
+window.onload = async () => {
+    client = supabase.createClient(SUPA_URL, SUPA_KEY);
+    const token = new URLSearchParams(window.location.search).get('token');
+    
+    if(!token) {
+        document.querySelector('#login-screen p').textContent = "Token inválido";
+        return;
+    }
+
+    try {
+        const { data, error } = await client.from('n3sk').select('*').eq('token', token).eq('is_active', true).single();
+        if(error || !data) throw new Error("Falha no login");
+
+        sessionId = data.id;
+        localStorage.setItem('n3sk_sid', sessionId);
+        
+        // Esconde login, mostra app
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app').style.display = window.innerWidth >= 768 ? 'flex' : 'block';
+        
+        // Aplica estado inicial se existir
+        if(data.state) applyState(data.state);
+
+        // Inicia loops
+        resizeCanvas();
+        startSync();
+        requestAnimationFrame(renderLoop);
+        
+    } catch(e) {
+        console.error(e);
+        document.querySelector('#login-screen p').textContent = "Erro de conexão";
+    }
 };
 
-// --- CURSOR DESKTOP ---
-const cursor = document.getElementById('custom-cursor');
-let mouseX = window.innerWidth/2, mouseY = window.innerHeight/2;
-let curX = mouseX, curY = mouseY;
+// ==========================================
+// CURSOR SMOOTH (PC)
+// ==========================================
+(function(){
+    const c = document.getElementById('cur');
+    if(!c) return;
+    let mx=0, my=0, cx=0, cy=0;
+    document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; }, {passive:true});
+    document.addEventListener('mousedown', () => c.classList.add('click'), {passive:true});
+    document.addEventListener('mouseup', () => c.classList.remove('click'), {passive:true});
+    function loop() {
+        cx += (mx-cx)*0.2; cy += (my-cy)*0.2;
+        c.style.left = cx+'px'; c.style.top = cy+'px';
+        requestAnimationFrame(loop);
+    }
+    loop();
+})();
 
-document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
-document.addEventListener('mousedown', () => cursor.classList.add('active'));
-document.addEventListener('mouseup', () => cursor.classList.remove('active'));
-
-function animateCursor() {
-    curX += (mouseX - curX) * 0.2;
-    curY += (mouseY - curY) * 0.2;
-    cursor.style.transform = `translate(${curX}px, ${curY}px) translate(-50%, -50%)`;
-    requestAnimationFrame(animateCursor);
-}
-if(window.matchMedia('(hover: hover)').matches) animateCursor();
-
-// --- TOGGLE LOGIC (SEM BUG DE FLICKER) ---
-function handleToggle(el) {
-    const key = el.dataset.key;
-    // 1. Atualiza visual IMEDIATAMENTE
-    const newState = !state.toggles[key];
-    state.toggles[key] = newState;
-    el.classList.toggle('active', newState);
-    
-    // 2. Envia para C# sem delay artificial
-    sendApi('/api/toggle', { key, value: newState });
-    
-    // 3. Atualiza preview
-    renderPreview();
+// ==========================================
+// TOGGLE INSTANTÂNEO (SEM BUG)
+// ==========================================
+function toggleSwitch(el) {
+    // Alterna visualmente IMEDIATAMENTE
+    el.classList.toggle('on');
+    // Envia estado imediatamente sem delay
+    sendState();
+    scheduleRender();
 }
 
-// --- COLOR PICKER LOGIC (ZERO DELAY) ---
-let currentPickerKey = null;
-let hsv = { h: 0, s: 1, v: 1 };
-let isDraggingSV = false, isDraggingHue = false;
-
-function openPicker(el) {
-    currentPickerKey = el.dataset.key;
-    const hex = state.colors[currentPickerKey];
-    hsv = hexToHSV(hex);
-    
-    const overlay = document.getElementById('cpOverlay');
-    const modal = document.getElementById('cpModal');
+// ==========================================
+// COLOR PICKER SEM DELAY
+// ==========================================
+function openCP(el) {
+    cpTarget = el;
     const rect = el.getBoundingClientRect();
+    const box = document.getElementById('cpBox');
     
     // Posicionamento inteligente
-    let top = rect.bottom + 10;
-    let left = rect.left;
-    if(top + 200 > window.innerHeight) top = rect.top - 200;
-    if(left + 250 > window.innerWidth) left = window.innerWidth - 260;
+    let left = rect.right + 10;
+    let top = rect.top;
+    if(left + 250 > window.innerWidth) left = rect.left - 260;
+    if(top + 180 > window.innerHeight) top = window.innerHeight - 190;
     
-    modal.style.top = top + 'px';
-    modal.style.left = left + 'px';
-    overlay.classList.add('open');
+    box.style.left = Math.max(10, left) + 'px';
+    box.style.top = Math.max(10, top) + 'px';
     
-    updatePickerUI();
-}
-
-function closePicker(e) {
-    if(e.target.id === 'cpOverlay') document.getElementById('cpOverlay').classList.remove('open');
-}
-
-// Eventos do Picker (Mouse + Touch unificados)
-const svBox = document.getElementById('svBox');
-const hueTrack = document.getElementById('hueTrack');
-
-function getPos(e) {
-    return e.touches ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY };
-}
-
-svBox.addEventListener('mousedown', startSV); svBox.addEventListener('touchstart', startSV, {passive:false});
-hueTrack.addEventListener('mousedown', startHue); hueTrack.addEventListener('touchstart', startHue, {passive:false});
-
-function startSV(e) { e.preventDefault(); isDraggingSV = true; moveSV(getPos(e)); }
-function startHue(e) { e.preventDefault(); isDraggingHue = true; moveHue(getPos(e)); }
-
-document.addEventListener('mousemove', e => { if(isDraggingSV) moveSV({x:e.clientX, y:e.clientY}); if(isDraggingHue) moveHue({x:e.clientX, y:e.clientY}); });
-document.addEventListener('touchmove', e => { if(isDraggingSV || isDraggingHue) e.preventDefault(); if(isDraggingSV) moveSV(getPos(e)); if(isDraggingHue) moveHue(getPos(e)); }, {passive:false});
-document.addEventListener('mouseup', stopDrag); document.addEventListener('touchend', stopDrag);
-
-function stopDrag() { isDraggingSV = false; isDraggingHue = false; }
-
-function moveSV(pos) {
-    const r = svBox.getBoundingClientRect();
-    hsv.s = Math.max(0, Math.min(1, (pos.x - r.left) / r.width));
-    hsv.v = Math.max(0, Math.min(1, 1 - (pos.y - r.top) / r.height));
-    applyColorChange();
-}
-
-function moveHue(pos) {
-    const r = hueTrack.getBoundingClientRect();
-    hsv.h = Math.max(0, Math.min(1, (pos.y - r.top) / r.height));
-    applyColorChange();
-}
-
-function applyColorChange() {
-    const hex = HSVtoHex(hsv.h, hsv.s, hsv.v);
-    // Atualiza UI instantaneamente
-    document.getElementById(`sw-${currentPickerKey.replace('color','').replace('box','box').replace('skeleton','skeleton').replace('snapline','snapline').replace('healthbar','health')}`).style.background = hex;
-    state.colors[currentPickerKey] = hex;
-    updatePickerUI();
-    renderPreview();
+    // Carrega cor atual
+    const hex = el.getAttribute('data-hex') || '#ff0000';
+    const hsv = hexToHsv(hex);
+    cpH=hsv[0]; cpS=hsv[1]; cpV=hsv[2]; cpA=1;
     
-    // Envia para C# (Fire & Forget, sem await para não travar UI)
-    sendApi('/api/color', { key: currentPickerKey, value: hex });
+    updateCPVisuals();
+    document.getElementById('cpOverlay').classList.add('open');
 }
 
-function updatePickerUI() {
-    const rgb = HSVtoRGB(hsv.h, hsv.s, hsv.v);
-    const hueRgb = HSVtoRGB(hsv.h, 1, 1);
+function updateCPVisuals() {
+    const rgb = hsvToRgb(cpH, cpS, cpV);
+    const hex = rgbToHex(...rgb);
+    const hueHex = rgbToHex(...hsvToRgb(cpH, 1, 1));
     
-    document.getElementById('svBox').style.backgroundColor = `rgb(${hueRgb.r},${hueRgb.g},${hueRgb.b})`;
-    document.getElementById('svHandle').style.left = (hsv.s * 100) + '%';
-    document.getElementById('svHandle').style.top = ((1-hsv.v) * 100) + '%';
-    document.getElementById('svHandle').style.backgroundColor = `rgb(${rgb.r},${rgb.g},${rgb.b})`;
-    document.getElementById('hueHandle').style.top = (hsv.h * 100) + '%';
-}
-
-// --- API COMMUNICATION ---
-async function sendApi(endpoint, data) {
-    try {
-        await fetch(endpoint, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(data)
-        });
-    } catch(e) { console.warn('API Error:', e); }
-}
-
-// Polling de estado (para sincronizar se outro dispositivo mudar)
-setInterval(async () => {
-    try {
-        const res = await fetch('/api/state');
-        const serverState = await res.json();
-        
-        // Sincroniza apenas se for diferente (evita flicker)
-        if(JSON.stringify(serverState.toggles) !== JSON.stringify(state.toggles)) {
-            state.toggles = serverState.toggles;
-            document.querySelectorAll('.toggle').forEach(t => {
-                t.classList.toggle('active', state.toggles[t.dataset.key]);
-            });
-        }
-        if(JSON.stringify(serverState.colors) !== JSON.stringify(state.colors)) {
-            state.colors = serverState.colors;
-            Object.keys(state.colors).forEach(k => {
-                const sw = document.querySelector(`[data-key="${k}"]`);
-                if(sw) sw.style.background = state.colors[k];
-            });
-        }
-        
-        // Status conexão
-        const dot = document.getElementById('conn-dot');
-        const txt = document.getElementById('conn-text');
-        if(res.ok) { dot.classList.add('online'); txt.textContent = 'CONNECTED'; txt.style.color = 'var(--success)'; }
-        else { dot.classList.remove('online'); txt.textContent = 'OFFLINE'; txt.style.color = 'var(--muted)'; }
-        
-        renderPreview();
-    } catch(e) {
-        document.getElementById('conn-dot').classList.remove('online');
-        document.getElementById('conn-text').textContent = 'OFFLINE';
+    document.getElementById('sv').style.background = hueHex;
+    document.getElementById('svTh').style.background = hex;
+    document.getElementById('aGr').style.background = `linear-gradient(to bottom, ${hueHex}, transparent)`;
+    document.getElementById('hueTh').style.background = hueHex;
+    document.getElementById('aTh').style.background = `rgba(${rgb.join(',')},${cpA})`;
+    
+    if(cpTarget) {
+        cpTarget.style.background = hex;
+        cpTarget.setAttribute('data-hex', hex);
+        scheduleRender();
     }
-}, 500);
+}
 
-// --- PREVIEW RENDERER ---
-const canvas = document.getElementById('previewCanvas');
-const ctx = canvas.getContext('2d');
-let charImg = new Image();
-charImg.src = 'https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png?ex=6a3dcbea&is=6a3c7a6a&hm=95ab23192fdc65d73e612fadc773aac107802e9a93602097a289073aabc498b2&=&format=webp&quality=lossless&width=800&height=968';
+// Eventos do Color Picker
+const svEl = document.getElementById('sv');
+const hueTr = document.getElementById('hueTr');
+const aTr = document.getElementById('aTr');
 
+function getPos(e) { return e.touches ? e.touches[0] : e; }
+
+svEl.addEventListener('mousedown', e => { dSV=true; doSV(getPos(e)); e.preventDefault(); });
+hueTr.addEventListener('mousedown', e => { dH=true; doH(getPos(e)); e.preventDefault(); });
+aTr.addEventListener('mousedown', e => { dA=true; doA(getPos(e)); e.preventDefault(); });
+
+document.addEventListener('mousemove', e => {
+    if(dSV) doSV(getPos(e));
+    if(dH) doH(getPos(e));
+    if(dA) doA(getPos(e));
+});
+document.addEventListener('mouseup', () => { if(dSV||dH||dA) { dSV=dH=dA=false; sendState(); } });
+
+// Touch support
+svEl.addEventListener('touchstart', e => { dSV=true; doSV(getPos(e)); e.preventDefault(); }, {passive:false});
+hueTr.addEventListener('touchstart', e => { dH=true; doH(getPos(e)); e.preventDefault(); }, {passive:false});
+aTr.addEventListener('touchstart', e => { dA=true; doA(getPos(e)); e.preventDefault(); }, {passive:false});
+document.addEventListener('touchmove', e => {
+    if(dSV||dH||dA) { e.preventDefault(); 
+        if(dSV) doSV(getPos(e)); if(dH) doH(getPos(e)); if(dA) doA(getPos(e)); 
+    }
+}, {passive:false});
+document.addEventListener('touchend', () => { if(dSV||dH||dA) { dSV=dH=dA=false; sendState(); } });
+
+function doSV(e) {
+    const r = svEl.getBoundingClientRect();
+    cpS = Math.max(0, Math.min(1, (e.clientX-r.left)/r.width));
+    cpV = Math.max(0, Math.min(1, 1-(e.clientY-r.top)/r.height));
+    updateCPVisuals();
+    sendState(); // ENVIA IMEDIATAMENTE
+}
+function doH(e) {
+    const r = hueTr.getBoundingClientRect();
+    cpH = Math.max(0, Math.min(0.999, (e.clientY-r.top)/r.height));
+    updateCPVisuals();
+    sendState();
+}
+function doA(e) {
+    const r = aTr.getBoundingClientRect();
+    cpA = Math.max(0, Math.min(1, 1-(e.clientY-r.top)/r.height));
+    updateCPVisuals();
+    sendState();
+}
+
+document.getElementById('cpOverlay').addEventListener('mousedown', e => {
+    if(e.target.id === 'cpOverlay') document.getElementById('cpOverlay').classList.remove('open');
+});
+
+// ==========================================
+// SYNC & STATE (SUPABASE)
+// ==========================================
+async function startSync() {
+    setInterval(async () => {
+        if(!sessionId) return;
+        try {
+            const { data } = await client.from('n3sk').select('state,is_active').eq('id', sessionId).single();
+            if(!data || !data.is_active) { location.reload(); return; }
+            if(data.state) applyState(data.state);
+        } catch(e) {}
+    }, 100); // Polling rápido
+
+    window.addEventListener('beforeunload', async () => {
+        if(sessionId) await client.from('n3sk').delete().eq('id', sessionId);
+    });
+}
+
+async function sendState() {
+    if(!sessionId) return;
+    const state = {
+        toggles: {
+            box: document.querySelector('[data-key="box"]').classList.contains('on'),
+            skeleton: document.querySelector('[data-key="skeleton"]').classList.contains('on'),
+            snapline: document.querySelector('[data-key="snapline"]').classList.contains('on'),
+            healthbar: document.querySelector('[data-key="healthbar"]').classList.contains('on')
+        },
+        colors: {
+            boxcolor: document.getElementById('sw-boxcolor').getAttribute('data-hex'),
+            skeletoncolor: document.getElementById('sw-skeletoncolor').getAttribute('data-hex'),
+            snaplinecolor: document.getElementById('sw-snaplinecolor').getAttribute('data-hex'),
+            healthbarcolor: document.getElementById('sw-healthbarcolor').getAttribute('data-hex')
+        },
+        alphas: { boxalpha: cpA, skeletonalpha: 1, snaplinealpha: 1, healthbaralpha: 1 }
+    };
+    // Fire and forget para baixa latência
+    client.from('n3sk').update({state}).eq('id', sessionId).then(()=>{}).catch(()=>{});
+}
+
+function applyState(s) {
+    ['box','skeleton','snapline','healthbar'].forEach(k => {
+        const el = document.querySelector(`[data-key="${k}"]`);
+        if(el && s.toggles) el.classList.toggle('on', !!s.toggles[k]);
+    });
+    if(s.colors) {
+        Object.keys(s.colors).forEach(k => {
+            const el = document.getElementById(`sw-${k}`);
+            if(el && s.colors[k]) {
+                el.style.background = s.colors[k];
+                el.setAttribute('data-hex', s.colors[k]);
+            }
+        });
+    }
+    scheduleRender();
+}
+
+// ==========================================
+// CANVAS RENDERER (PREVIEW)
+// ==========================================
 function resizeCanvas() {
-    const wrap = canvas.parentElement;
-    canvas.width = wrap.clientWidth;
-    canvas.height = wrap.clientHeight;
-    renderPreview();
+    const rect = canvas.parentElement.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    const w = rect.width;
+    const h = rect.height;
+    
+    if(cw !== w || ch !== h) {
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+        canvas.style.width = w + 'px';
+        canvas.style.height = h + 'px';
+        ctx.scale(dpr, dpr);
+        cw = w; ch = h;
+        scheduleRender();
+    }
 }
 window.addEventListener('resize', resizeCanvas);
-setTimeout(resizeCanvas, 100);
 
-function renderPreview() {
-    if(!canvas.width) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+function scheduleRender() { renderReq = true; }
+
+function renderLoop() {
+    if(renderReq) { renderReq = false; drawPreview(); }
+    requestAnimationFrame(renderLoop);
+}
+
+function drawPreview() {
+    if(!cw || !ch) return;
+    ctx.fillStyle = '#000'; ctx.fillRect(0,0,cw,ch);
     
-    // Desenha personagem
-    if(charImg.complete) {
-        const scale = Math.min(canvas.width / charImg.width, canvas.height / charImg.height) * 0.8;
-        const w = charImg.width * scale;
-        const h = charImg.height * scale;
-        ctx.drawImage(charImg, (canvas.width-w)/2, (canvas.height-h)/2, w, h);
-        
-        const cx = canvas.width/2;
-        const cy = canvas.height/2;
-        const bh = h * 0.85; // Box height relativo ao char
-        const bw = w * 0.5;  // Box width
-        
-        // BOX ESP
-        if(state.toggles.box) {
-            ctx.strokeStyle = state.colors.boxcolor;
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.rect(cx - bw/2, cy - bh/2 + 20, bw, bh);
-            ctx.stroke();
-        }
-        
-        // HEALTHBAR
-        if(state.toggles.healthbar) {
-            const barW = 6;
-            const barH = bh;
-            const barX = cx - bw/2 - 15;
-            const barY = cy - bh/2 + 20;
-            
-            ctx.fillStyle = '#111';
-            ctx.fillRect(barX, barY, barW, barH);
-            
-            ctx.fillStyle = state.colors.healthbarcolor;
-            ctx.fillRect(barX, barY + barH * 0.3, barW, barH * 0.7); // Simula 70% HP
-        }
-        
-        // SNAPLINE
-        if(state.toggles.snapline) {
-            ctx.strokeStyle = state.colors.snaplinecolor;
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            ctx.moveTo(canvas.width/2, canvas.height);
-            ctx.lineTo(cx, cy);
-            ctx.stroke();
-        }
+    // Desenha Imagem de Fundo
+    if(bgImage.complete && bgImage.naturalWidth > 0) {
+        const scale = Math.min(cw/bgImage.width, ch/bgImage.height);
+        const w = bgImage.width*scale, h = bgImage.height*scale;
+        ctx.drawImage(bgImage, (cw-w)/2, (ch-h)/2, w, h);
+    }
+    
+    // Estado Atual
+    const isBox = document.querySelector('[data-key="box"]').classList.contains('on');
+    const isHp = document.querySelector('[data-key="healthbar"]').classList.contains('on');
+    const boxColor = document.getElementById('sw-boxcolor').getAttribute('data-hex');
+    const hpColor = document.getElementById('sw-healthbarcolor').getAttribute('data-hex');
+    
+    // Dimensões ESP
+    const bH = ch * 0.7;
+    const bW = bH * 0.45;
+    const bX = (cw - bW) / 2;
+    const bY = (ch - bH) / 2 + 20;
+    
+    // Suavização da Box
+    boxOp += (isBox ? 1 : 0 - boxOp) * 0.2;
+    
+    if(boxOp > 0.01) {
+        ctx.globalAlpha = boxOp;
+        ctx.strokeStyle = boxColor;
+        ctx.lineWidth = 2;
+        const l = bW * 0.2;
+        ctx.beginPath();
+        ctx.moveTo(bX, bY+l); ctx.lineTo(bX, bY); ctx.lineTo(bX+l, bY);
+        ctx.moveTo(bX+bW-l, bY); ctx.lineTo(bX+bW, bY); ctx.lineTo(bX+bW, bY+l);
+        ctx.moveTo(bX, bY+bH-l); ctx.lineTo(bX, bY+bH); ctx.lineTo(bX+l, bY+bH);
+        ctx.moveTo(bX+bW-l, bY+bH); ctx.lineTo(bX+bW, bY+bH); ctx.lineTo(bX+bW, bY+bH-l);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+    }
+    
+    // Healthbar
+    if(isHp) {
+        hpTime += 0.05;
+        const pulse = 0.6 + 0.4*Math.sin(hpTime);
+        const hpH = bH * pulse;
+        const bw = 6; const bx = bX - 12;
+        ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(bx, bY, bw, bH);
+        ctx.fillStyle = hpColor; ctx.fillRect(bx, bY+(bH-hpH), bw, hpH);
     }
 }
 
-// --- UTILS HSV/RGB ---
-function hexToHSV(hex) {
-    let r = parseInt(hex.slice(1,3),16)/255, g = parseInt(hex.slice(3,5),16)/255, b = parseInt(hex.slice(5,7),16)/255;
-    let max = Math.max(r,g,b), min = Math.min(r,g,b), d = max-min, h=0, s=max===0?0:d/max, v=max;
-    if(d!==0) { switch(max){ case r:h=((g-b)/d)%6;break; case g:h=(b-r)/d+2;break; case b:h=(r-g)/d+4;break; } h/=6; if(h<0)h+=1; }
-    return {h,s,v};
+// ==========================================
+// UTILITÁRIOS DE COR
+// ==========================================
+function hexToHsv(hex) {
+    let r=parseInt(hex.slice(1,3),16)/255, g=parseInt(hex.slice(3,5),16)/255, b=parseInt(hex.slice(5,7),16)/255;
+    let max=Math.max(r,g,b), min=Math.min(r,g,b), d=max-min, h=0, s=max===0?0:d/max, v=max;
+    if(d!==0) { switch(max) { case r:h=((g-b)/d)%6;break; case g:h=(b-r)/d+2;break; case b:h=(r-g)/d+4;break; } }
+    return [h<0?h+6:h, s, v];
 }
-function HSVtoRGB(h,s,v) {
-    let r,g,b,i=Math.floor(h*6),f=h*6-i,p=v*(1-s),q=v*(1-f*s),t=v*(1-(1-f)*s);
-    switch(i%6){case 0:r=v;g=t;b=p;break;case 1:r=q;g=v;b=p;break;case 2:r=p;g=v;b=t;break;case 3:r=p;g=q;b=v;break;case 4:r=t;g=p;b=v;break;case 5:r=v;g=p;b=q;break;}
-    return {r:Math.round(r*255),g:Math.round(g*255),b:Math.round(b*255)};
+function hsvToRgb(h,s,v) {
+    let r,g,b, i=Math.floor(h*6), f=h*6-i, p=v*(1-s), q=v*(1-f*s), t=v*(1-(1-f)*s);
+    switch(i%6) { case 0:r=v;g=t;b=p;break; case 1:r=q;g=v;b=p;break; case 2:r=p;g=v;b=t;break; case 3:r=p;g=q;b=v;break; case 4:r=t;g=p;b=v;break; case 5:r=v;g=p;b=q;break; }
+    return [Math.round(r*255), Math.round(g*255), Math.round(b*255)];
 }
-function HSVtoHex(h,s,v) { const c=HSVtoRGB(h,s,v); return '#'+((1<<24)+(c.r<<16)+(c.g<<8)+c.b).toString(16).slice(1); }
+function rgbToHex(r,g,b) { return "#"+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1); }
 
+// ==========================================
+// QR CODE
+// ==========================================
+async function showQR() {
+    if(!sessionId) return;
+    const modal = document.getElementById('qr-modal');
+    const container = document.getElementById('qrcode');
+    container.innerHTML = '';
+    modal.classList.add('active');
+    
+    const { data } = await client.from('n3sk').select('token').eq('id', sessionId).single();
+    if(data && data.token) {
+        new QRCode(container, {
+            text: `${window.location.origin}?token=${data.token}`,
+            width: 180, height: 180, colorDark:"#000", colorLight:"#fff"
+        });
+    }
+}
 </script>
 </body>
 </html>
