@@ -218,6 +218,7 @@ let isGlobal = false;
 let bgImage = null;
 let isUpdatingLocally = false; // TRAVA PARA EVITAR BUG DE TOGGLE
 let toggleLocked = false; // BLOQUEIA CLIQUES DUPLOS
+let lastToggleTime = 0; // REGISTRA ÚLTIMO CLIQUE EM TOGGLE
 
 // ============================================
 // CURSOR (INICIA IMEDIATAMENTE)
@@ -288,13 +289,17 @@ function showLoginError(msg){
 }
 
 // ============================================
-// TOGGLES (BLINDADO CONTRA BUG - SEM DELAYS)
+// TOGGLES (BLINDADO CONTRA BUG - PROTEÇÃO MÁXIMA)
 // ============================================
 function toggleSwitch(el, key){
-    // Bloqueia múltiplos cliques
+    // Proteção dupla contra cliques rápidos
+    const now = Date.now();
+    if(now - lastToggleTime < 300) return; // Ignora cliques dentro de 300ms
+    lastToggleTime = now;
+    
     if(toggleLocked) return;
     toggleLocked = true;
-    setTimeout(() => { toggleLocked = false; }, 80);
+    setTimeout(() => { toggleLocked = false; }, 200);
     
     // Muda o estado localmente (sem toggle - usa add/remove)
     const isNowOn = !el.classList.contains('on');
@@ -306,11 +311,11 @@ function toggleSwitch(el, key){
     
     scheduleRender();
     
-    // Bloqueia sync por tempo fixo
+    // TRAVA FORTE para não deixar sync interferir (1 segundo!)
     isUpdatingLocally = true;
-    setTimeout(() => { isUpdatingLocally = false; }, 250);
+    setTimeout(() => { isUpdatingLocally = false; }, 1000);
     
-    // Envia estado imediatamente (sem delay)
+    // Envia estado imediatamente
     sendState();
 }
 
@@ -527,7 +532,7 @@ async function startSync(){
         const {data, error} = await client.from('n3sk').select('state, is_active').eq('id', sessionId).single();
         if(error || !data || !data.is_active){ location.reload(); return; }
         if(data.state) applyState(data.state);
-    }, 50); // Sincroniza a cada 50ms (super rápido!)
+    }, 200); // Sincroniza a cada 200ms (evita conflitos)
 }
 
 async function sendState(){
