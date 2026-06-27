@@ -21,10 +21,22 @@
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;cursor:none}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif}
+
+/* CURSOR CUSTOMIZADO - CORRIGIDO */
 @media(hover:hover){ 
     body { cursor: none; }
-    #cur{position:fixed;width:18px;height:18px;border:2px solid rgba(199,48,48,.9);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:transform .12s ease,border-color .15s ease} 
+    #cur{
+        position:fixed;
+        width:18px;
+        height:18px;
+        border:2px solid rgba(199,48,48,.9);
+        border-radius:50%;
+        pointer-events:none;
+        z-index:99999;
+        transform:translate(-50%,-50%);
+        transition:transform .12s ease,border-color .15s ease
+    } 
     #cur.ck{transform:translate(-50%,-50%) scale(.65);border-color:#ff6b6b} 
 }
 @media(hover:none), (max-width: 900px){ 
@@ -50,7 +62,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe 
 .stat-txt{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1px;transition:color .3s}
 .stat-txt.on{color:#4ade80}
 
-/* Botão QR Global */
 .btn-global-qr {
     width: 100%; padding: 12px; background: transparent; border: 1.5px solid #c73030;
     color: #c73030; font-weight: bold; letter-spacing: 1px; border-radius: 8px;
@@ -108,7 +119,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe 
 .bag{position:absolute;inset:0;border-radius:99px;pointer-events:none}
 .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,.6),0 2px 5px rgba(0,0,0,.7);pointer-events:none;z-index:10; transition: top 0.1s linear, background 0.1s linear;}
 
-/* LOGIN SCREEN */
 #login-screen {
     position: fixed; inset: 0; z-index: 99999;
     display: flex; align-items: center; justify-content: center;
@@ -133,7 +143,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe 
 }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-/* QR MODAL */
 #qr-modal {
     position: fixed; inset: 0; z-index: 99998;
     display: none; align-items: center; justify-content: center;
@@ -169,7 +178,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe 
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
 <div id="login-screen">
     <div class="login-card">
         <h1>n3sk <span></span></h1>
@@ -178,7 +186,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe 
     </div>
 </div>
 
-<!-- QR MODAL -->
 <div id="qr-modal">
     <div class="qr-modal-content">
         <h2>ACESSO GLOBAL</h2>
@@ -188,7 +195,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe 
     </div>
 </div>
 
-<!-- APP ORIGINAL -->
 <div id='cur'></div>
 <div class='cp-ol' id='cpOl'>
   <div class='cp-box' id='cpBox'>
@@ -253,6 +259,7 @@ let isGlobal = false;
 let globalQr = null;
 
 window.onload = function() {
+    console.log("[DEBUG] Página carregada");
     init();
     resizeCanvas(); 
     scheduleRender();
@@ -262,12 +269,15 @@ async function init() {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
     
+    console.log("[DEBUG] Token da URL:", token);
+    
     if (!token) {
         showLoginError("Nenhum token fornecido na URL.");
         return;
     }
 
     try {
+        console.log("[DEBUG] Buscando token no Supabase...");
         const { data, error } = await supabase
             .from('n3sk')
             .select('*')
@@ -275,68 +285,94 @@ async function init() {
             .eq('is_active', true)
             .single();
 
+        console.log("[DEBUG] Resposta Supabase:", data, error);
+
         if (error || !data) {
+            console.error("[DEBUG] Erro na busca:", error);
             showLoginError("Token inválido ou sessão expirada.");
             return;
         }
 
         sessionId = data.id;
         isGlobal = data.is_global;
+        
+        console.log("[DEBUG] Session ID:", sessionId);
+        console.log("[DEBUG] Is Global:", isGlobal);
+        console.log("[DEBUG] IP salvo:", data.ip);
+        console.log("[DEBUG] HWID salvo:", data.hwid);
 
-        if (!isGlobal && data.ip) {
+        if (!isGlobal && data.ip && data.ip !== "UNKNOWN") {
             try {
+                console.log("[DEBUG] Validando IP público...");
                 const ipRes = await fetch('https://api.ipify.org?format=json');
                 const ipData = await ipRes.json();
+                console.log("[DEBUG] Meu IP:", ipData.ip, "IP salvo:", data.ip);
+                
                 if (ipData.ip !== data.ip) {
                     showLoginError("Acesso negado. Este link é exclusivo para o dispositivo original.");
                     return;
                 }
             } catch (e) {
-                // Fallback se falhar ao pegar IP
+                console.warn("[DEBUG] Não conseguiu validar IP, continuando...");
             }
         }
 
         showApp();
         startStateSync();
     } catch (e) {
-        showLoginError("Erro ao conectar com o servidor.");
+        console.error("[DEBUG] Erro na init:", e);
+        showLoginError("Erro ao conectar com o servidor: " + e.message);
     }
 }
 
 function showLoginError(msg) {
+    console.error("[DEBUG] Erro login:", msg);
     document.getElementById('login-msg').textContent = msg;
     document.getElementById('login-loader').style.display = 'none';
     document.querySelector('.login-card').classList.add('error');
 }
 
 function showApp() {
+    console.log("[DEBUG] Mostrando app");
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').style.display = 'block';
     if (isGlobal) {
         document.getElementById('btnGlobalQr').style.display = 'none';
     }
+    setConn(true);
 }
 
 async function startStateSync() {
+    console.log("[DEBUG] Iniciando sync de estado...");
     setInterval(async () => {
         if (!sessionId) return;
-        const { data, error } = await supabase
-            .from('n3sk')
-            .select('state, is_active')
-            .eq('id', sessionId)
-            .single();
-        
-        if (error || !data || !data.is_active) {
-            showLoginError("Sessão encerrada pelo loader.");
-            document.getElementById('app').style.display = 'none';
-            document.getElementById('login-screen').style.display = 'flex';
-            document.getElementById('login-msg').textContent = "Sessão encerrada.";
-            document.getElementById('login-loader').style.display = 'none';
-            return;
-        }
+        try {
+            const { data, error } = await supabase
+                .from('n3sk')
+                .select('state, is_active')
+                .eq('id', sessionId)
+                .single();
+            
+            if (error) {
+                console.error("[DEBUG] Erro no sync:", error);
+                return;
+            }
+            
+            if (!data || !data.is_active) {
+                console.log("[DEBUG] Sessão inativa");
+                showLoginError("Sessão encerrada pelo loader.");
+                document.getElementById('app').style.display = 'none';
+                document.getElementById('login-screen').style.display = 'flex';
+                document.getElementById('login-msg').textContent = "Sessão encerrada.";
+                document.getElementById('login-loader').style.display = 'none';
+                return;
+            }
 
-        if (data.state) {
-            applyState(data.state);
+            if (data.state) {
+                applyState(data.state);
+            }
+        } catch (e) {
+            console.error("[DEBUG] Erro no setInterval:", e);
         }
     }, 500);
 }
@@ -369,9 +405,11 @@ async function sendStateUpdate() {
     clearTimeout(updateTimeout);
     updateTimeout = setTimeout(async () => {
         try {
-            await supabase.from('n3sk').update({ state: state }).eq('id', sessionId);
+            console.log("[DEBUG] Enviando estado:", state);
+            const { data, error } = await supabase.from('n3sk').update({ state: state }).eq('id', sessionId);
+            if (error) console.error("[DEBUG] Erro ao salvar:", error);
         } catch (e) {
-            console.error("Erro ao salvar estado:", e);
+            console.error("[DEBUG] Erro ao enviar estado:", e);
         }
     }, 150);
 }
@@ -400,12 +438,40 @@ function closeGlobalQr() {
 }
 
 const PREVIEW_IMG_URL = 'https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png?ex=6a3dcbea&is=6a3c7a6a&hm=95ab23192fdc65d73e612fadc773aac107802e9a93602097a289073aabc498b2&=&format=webp&quality=lossless&width=800&height=968';
-var cur=document.getElementById('cur');
-var mx=innerWidth/2,my=innerHeight/2,cx=mx,cy=my;
-document.addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY});
-document.addEventListener('mousedown',function(){if(cur)cur.classList.add('ck')});
-document.addEventListener('mouseup',function(){if(cur)cur.classList.remove('ck')});
-(function loop(){cx+=(mx-cx)*.13;cy+=(my-cy)*.13;if(cur){cur.style.left=cx+'px';cur.style.top=cy+'px';}requestAnimationFrame(loop)})();
+
+// CURSOR CUSTOMIZADO - CORRIGIDO
+var cur = document.getElementById('cur');
+var mx = window.innerWidth / 2, my = window.innerHeight / 2, cx = mx, cy = my;
+
+if (cur && window.matchMedia("(hover: hover)").matches) {
+    document.addEventListener('mousemove', function(e) {
+        mx = e.clientX;
+        my = e.clientY;
+    });
+    
+    document.addEventListener('mousedown', function() {
+        if(cur) cur.classList.add('ck');
+    });
+    
+    document.addEventListener('mouseup', function() {
+        if(cur) cur.classList.remove('ck');
+    });
+    
+    // Loop de animação do cursor
+    function cursorLoop() {
+        cx += (mx - cx) * 0.13;
+        cy += (my - cy) * 0.13;
+        if(cur) {
+            cur.style.left = cx + 'px';
+            cur.style.top = cy + 'px';
+        }
+        requestAnimationFrame(cursorLoop);
+    }
+    cursorLoop();
+    console.log("[DEBUG] Cursor customizado ativado");
+} else {
+    console.log("[DEBUG] Cursor customizado desativado (touch ou sem cursor)");
+}
 
 var canvas = document.getElementById('espCanvas');
 var ctx = canvas.getContext('2d', { alpha: false });
@@ -609,6 +675,7 @@ function tg(el){
 }
 
 function applyState(state){
+  console.log("[DEBUG] Aplicando estado:", state);
   setConn(true);
   var tm={box:'tgl-box',skeleton:'tgl-skeleton',snapline:'tgl-snapline',healthbar:'tgl-healthbar'};
   for(var k in tm){var el=document.getElementById(tm[k]);if(el && state.toggles)el.classList.toggle('on',!!state.toggles[k]);}
