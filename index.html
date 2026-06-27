@@ -179,7 +179,7 @@ function updateStatus(msg, isError = false) {
 if (!SESSION_TOKEN) {
     updateStatus("TOKEN NÃO ENCONTRADO", true);
 } else {
-    updateStatus("Conectando...");
+    updateStatus("Validando acesso...");
 }
 
 // --- CURSOR ORIGINAL SEM LAG ---
@@ -363,10 +363,10 @@ function sendFinalColor(){
     sendAlpha(cpTarget, cpA);
 }
 
-// --- INTEGRAÇÃO SUPABASE (SUBSTITUI /api/...) ---
+// --- INTEGRAÇÃO SUPABASE COM VALIDAÇÃO HWID ---
 async function fetchState() {
     try {
-        const url = `${SUPA_URL}/rest/v1/${TABLE}?token=eq.${SESSION_TOKEN}&select=id,state,is_active&order=created_at.desc&limit=1`;
+        const url = `${SUPA_URL}/rest/v1/${TABLE}?token=eq.${SESSION_TOKEN}&select=id,state,is_active,hwid&order=created_at.desc&limit=1`;
         const res = await fetch(url, {
             headers: { 
                 'apikey': SUPA_KEY, 
@@ -379,7 +379,19 @@ async function fetchState() {
         const data = await res.json();
         
         if (data.length > 0 && data[0].state && data[0].is_active) {
-            return data[0].state;
+            const session = data[0];
+            
+            // VALIDAÇÃO CRÍTICA: Se tem HWID no banco, verifica se bate com o navegador
+            if (session.hwid && session.hwid.length > 0) {
+                const browserHwid = generateBrowserHwid();
+                if (session.hwid !== browserHwid) {
+                    updateStatus("ACESSO NEGADO: HWID inválido", true);
+                    return null;
+                }
+            }
+            // Se não tem HWID (token global do QR), permite acesso universal
+            
+            return session.state;
         }
         return null;
     } catch(e) { 
@@ -388,9 +400,21 @@ async function fetchState() {
     }
 }
 
+// Gera fingerprint único do navegador para validar HWID
+function generateBrowserHwid() {
+    const raw = navigator.userAgent + screen.width + screen.height + screen.colorDepth + 
+                navigator.language + new Date().getTimezoneOffset() + navigator.platform;
+    let hash = 0;
+    for (let i = 0; i < raw.length; i++) {
+        const char = raw.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash |= 0;
+    }
+    return Math.abs(hash).toString(16).toUpperCase().padStart(16, '0').substring(0, 16);
+}
+
 async function updateState(newState) {
     try {
-        // Busca o ID da sessão pelo token antes de atualizar
         const findRes = await fetch(`${SUPA_URL}/rest/v1/${TABLE}?token=eq.${SESSION_TOKEN}&select=id&order=created_at.desc&limit=1`, {
             headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}` }
         });
@@ -502,7 +526,10 @@ function openGlobalQR(){
         alert("Conecte-se primeiro!");
         return;
     }
-    // Gera URL com token atual (que funciona como global dentro da mesma sessão)
+    // O QR Code usa o MESMO token atual, mas como foi gerado via botão interno,
+    // ele é considerado "global" para quem escanear.
+    // Na prática, o C# pode gerar um token separado via GenerateGlobalToken()
+    // e injetar aqui via WebSocket/API local, mas para simplificar:
     const url = `${window.location.origin}${window.location.pathname}?token=${SESSION_TOKEN}`;
     const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
     document.getElementById('qrImage').src = qrApi;
