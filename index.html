@@ -125,15 +125,40 @@
         .sv{width:190px;height:152px;border-radius:5px;position:relative;overflow:hidden;border:1px solid #222;cursor:none}
         .sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent)}
         .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,#000)}
-        /* SMOOTH NAS BOLINHAS DO COLOR PICKER */
-        .sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,0.7);transition:left 0.05s linear,top 0.05s linear}
+        
+        /* BOLINHAS DO COLOR PICKER - SEM TRANSITION CSS PARA TEMPO REAL */
+        .sv-th{
+            position:absolute;
+            width:13px; height:13px;
+            border-radius:50%;
+            border:2.5px solid #fff;
+            transform:translate(-50%,-50%);
+            pointer-events:none;
+            box-shadow:0 0 0 1.5px rgba(0,0,0,0.7);
+            /* REMOVIDO TRANSITION PARA SER INSTANTÂNEO NO MOUSEMOVE */
+        }
+        
         .bars{display:flex;gap:8px}
         .btr{position:relative;width:14px;height:152px;border-radius:99px;overflow:visible;border:1px solid #222;cursor:none}
         .bin{position:absolute;inset:0;border-radius:99px;overflow:hidden}
         .bh{width:100%;height:100%;background:linear-gradient(to bottom,#f00 0%,#ff0 17%,#0f0 33%,#0ff 50%,#00f 67%,#f0f 83%,#f00 100%)}
         .bck{width:100%;height:100%;background:repeating-conic-gradient(#555 0% 25%,#333 0% 50%) 0 0/8px 8px}
         .bag{position:absolute;inset:0;border-radius:99px;pointer-events:none}
-        .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,0.6);pointer-events:none;z-index:10;transition:top 0.05s linear}
+        
+        /* BOLINHA ALPHA/HUE - SEM TRANSITION CSS */
+        .bth{
+            position:absolute;
+            left:50%;
+            transform:translate(-50%,-50%);
+            width:17px; height:17px;
+            border-radius:50%;
+            background:#fff;
+            border:2.5px solid #fff;
+            box-shadow:0 0 0 1.5px rgba(0,0,0,0.6);
+            pointer-events:none;
+            z-index:10;
+            /* REMOVIDO TRANSITION PARA SER INSTANTÂNEO NO MOUSEMOVE */
+        }
         
         /* MOBILE RESPONSIVE */
         @media(max-width:900px){
@@ -324,7 +349,7 @@ function toggleSwitch(el, key){
 }
 
 // ============================================
-// COLOR PICKER (TEMPO REAL + SMOOTH)
+// COLOR PICKER (TEMPO REAL + SMOOTH MATEMÁTICO)
 // ============================================
 let cpTarget = null;
 let cpH = 0, cpS = 1, cpV = 1, cpA = 1;
@@ -436,6 +461,7 @@ function updateCP(){
 }
 
 function updateHandles(){
+    // Aplica posição diretamente sem esperar CSS transition
     svTh.style.left = (svCX*100)+'%';
     svTh.style.top = (svCY*100)+'%';
     const hH = hueTr.getBoundingClientRect().height || 152;
@@ -444,13 +470,18 @@ function updateHandles(){
     aTh.style.top = (aCY*aH)+'px';
 }
 
+// Loop de animação suave (Lerp) para as bolinhas
 function runAnim(){
-    const sp = 0.3; 
+    const sp = 0.4; // Velocidade do smooth (quanto maior, mais rápido)
+    
+    // Interpolação linear para movimento suave
     svCX += (svTX - svCX) * sp;
     svCY += (svTY - svCY) * sp;
     hCY += (hTY - hCY) * sp;
+    
     updateHandles();
-    if(Math.abs(svCX-svTX)>0.0005 || Math.abs(svCY-svTY)>0.0005 || Math.abs(hCY-hTY)>0.0005)
+    
+    if(Math.abs(svCX-svTX)>0.001 || Math.abs(svCY-svTY)>0.001 || Math.abs(hCY-hTY)>0.001)
         requestAnimationFrame(runAnim);
     else animRun = false;
 }
@@ -480,14 +511,14 @@ function doSV(e){
     cpS = clamp((e.clientX - r.left)/r.width, 0, 1);
     cpV = clamp(1 - (e.clientY - r.top)/r.height, 0, 1);
     svTX = cpS; svTY = 1 - cpV;
-    updateCP(); // Atualiza EM TEMPO REAL enquanto arrasta
-    startAnim();
+    updateCP(); // Atualiza cor EM TEMPO REAL enquanto arrasta
+    startAnim(); // Inicia smooth da bolinha
 }
 function doH(e){
     const r = hueTr.getBoundingClientRect();
     cpH = clamp((e.clientY - r.top)/r.height, 0, 0.9999);
     hTY = cpH;
-    updateCP(); // Atualiza EM TEMPO REAL
+    updateCP(); // Atualiza cor EM TEMPO REAL
     startAnim();
 }
 function doA(e){
@@ -496,7 +527,7 @@ function doA(e){
     cpA = clamp(1 - (e.clientY - r.top)/height, 0, 1);
     aCY = 1 - cpA;
     updateHandles(); 
-    updateCP(); // Atualiza EM TEMPO REAL
+    updateCP(); // Atualiza cor EM TEMPO REAL
 }
 
 // Touch support
