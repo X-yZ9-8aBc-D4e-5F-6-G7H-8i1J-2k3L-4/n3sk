@@ -2,187 +2,227 @@
 <html lang="pt-BR">
 <head>
     <meta charset='utf-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover'>
+    <meta name='viewport' content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover'>
     <meta name='color-scheme' content='light dark'>
-    <title>n3sk | Dashboard</title>
-    <!-- Bibliotecas Externas -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <title>n3sk</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-    
     <style>
-        :root {
-            --red: #c73030;
-            --red-dim: rgba(199, 48, 48, 0.2);
-            --bg: #050505;
-            --panel-bg: #0f0f0f;
-            --border: #5a1e1e;
-            --text: #e0e0e0;
-            --muted: #666;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; font-family: 'Segoe UI', system-ui, sans-serif; }
+        :root{--red:#c73030;--bg:#0a0a0a;--bg2:#111;--bg3:#1a1a1a;--border:#8b2e2e;--text:#e0e0e0;--muted:#888}
+        *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+        html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;overflow:hidden}
         
-        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
-
-        /* CURSOR PERSONALIZADO (PC) */
-        @media (hover: hover) and (pointer: fine) {
-            body { cursor: none !important; }
-            #cur {
-                position: fixed; width: 20px; height: 20px; border: 2px solid var(--red); border-radius: 50%;
-                pointer-events: none; z-index: 99999; transform: translate(-50%, -50%);
-                transition: transform 0.1s ease-out; display: block !important;
-            }
-            #cur.click { transform: translate(-50%, -50%) scale(0.8); background: rgba(199, 48, 48, 0.2); }
+        /* CURSOR - DESKTOP ONLY */
+        @media (hover:hover) and (pointer:fine) {
+            body{cursor:none !important}
+            *{cursor:none !important}
+            #cur{position:fixed;width:18px;height:18px;border:2px solid rgba(199,48,48,0.9);border-radius:50%;pointer-events:none;z-index:9999999;transform:translate(-50%,-50%);transition:transform 0.08s ease;display:block !important}
+            #cur.ck{transform:translate(-50%,-50%) scale(0.65)}
         }
-        @media (max-width: 900px) { #cur { display: none !important; } }
-
-        /* TELA DE LOGIN */
-        #login-screen {
-            position: fixed; inset: 0; z-index: 9999; background: #000;
-            display: flex; align-items: center; justify-content: center; flex-direction: column;
-        }
-        .loader { width: 40px; height: 40px; border: 3px solid #222; border-top-color: var(--red); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* LAYOUT PRINCIPAL */
-        #app { display: none; height: 100%; width: 100%; padding: 10px; gap: 10px; flex-direction: column; overflow-y: auto; }
         
-        /* PAINÉIS ESTILO BASE */
-        .panel {
-            background: var(--panel-bg); border: 1px solid var(--border); border-radius: 8px;
-            overflow: hidden; display: flex; flex-direction: column;
+        /* MOBILE - remove cursor */
+        @media (hover:none) and (pointer:coarse) {
+            #cur{display:none !important}
+            body{cursor:auto !important}
         }
-        .ph {
-            background: linear-gradient(90deg, #3a0e0e, #1a0505); padding: 10px 15px;
-            font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #fff;
-            border-bottom: 1px solid var(--border); text-transform: uppercase;
+        
+        /* LOGIN SCREEN */
+        #login-screen{
+            position:fixed;inset:0;z-index:99998;
+            display:flex;align-items:center;justify-content:center;
+            background:linear-gradient(135deg,#0a0a0a 0%,#1a0505 50%,#0a0a0a 100%);
+            font-family:'Segoe UI',sans-serif;color:white;
         }
-        .row {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 15px; border-bottom: 1px solid #1a1a1a;
+        
+        .login-card{
+            background:rgba(15,15,15,0.98);backdrop-filter:blur(25px);
+            padding:70px 55px;border-radius:25px;
+            border:1px solid rgba(199,48,48,0.25);
+            box-shadow:0 30px 120px rgba(0,0,0,0.8),inset 0 1px 0 rgba(199,48,48,0.15),0 0 60px rgba(199,48,48,0.1);
+            text-align:center;max-width:420px;width:90%;
+            animation:popIn 0.6s cubic-bezier(0.34,1.56,0.64,1);
         }
-        .row:last-child { border-bottom: none; }
-        .row span { font-size: 13px; font-weight: 500; }
-
-        /* TOGGLE SWITCH SUAVE E INSTANTÂNEO */
-        .tgl {
-            width: 44px; height: 24px; background: #222; border-radius: 20px;
-            position: relative; border: 1px solid #333; transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
-            cursor: pointer; flex-shrink: 0;
+        @keyframes popIn{
+            0%{opacity:0;transform:translateY(60px) scale(0.85)}
+            100%{opacity:1;transform:translateY(0) scale(1)}
         }
-        .tgl.on { background: var(--red); border-color: #ff5555; box-shadow: 0 0 10px rgba(199, 48, 48, 0.4); }
-        .tgl::after {
-            content: ''; position: absolute; width: 18px; height: 18px; background: #fff;
-            border-radius: 50%; top: 2px; left: 2px; transition: transform 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        
+        .login-card h1{
+            font-size:56px;margin:0 0 8px;letter-spacing:5px;text-transform:uppercase;font-weight:900;
+            background:linear-gradient(135deg,#ff8888,var(--red),#ff5555);
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+            background-clip:text;
         }
-        .tgl.on::after { transform: translateX(20px); }
-
-        /* COLOR SWATCH */
-        .sw {
-            width: 32px; height: 20px; border-radius: 4px; border: 1px solid #444;
-            cursor: pointer; transition: transform 0.1s;
+        
+        .login-status{
+            display:flex;align-items:center;justify-content:center;gap:10px;margin:40px 0 25px;
         }
-        .sw:active { transform: scale(0.9); }
-
-        /* PREVIEW CANVAS */
-        .preview-container { flex: 1; min-height: 300px; background: #000; position: relative; display: flex; align-items: center; justify-content: center; }
-        canvas { max-width: 100%; max-height: 100%; object-fit: contain; }
-
-        /* COLOR PICKER MODAL */
-        .cp-overlay { display: none; position: fixed; inset: 0; z-index: 9000; background: rgba(0,0,0,0.5); }
-        .cp-overlay.open { display: block; }
-        .cp-box {
-            position: absolute; background: #111; border: 1px solid var(--border);
-            border-radius: 8px; padding: 10px; display: flex; gap: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        
+        .status-dot{
+            width:9px;height:9px;border-radius:50%;background:#444;animation:pulse-status 1.3s ease-in-out infinite;
         }
-        .sv { width: 180px; height: 140px; border-radius: 4px; position: relative; overflow: hidden; border: 1px solid #333; cursor: crosshair; }
-        .sv-w { position: absolute; inset: 0; background: linear-gradient(to right, #fff, transparent); }
-        .sv-b { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, #000); }
-        .sv-th { position: absolute; width: 12px; height: 12px; border: 2px solid #fff; border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; box-shadow: 0 0 3px #000; }
-        .bars { display: flex; gap: 8px; }
-        .btr { width: 14px; height: 140px; border-radius: 10px; position: relative; border: 1px solid #333; cursor: pointer; overflow: visible; }
-        .bin { position: absolute; inset: 0; border-radius: 10px; overflow: hidden; }
-        .bh { width: 100%; height: 100%; background: linear-gradient(to bottom, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00); }
-        .bck { width: 100%; height: 100%; background: repeating-conic-gradient(#444 0% 25%, #222 0% 50%) 0 0 / 6px 6px; }
-        .bag { position: absolute; inset: 0; border-radius: 10px; pointer-events: none; }
-        .bth { position: absolute; left: 50%; transform: translate(-50%, -50%); width: 16px; height: 16px; border-radius: 50%; background: #fff; border: 2px solid #fff; box-shadow: 0 0 3px #000; pointer-events: none; z-index: 2; }
-
-        /* QR MODAL */
-        #qr-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9998; align-items: center; justify-content: center; flex-direction: column; }
-        #qr-modal.active { display: flex; }
-        .qr-box { background: #111; padding: 20px; border-radius: 10px; border: 1px solid var(--border); text-align: center; }
-        .btn-close { margin-top: 15px; padding: 8px 20px; background: var(--red); color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
-
-        /* RESPONSIVIDADE MOBILE */
-        @media (min-width: 768px) {
-            #app { flex-direction: row; align-items: flex-start; }
-            .sidebar { width: 250px; flex-shrink: 0; }
-            .main-content { flex: 1; display: flex; flex-direction: column; gap: 10px; }
-            .preview-panel { height: 500px; }
+        .status-dot.checking{background:#ffa500;box-shadow:0 0 12px #ffa500}
+        
+        @keyframes pulse-status{
+            0%,100%{opacity:0.4;transform:scale(1)}
+            50%{opacity:1;transform:scale(1.3)}
         }
-        @media (max-width: 767px) {
-            .sidebar { order: 2; }
-            .main-content { order: 1; }
-            .preview-panel { order: 3; height: 40vh; min-height: 300px; }
+        
+        .login-card p{color:#999;font-size:13px;margin-bottom:20px;letter-spacing:0.8px;font-weight:500}
+        
+        .loader{
+            width:45px;height:45px;margin:0 auto 20px;
+            border:3px solid #2a2a2a;
+            border-top-color:var(--red);
+            border-radius:50%;
+            animation:spin 1s linear infinite;
+        }
+        @keyframes spin{to{transform:rotate(360deg)}}
+        
+        #app{display:none;height:100%;width:100%}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(74,222,128,0.7)}70%{box-shadow:0 0 0 8px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
+        
+        .wrap{display:flex;height:100%;gap:12px;padding:12px;animation:fadeIn 0.5s ease}
+        .sidebar{width:240px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:14px;overflow-y:auto}
+        .profile-card{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px}
+        .profile-img{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--red);box-shadow:0 0 10px rgba(199,48,48,0.3);background:var(--bg3);flex-shrink:0}
+        .profile-info{display:flex;flex-direction:column;gap:2px}
+        .profile-name{font-size:14px;font-weight:700;color:#fff}
+        .profile-sub{font-size:10px;color:var(--muted)}
+        .logo{text-align:center;padding:10px 0 16px;border-bottom:1.5px solid var(--border)}
+        .stat-box{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;background:var(--bg3);border-radius:6px;border:1px solid var(--border)}
+        .stat-dot{width:10px;height:10px;border-radius:50%;background:#444;transition:all 0.3s}
+        .stat-dot.on{background:#4ade80;box-shadow:0 0 10px #4ade80;animation:pulse 2s infinite}
+        .stat-txt{font-size:10px;font-weight:700;color:var(--muted);transition:all 0.3s}
+        .stat-txt.on{color:#4ade80}
+        
+        .btn-qr{width:100%;padding:12px;background:transparent;border:1.5px solid var(--red);color:var(--red);font-weight:700;border-radius:8px;cursor:pointer;margin-top:10px;transition:all 0.25s;user-select:none}
+        .btn-qr:hover{background:var(--red);color:#fff;box-shadow:0 0 20px rgba(199,48,48,0.5)}
+        .btn-qr:active{transform:scale(0.98)}
+        
+        .main{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+        .panel{background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;overflow:hidden}
+        .ph{background:var(--border);padding:8px 14px;font-size:10px;font-weight:700;letter-spacing:2px;color:#fff}
+        .row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid #1c1c1c;user-select:none;transition:all 0.15s}
+        .row:hover{background:rgba(199,48,48,0.05)}
+        .row:last-child{border-bottom:none}
+        
+        .tgl{
+            width:50px;height:28px;background:#2a2a2a;border-radius:99px;position:relative;
+            border:1.5px solid #444;transition:all 0.2s ease;cursor:pointer;flex-shrink:0;
+        }
+        .tgl.on{background:var(--red);border-color:#ff6b6b;box-shadow:0 0 15px rgba(199,48,48,0.5);transform:scale(1.05)}
+        .tgl::after{
+            content:'';position:absolute;width:22px;height:22px;border-radius:50%;background:#fff;
+            top:2px;left:2px;transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 2px 5px rgba(0,0,0,0.3)
+        }
+        .tgl.on::after{left:26px;box-shadow:0 2px 8px rgba(0,0,0,0.4);transform:scale(1.1)}
+        
+        .sw{width:38px;height:26px;border-radius:5px;border:1.5px solid #555;cursor:pointer;transition:all 0.2s;flex-shrink:0}
+        .sw:hover{border-color:var(--red);box-shadow:0 0 10px rgba(199,48,48,0.25);transform:scale(1.1)}
+        
+        .preview{width:420px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+        .preview canvas{flex:1;background:#050505}
+        
+        /* QR MODAL - CENTRALIZADO */
+        #qr-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.96);align-items:center;justify-content:center;z-index:99997;backdrop-filter:blur(15px)}
+        #qr-modal.active{display:flex;animation:fadeIn 0.3s ease}
+        .qr-box{
+            background:rgba(15,15,15,0.99);padding:55px;border-radius:25px;border:1px solid rgba(199,48,48,0.25);
+            text-align:center;box-shadow:0 30px 120px rgba(0,0,0,0.9),0 0 60px rgba(199,48,48,0.15);
+            animation:slideUp 0.4s cubic-bezier(0.34,1.56,0.64,1);
+            max-width:500px;width:90%;
+        }
+        @keyframes slideUp{from{opacity:0;transform:translateY(40px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+        .qr-box h2{color:var(--red);margin-bottom:12px;letter-spacing:2px;font-size:26px;font-weight:900}
+        .qr-box #qrcode{background:#fff;padding:25px;border-radius:18px;margin:30px auto;display:inline-block;box-shadow:0 15px 50px rgba(199,48,48,0.25)}
+        .qr-close{background:var(--red);color:#fff;border:none;padding:14px 40px;border-radius:8px;font-weight:700;cursor:pointer;margin-top:25px;transition:all 0.25s;font-size:14px;user-select:none}
+        .qr-close:hover{background:#ff6b6b;box-shadow:0 0 20px rgba(199,48,48,0.5);transform:translateY(-2px)}
+        .qr-close:active{transform:translateY(0)}
+        
+        /* COLOR PICKER - SMOOTH */
+        .cp-ol{display:none;position:fixed;inset:0;z-index:9000}
+        .cp-ol.open{display:block}
+        .cp-box{position:fixed;background:#161616;border:1.5px solid var(--border);border-radius:12px;padding:14px;display:flex;gap:12px;align-items:flex-start;z-index:9001;box-shadow:0 20px 60px rgba(0,0,0,0.95);user-select:none;animation:fadeIn 0.2s ease}
+        .sv{width:200px;height:160px;border-radius:6px;position:relative;overflow:hidden;border:1px solid #222;cursor:crosshair;transition:all 0.2s}
+        .sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent);transition:all 0.2s}
+        .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,#000);transition:all 0.2s}
+        .sv-th{position:absolute;width:14px;height:14px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,0.8);transition:all 0.08s ease-out}
+        .bars{display:flex;gap:10px}
+        .btr{position:relative;width:16px;height:160px;border-radius:99px;overflow:visible;border:1px solid #222;cursor:pointer;transition:all 0.2s}
+        .bin{position:absolute;inset:0;border-radius:99px;overflow:hidden}
+        .bh{width:100%;height:100%;background:linear-gradient(to bottom,#f00 0%,#ff0 17%,#0f0 33%,#0ff 50%,#00f 67%,#f0f 83%,#f00 100%);transition:all 0.2s}
+        .bck{width:100%;height:100%;background:repeating-conic-gradient(#555 0% 25%,#333 0% 50%) 0 0/8px 8px}
+        .bag{position:absolute;inset:0;border-radius:99px;pointer-events:none;transition:all 0.2s}
+        .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,0.7);pointer-events:none;z-index:10;transition:all 0.08s ease-out}
+        
+        /* MOBILE RESPONSIVO */
+        @media (max-width:768px) {
+            .wrap{flex-direction:column;gap:10px;padding:10px}
+            .sidebar{width:100%;order:3}
+            .main{order:1;gap:10px}
+            .preview{width:100%;order:2}
+            .login-card{padding:50px 40px;width:95%}
+            .login-card h1{font-size:40px}
+            .panel{border-radius:8px}
+            .row{padding:10px 12px}
+            .tgl{width:45px;height:24px}
+            .tgl::after{width:18px;height:18px;top:1px;left:1px}
+            .tgl.on::after{left:22px}
+            .sw{width:32px;height:22px}
+            .cp-box{flex-direction:column;width:90vw}
+            .sv{width:100%;max-width:200px;height:140px}
+            .bars{flex-direction:row;width:100%;justify-content:center}
+            .btr{width:14px;height:140px}
+            .qr-box{padding:40px;width:95%}
+        }
+        
+        @media (max-width:480px) {
+            .login-card{padding:40px 30px}
+            .login-card h1{font-size:32px}
+            .sidebar{padding:12px}
+            .row{padding:9px 10px;font-size:13px}
+            .tgl{width:42px;height:22px}
+            .tgl::after{width:16px;height:16px;top:1px}
+            .tgl.on::after{left:20px}
+            .sw{width:28px;height:20px}
         }
     </style>
 </head>
 <body>
 
-<!-- Cursor PC -->
+<!-- CURSOR GLOBAL (DESKTOP ONLY) -->
 <div id="cur"></div>
 
-<!-- Login -->
+<!-- LOGIN SCREEN -->
 <div id="login-screen">
-    <div class="loader"></div>
-    <p style="color:#888; font-size:12px;">Conectando ao servidor...</p>
-</div>
-
-<!-- App Principal -->
-<div id="app">
-    <!-- Sidebar / Painel de Controle -->
-    <div class="panel sidebar">
-        <div class="ph">CONFIGURAÇÕES</div>
-        
-        <div class="row"><span>Draw Box</span><div class="tgl on" data-key="box" onclick="toggleSwitch(this)"></div></div>
-        <div class="row"><span>Draw Skeleton</span><div class="tgl on" data-key="skeleton" onclick="toggleSwitch(this)"></div></div>
-        <div class="row"><span>Draw Snapline</span><div class="tgl" data-key="snapline" onclick="toggleSwitch(this)"></div></div>
-        <div class="row"><span>Draw Healthbar</span><div class="tgl on" data-key="healthbar" onclick="toggleSwitch(this)"></div></div>
-        
-        <div class="ph" style="margin-top:10px; border-top:1px solid var(--border);">ESP COLORS</div>
-        <div class="row"><span>Box Color</span><div class="sw" id="sw-boxcolor" data-hex="#c73030" style="background:#c73030" onclick="openCP(this)"></div></div>
-        <div class="row"><span>Skeleton Color</span><div class="sw" id="sw-skeletoncolor" data-hex="#aaaaaa" style="background:#aaaaaa" onclick="openCP(this)"></div></div>
-        <div class="row"><span>Snapline Color</span><div class="sw" id="sw-snaplinecolor" data-hex="#00ff00" style="background:#00ff00" onclick="openCP(this)"></div></div>
-        <div class="row"><span>Healthbar Color</span><div class="sw" id="sw-healthbarcolor" data-hex="#00ff00" style="background:#00ff00" onclick="openCP(this)"></div></div>
-    </div>
-
-    <!-- Conteúdo Principal -->
-    <div class="main-content">
-        <!-- Preview Panel -->
-        <div class="panel preview-panel">
-            <div class="ph">PREVIEW</div>
-            <div class="preview-container">
-                <canvas id="espCanvas"></canvas>
-            </div>
+    <div class="login-card">
+        <h1>N3SK</h1>
+        <div class="login-status">
+            <div class="status-dot checking"></div>
+            <span id="login-msg" style="font-size:13px;color:#999">Validando acesso...</span>
         </div>
-        
-        <!-- Status / Info (Opcional, para manter layout mobile balanceado) -->
-        <div class="panel" style="padding:15px; display:flex; justify-content:space-between; align-items:center;">
-            <div style="font-size:12px; color:#888;">Status: <span id="status-text" style="color:#4ade80;">ONLINE</span></div>
-            <button onclick="showQR()" style="background:transparent; border:1px solid var(--red); color:var(--red); padding:5px 10px; border-radius:4px; font-size:10px; cursor:pointer;">GERAR QR</button>
-        </div>
+        <div class="loader" id="login-loader"></div>
+        <p>Aguarde...</p>
     </div>
 </div>
 
-<!-- Color Picker Modal -->
-<div class="cp-overlay" id="cpOverlay">
+<!-- QR MODAL -->
+<div id="qr-modal">
+    <div class="qr-box">
+        <h2>QR GLOBAL</h2>
+        <p style="color:#999;font-size:13px;margin-bottom:20px">Escaneie para acessar</p>
+        <div id="qrcode"></div>
+        <button class="qr-close" onclick="closeQR()">FECHAR</button>
+    </div>
+</div>
+
+<!-- COLOR PICKER -->
+<div class="cp-ol" id="cpOl">
     <div class="cp-box" id="cpBox">
-        <div class="sv" id="sv">
-            <div class="sv-w"></div><div class="sv-b"></div>
-            <div class="sv-th" id="svTh"></div>
-        </div>
+        <div class="sv" id="sv"><div class="sv-w"></div><div class="sv-b"></div><div class="sv-th" id="svTh"></div></div>
         <div class="bars">
             <div class="btr" id="hueTr"><div class="bin"><div class="bh"></div></div><div class="bth" id="hueTh"></div></div>
             <div class="btr" id="aTr"><div class="bin"><div class="bck"></div></div><div class="bag" id="aGr"></div><div class="bth" id="aTh"></div></div>
@@ -190,226 +230,349 @@
     </div>
 </div>
 
-<!-- QR Modal -->
-<div id="qr-modal">
-    <div class="qr-box">
-        <h3 style="color:#fff; margin-bottom:10px;">SCAN ME</h3>
-        <div id="qrcode" style="background:#fff; padding:10px; border-radius:5px;"></div>
-        <button class="btn-close" onclick="document.getElementById('qr-modal').classList.remove('active')">FECHAR</button>
+<!-- APP -->
+<div id="app">
+<div class="wrap">
+    <div class="sidebar">
+        <div class="profile-card">
+            <!-- Fallback image handler -->
+            <img class="profile-img" id="profile-img" 
+                 src="https://via.placeholder.com/100/c73030/ffffff?text=SP" 
+                 onerror="this.src='https://via.placeholder.com/100/c73030/ffffff?text=SP'"
+                 alt="Profile">
+            <div class="profile-info"><div class="profile-name">n3sk</div><div class="profile-sub">Fuck any Anti-cheat</div></div>
+        </div>
+        <div class="logo"></div>
+        <div class="stat-box"><div class="stat-dot" id="dot"></div><div class="stat-txt" id="txt">OFFLINE</div></div>
+        <button class="btn-qr" onclick="showQR()">GERAR QR</button>
     </div>
+    <div class="main">
+        <div class="panel">
+            <div class="ph">ESP TOGGLES</div>
+            <div class="row"><span>Draw box</span><div class="tgl on" id="tgl-box" data-key="box" onclick="quickToggle(event)"></div></div>
+            <div class="row"><span>Draw skeleton</span><div class="tgl on" id="tgl-skeleton" data-key="skeleton" onclick="quickToggle(event)"></div></div>
+            <div class="row"><span>Draw snapline</span><div class="tgl" id="tgl-snapline" data-key="snapline" onclick="quickToggle(event)"></div></div>
+            <div class="row"><span>Draw healthbar</span><div class="tgl on" id="tgl-healthbar" data-key="healthbar" onclick="quickToggle(event)"></div></div>
+        </div>
+        <div class="panel">
+            <div class="ph">ESP COLORS</div>
+            <div class="row"><span>Box</span><div class="sw" id="sw-boxcolor" data-hex="#ff0000" onclick="openColorPicker(event)" style="background:#ff0000"></div></div>
+            <div class="row"><span>Skeleton</span><div class="sw" id="sw-skeletoncolor" data-hex="#ffffff" onclick="openColorPicker(event)" style="background:#ffffff"></div></div>
+            <div class="row"><span>Snapline</span><div class="sw" id="sw-snaplinecolor" data-hex="#00ff00" onclick="openColorPicker(event)" style="background:#00ff00"></div></div>
+            <div class="row"><span>Healthbar</span><div class="sw" id="sw-healthbarcolor" data-hex="#00ff00" onclick="openColorPicker(event)" style="background:#00ff00"></div></div>
+        </div>
+    </div>
+    <div class="preview"><div class="ph">Preview</div><canvas id="cvs"></canvas></div>
+</div>
 </div>
 
 <script>
-// ==========================================
-// CONFIGURAÇÃO E VARIÁVEIS
-// ==========================================
-const SUPA_URL = "https://gkzxuerurfedfwuxhimf.supabase.co";
-const SUPA_KEY = "sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6";
-// URL DA IMAGEM FORNECIDA
-const PREVIEW_IMG_SRC = "https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png?ex=6a3dcbea&is=6a3c7a6a&hm=95ab23192fdc65d73e612fadc773aac107802e9a93602097a289073aabc498b2&=&format=webp&quality=lossless&width=800&height=968";
-
-let client, sessionId;
-let cpTarget = null, cpH=0, cpS=1, cpV=1, cpA=1;
-let dSV=false, dH=false, dA=false;
-
-// Canvas Setup
-const canvas = document.getElementById('espCanvas');
-const ctx = canvas.getContext('2d', { alpha: false });
-let bgImage = new Image();
-bgImage.crossOrigin = "Anonymous";
-bgImage.src = PREVIEW_IMG_SRC;
-let cw=0, ch=0, renderReq=false;
-let hpTime=0, boxOp=0;
-
-// ==========================================
-// INICIALIZAÇÃO
-// ==========================================
-window.onload = async () => {
-    client = supabase.createClient(SUPA_URL, SUPA_KEY);
-    const token = new URLSearchParams(window.location.search).get('token');
-    
-    if(!token) {
-        document.querySelector('#login-screen p').textContent = "Token inválido";
-        return;
-    }
-
-    try {
-        const { data, error } = await client.from('n3sk').select('*').eq('token', token).eq('is_active', true).single();
-        if(error || !data) throw new Error("Falha no login");
-
-        sessionId = data.id;
-        localStorage.setItem('n3sk_sid', sessionId);
-        
-        // Esconde login, mostra app
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('app').style.display = window.innerWidth >= 768 ? 'flex' : 'block';
-        
-        // Aplica estado inicial se existir
-        if(data.state) applyState(data.state);
-
-        // Inicia loops
-        resizeCanvas();
-        startSync();
-        requestAnimationFrame(renderLoop);
-        
-    } catch(e) {
-        console.error(e);
-        document.querySelector('#login-screen p').textContent = "Erro de conexão";
-    }
-};
-
-// ==========================================
-// CURSOR SMOOTH (PC)
-// ==========================================
+// ============================================
+// CURSOR GLOBAL - DESKTOP ONLY
+// ============================================
 (function(){
-    const c = document.getElementById('cur');
-    if(!c) return;
-    let mx=0, my=0, cx=0, cy=0;
-    document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; }, {passive:true});
-    document.addEventListener('mousedown', () => c.classList.add('click'), {passive:true});
-    document.addEventListener('mouseup', () => c.classList.remove('click'), {passive:true});
-    function loop() {
-        cx += (mx-cx)*0.2; cy += (my-cy)*0.2;
-        c.style.left = cx+'px'; c.style.top = cy+'px';
+    const cur = document.getElementById('cur');
+    if(!cur) return;
+    
+    let mx = window.innerWidth/2, my = window.innerHeight/2;
+    let cx = mx, cy = my;
+    
+    document.addEventListener('mousemove', e => { 
+        mx = e.clientX; 
+        my = e.clientY; 
+    }, {passive:true});
+    
+    document.addEventListener('mousedown', () => cur.classList.add('ck'), {passive:true});
+    document.addEventListener('mouseup', () => cur.classList.remove('ck'), {passive:true});
+    
+    function loop(){
+        cx += (mx-cx)*0.16;
+        cy += (my-cy)*0.16;
+        cur.style.left = cx+'px';
+        cur.style.top = cy+'px';
         requestAnimationFrame(loop);
     }
     loop();
 })();
 
-// ==========================================
-// TOGGLE INSTANTÂNEO (SEM BUG)
-// ==========================================
-function toggleSwitch(el) {
-    // Alterna visualmente IMEDIATAMENTE
+// ============================================
+// SUPABASE
+// ============================================
+const SUPA_URL = "https://gkzxuerurfedfwuxhimf.supabase.co";
+const SUPA_KEY = "sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6";
+const client = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+let sessionId = null;
+let globalSessionId = null;
+let syncInterval = null;
+
+// ============================================
+// INICIALIZAÇÃO
+// ============================================
+window.onload = async function(){
+    const token = new URLSearchParams(window.location.search).get('token');
+    console.log("[INIT] Token:", token);
+    
+    if(!token){
+        document.getElementById('login-msg').textContent = "Token não encontrado";
+        return;
+    }
+    
+    try{
+        const {data, error} = await client.from('n3sk').select('*').eq('token', token).eq('is_active', true).single();
+        
+        if(error || !data){
+            document.getElementById('login-msg').textContent = "Token inválido";
+            return;
+        }
+        
+        sessionId = data.id;
+        
+        if(data.is_global){
+            const mainId = data.id.replace('_GLOBAL', '');
+            globalSessionId = data.id;
+            sessionId = mainId;
+        } else {
+            globalSessionId = `${data.id}_GLOBAL`;
+        }
+        
+        if(!data.is_global && data.ip && data.ip !== "UNKNOWN"){
+            try{
+                const res = await fetch('https://api.ipify.org?format=json');
+                const ipData = await res.json();
+                if(ipData.ip !== data.ip){
+                    document.getElementById('login-msg').textContent = "IP diferente";
+                    return;
+                }
+            }catch(e){}
+        }
+        
+        localStorage.setItem('n3sk_session', sessionId);
+        
+        // Carregar imagem apenas após login
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.src = 'https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png';
+        img.onload = () => {
+            document.getElementById('profile-img').src = img.src;
+        };
+        img.onerror = () => {
+            // Fallback já definido no HTML via onerror
+            console.warn("[IMG] Falha ao carregar preview, usando fallback");
+        };
+        
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        setConn(true);
+        startSync();
+        resizeCanvas();
+        scheduleRender();
+        console.log("[INIT] Pronto!");
+        
+    }catch(e){
+        console.error(e);
+        document.getElementById('login-msg').textContent = "Erro";
+    }
+};
+
+// ============================================
+// TOGGLE - SEM DELAY, RESPOSTA IMEDIATA
+// ============================================
+function quickToggle(event){
+    event.stopPropagation();
+    const el = event.currentTarget;
+    
+    // Alterna visualmente imediatamente
     el.classList.toggle('on');
-    // Envia estado imediatamente sem delay
-    sendState();
     scheduleRender();
+    
+    // Envia estado imediatamente (sem debounce)
+    sendState();
 }
 
-// ==========================================
-// COLOR PICKER SEM DELAY
-// ==========================================
-function openCP(el) {
+// ============================================
+// COLOR PICKER - SMOOTH & INSTANTÂNEO
+// ============================================
+let cpTarget = null;
+let cpH = 0, cpS = 1, cpV = 1, cpA = 1;
+let dSV = false, dH = false, dA = false;
+
+const cpOl = document.getElementById('cpOl');
+const cpBox = document.getElementById('cpBox');
+const svEl = document.getElementById('sv');
+const svTh = document.getElementById('svTh');
+const hueTr = document.getElementById('hueTr');
+const hueTh = document.getElementById('hueTh');
+const aTr = document.getElementById('aTr');
+const aGr = document.getElementById('aGr');
+const aTh = document.getElementById('aTh');
+
+function openColorPicker(event){
+    event.stopPropagation();
+    const el = event.currentTarget;
     cpTarget = el;
     const rect = el.getBoundingClientRect();
-    const box = document.getElementById('cpBox');
+    cpBox.style.left = Math.min(rect.right + 15, window.innerWidth - 270) + 'px';
+    cpBox.style.top = Math.min(rect.top, window.innerHeight - 220) + 'px';
     
-    // Posicionamento inteligente
-    let left = rect.right + 10;
-    let top = rect.top;
-    if(left + 250 > window.innerWidth) left = rect.left - 260;
-    if(top + 180 > window.innerHeight) top = window.innerHeight - 190;
-    
-    box.style.left = Math.max(10, left) + 'px';
-    box.style.top = Math.max(10, top) + 'px';
-    
-    // Carrega cor atual
-    const hex = el.getAttribute('data-hex') || '#ff0000';
+    let hex = el.getAttribute('data-hex') || '#ff0000';
     const hsv = hexToHsv(hex);
-    cpH=hsv[0]; cpS=hsv[1]; cpV=hsv[2]; cpA=1;
+    cpH = hsv[0]; cpS = hsv[1]; cpV = hsv[2]; cpA = 1;
     
-    updateCPVisuals();
-    document.getElementById('cpOverlay').classList.add('open');
+    updateCP();
+    updateHandles();
+    cpOl.classList.add('open');
 }
 
-function updateCPVisuals() {
+function hexToHsv(hex){
+    hex = hex.replace('#','');
+    const r = parseInt(hex.substring(0,2),16)/255;
+    const g = parseInt(hex.substring(2,4),16)/255;
+    const b = parseInt(hex.substring(4,6),16)/255;
+    const max = Math.max(r,g,b), min = Math.min(r,g,b);
+    const d = max - min;
+    let h = 0;
+    if(d !== 0){
+        switch(max){
+            case r: h = ((g-b)/d)%6; break;
+            case g: h = (b-r)/d + 2; break;
+            case b: h = (r-g)/d + 4; break;
+        }
+    }
+    h = h < 0 ? h + 6 : h;
+    return [h/6, max === 0 ? 0 : d/max, max];
+}
+
+function hsvToRgb(h,s,v){
+    let r,g,b;
+    const i = Math.floor(h*6);
+    const f = h*6 - i;
+    const p = v*(1-s);
+    const q = v*(1-f*s);
+    const t = v*(1-(1-f)*s);
+    switch(i%6){
+        case 0: r=v; g=t; b=p; break;
+        case 1: r=q; g=v; b=p; break;
+        case 2: r=p; g=v; b=t; break;
+        case 3: r=p; g=q; b=v; break;
+        case 4: r=t; g=p; b=v; break;
+        case 5: r=v; g=p; b=q; break;
+    }
+    return [Math.round(r*255), Math.round(g*255), Math.round(b*255)];
+}
+
+function rgbToHex(r,g,b){
+    return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+
+function updateCP(){
     const rgb = hsvToRgb(cpH, cpS, cpV);
-    const hex = rgbToHex(...rgb);
-    const hueHex = rgbToHex(...hsvToRgb(cpH, 1, 1));
+    const hex = rgbToHex(rgb[0], rgb[1], rgb[2]);
+    const hRgb = hsvToRgb(cpH, 1, 1);
+    const hHex = rgbToHex(hRgb[0], hRgb[1], hRgb[2]);
     
-    document.getElementById('sv').style.background = hueHex;
-    document.getElementById('svTh').style.background = hex;
-    document.getElementById('aGr').style.background = `linear-gradient(to bottom, ${hueHex}, transparent)`;
-    document.getElementById('hueTh').style.background = hueHex;
-    document.getElementById('aTh').style.background = `rgba(${rgb.join(',')},${cpA})`;
+    svEl.style.background = hHex;
+    svTh.style.background = hex;
+    aGr.style.background = `linear-gradient(to bottom,${hHex},transparent)`;
+    hueTh.style.background = hHex;
+    aTh.style.background = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${cpA})`;
     
-    if(cpTarget) {
+    if(cpTarget){
         cpTarget.style.background = hex;
         cpTarget.setAttribute('data-hex', hex);
         scheduleRender();
+        
+        // Envia atualização IMEDIATAMENTE enquanto arrasta
+        sendState();
     }
 }
 
-// Eventos do Color Picker
-const svEl = document.getElementById('sv');
-const hueTr = document.getElementById('hueTr');
-const aTr = document.getElementById('aTr');
+function updateHandles(){
+    const svRect = svEl.getBoundingClientRect();
+    svTh.style.left = (cpS * svRect.width) + 'px';
+    svTh.style.top = ((1-cpV) * svRect.height) + 'px';
+    
+    const hueRect = hueTr.getBoundingClientRect();
+    hueTh.style.top = (cpH * hueRect.height) + 'px';
+    
+    const aRect = aTr.getBoundingClientRect();
+    aTh.style.top = ((1-cpA) * aRect.height) + 'px';
+}
 
-function getPos(e) { return e.touches ? e.touches[0] : e; }
+function clamp(v,a,b){ return Math.max(a, Math.min(b,v)); }
 
-svEl.addEventListener('mousedown', e => { dSV=true; doSV(getPos(e)); e.preventDefault(); });
-hueTr.addEventListener('mousedown', e => { dH=true; doH(getPos(e)); e.preventDefault(); });
-aTr.addEventListener('mousedown', e => { dA=true; doA(getPos(e)); e.preventDefault(); });
+cpOl.addEventListener('mousedown', e => {
+    if(e.target === cpOl) cpOl.classList.remove('open');
+});
+
+svEl.addEventListener('mousedown', e => { e.preventDefault(); dSV = true; doSV(e); });
+hueTr.addEventListener('mousedown', e => { e.preventDefault(); dH = true; doH(e); });
+aTr.addEventListener('mousedown', e => { e.preventDefault(); dA = true; doA(e); });
 
 document.addEventListener('mousemove', e => {
-    if(dSV) doSV(getPos(e));
-    if(dH) doH(getPos(e));
-    if(dA) doA(getPos(e));
+    if(dSV) doSV(e);
+    if(dH) doH(e);
+    if(dA) doA(e);
 });
-document.addEventListener('mouseup', () => { if(dSV||dH||dA) { dSV=dH=dA=false; sendState(); } });
 
-// Touch support
-svEl.addEventListener('touchstart', e => { dSV=true; doSV(getPos(e)); e.preventDefault(); }, {passive:false});
-hueTr.addEventListener('touchstart', e => { dH=true; doH(getPos(e)); e.preventDefault(); }, {passive:false});
-aTr.addEventListener('touchstart', e => { dA=true; doA(getPos(e)); e.preventDefault(); }, {passive:false});
-document.addEventListener('touchmove', e => {
-    if(dSV||dH||dA) { e.preventDefault(); 
-        if(dSV) doSV(getPos(e)); if(dH) doH(getPos(e)); if(dA) doA(getPos(e)); 
+document.addEventListener('mouseup', () => {
+    if(dSV || dH || dA){
+        dSV = false; dH = false; dA = false;
+        sendState();
     }
-}, {passive:false});
-document.addEventListener('touchend', () => { if(dSV||dH||dA) { dSV=dH=dA=false; sendState(); } });
-
-function doSV(e) {
-    const r = svEl.getBoundingClientRect();
-    cpS = Math.max(0, Math.min(1, (e.clientX-r.left)/r.width));
-    cpV = Math.max(0, Math.min(1, 1-(e.clientY-r.top)/r.height));
-    updateCPVisuals();
-    sendState(); // ENVIA IMEDIATAMENTE
-}
-function doH(e) {
-    const r = hueTr.getBoundingClientRect();
-    cpH = Math.max(0, Math.min(0.999, (e.clientY-r.top)/r.height));
-    updateCPVisuals();
-    sendState();
-}
-function doA(e) {
-    const r = aTr.getBoundingClientRect();
-    cpA = Math.max(0, Math.min(1, 1-(e.clientY-r.top)/r.height));
-    updateCPVisuals();
-    sendState();
-}
-
-document.getElementById('cpOverlay').addEventListener('mousedown', e => {
-    if(e.target.id === 'cpOverlay') document.getElementById('cpOverlay').classList.remove('open');
 });
 
-// ==========================================
-// SYNC & STATE (SUPABASE)
-// ==========================================
-async function startSync() {
-    setInterval(async () => {
-        if(!sessionId) return;
-        try {
-            const { data } = await client.from('n3sk').select('state,is_active').eq('id', sessionId).single();
-            if(!data || !data.is_active) { location.reload(); return; }
-            if(data.state) applyState(data.state);
-        } catch(e) {}
-    }, 100); // Polling rápido
-
-    window.addEventListener('beforeunload', async () => {
-        if(sessionId) await client.from('n3sk').delete().eq('id', sessionId);
-    });
+function doSV(e){
+    const r = svEl.getBoundingClientRect();
+    cpS = clamp((e.clientX - r.left)/r.width, 0, 1);
+    cpV = clamp(1 - (e.clientY - r.top)/r.height, 0, 1);
+    updateCP();
+    updateHandles();
 }
 
-async function sendState() {
+function doH(e){
+    const r = hueTr.getBoundingClientRect();
+    cpH = clamp((e.clientY - r.top)/r.height, 0, 0.9999);
+    updateCP();
+    updateHandles();
+}
+
+function doA(e){
+    const r = aTr.getBoundingClientRect();
+    cpA = clamp(1 - (e.clientY - r.top)/r.height, 0, 1);
+    updateCP();
+    updateHandles();
+}
+
+// ============================================
+// SYNC - MANTÉM JOGO ATUALIZADO (40ms)
+// ============================================
+async function startSync(){
+    syncInterval = setInterval(async () => {
+        if(!sessionId) return;
+        try{
+            const {data, error} = await client.from('n3sk').select('state, is_active').eq('id', sessionId).single();
+            if(error || !data || !data.is_active){ 
+                deleteSession();
+                location.reload(); 
+                return; 
+            }
+            if(data.state) applyState(data.state);
+        }catch(e){}
+    }, 40); // Sync ultra-rápido
+    
+    window.addEventListener('beforeunload', () => deleteSession());
+}
+
+async function sendState(){
     if(!sessionId) return;
+    
     const state = {
         toggles: {
-            box: document.querySelector('[data-key="box"]').classList.contains('on'),
-            skeleton: document.querySelector('[data-key="skeleton"]').classList.contains('on'),
-            snapline: document.querySelector('[data-key="snapline"]').classList.contains('on'),
-            healthbar: document.querySelector('[data-key="healthbar"]').classList.contains('on')
+            box: document.getElementById('tgl-box').classList.contains('on'),
+            skeleton: document.getElementById('tgl-skeleton').classList.contains('on'),
+            snapline: document.getElementById('tgl-snapline').classList.contains('on'),
+            healthbar: document.getElementById('tgl-healthbar').classList.contains('on')
         },
         colors: {
             boxcolor: document.getElementById('sw-boxcolor').getAttribute('data-hex'),
@@ -419,140 +582,207 @@ async function sendState() {
         },
         alphas: { boxalpha: cpA, skeletonalpha: 1, snaplinealpha: 1, healthbaralpha: 1 }
     };
-    // Fire and forget para baixa latência
-    client.from('n3sk').update({state}).eq('id', sessionId).then(()=>{}).catch(()=>{});
-}
-
-function applyState(s) {
-    ['box','skeleton','snapline','healthbar'].forEach(k => {
-        const el = document.querySelector(`[data-key="${k}"]`);
-        if(el && s.toggles) el.classList.toggle('on', !!s.toggles[k]);
-    });
-    if(s.colors) {
-        Object.keys(s.colors).forEach(k => {
-            const el = document.getElementById(`sw-${k}`);
-            if(el && s.colors[k]) {
-                el.style.background = s.colors[k];
-                el.setAttribute('data-hex', s.colors[k]);
-            }
-        });
-    }
-    scheduleRender();
-}
-
-// ==========================================
-// CANVAS RENDERER (PREVIEW)
-// ==========================================
-function resizeCanvas() {
-    const rect = canvas.parentElement.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
-    const w = rect.width;
-    const h = rect.height;
     
-    if(cw !== w || ch !== h) {
-        canvas.width = w * dpr;
-        canvas.height = h * dpr;
-        canvas.style.width = w + 'px';
-        canvas.style.height = h + 'px';
+    try{
+        await client.from('n3sk').update({state}).eq('id', sessionId).select();
+    }catch(e){
+        console.error("[SEND] Erro:", e);
+    }
+}
+
+function applyState(s){
+    setConn(true);
+    const toggles = {box:'tgl-box', skeleton:'tgl-skeleton', snapline:'tgl-snapline', healthbar:'tgl-healthbar'};
+    for(let k in toggles){
+        const el = document.getElementById(toggles[k]);
+        if(el && s.toggles) el.classList.toggle('on', !!s.toggles[k]);
+    }
+    
+    if(s.colors){
+        const colorMap = {
+            boxcolor: 'sw-boxcolor',
+            skeletoncolor: 'sw-skeletoncolor',
+            snaplinecolor: 'sw-snaplinecolor',
+            healthbarcolor: 'sw-healthbarcolor'
+        };
+        for(let key in colorMap){
+            if(s.colors[key]){
+                const el = document.getElementById(colorMap[key]);
+                if(el){
+                    el.style.background = s.colors[key];
+                    el.setAttribute('data-hex', s.colors[key]);
+                }
+            }
+        }
+    }
+}
+
+function setConn(c){
+    document.getElementById('dot').classList.toggle('on', c);
+    document.getElementById('txt').classList.toggle('on', c);
+    document.getElementById('txt').textContent = c ? 'CONECTADO' : 'OFFLINE';
+}
+
+// ============================================
+// DELETE SESSION
+// ============================================
+async function deleteSession(){
+    if(!sessionId) return;
+    const owner = localStorage.getItem('n3sk_session');
+    if(owner !== sessionId) return;
+    
+    try{
+        await client.from('n3sk').delete().eq('id', sessionId).catch(() => {});
+        if(globalSessionId){
+            await client.from('n3sk').delete().eq('id', globalSessionId).catch(() => {});
+        }
+        localStorage.removeItem('n3sk_session');
+    }catch(e){}
+}
+
+// ============================================
+// QR CODE - CENTRALIZADO
+// ============================================
+async function showQR(){
+    if(!globalSessionId){
+        alert("Sessão não pronta");
+        return;
+    }
+    
+    try{
+        const {data, error} = await client.from('n3sk').select('token').eq('id', globalSessionId).eq('is_global', true).single();
+        
+        if(!error && data && data.token){
+            const link = `https://n3sk.xyz/?token=${data.token}`;
+            document.getElementById('qr-modal').classList.add('active');
+            
+            // Limpa QR anterior antes de gerar novo
+            const qrDiv = document.getElementById('qrcode');
+            qrDiv.innerHTML = '';
+            
+            new QRCode(qrDiv, {
+                text: link,
+                width: 200,
+                height: 200,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            console.log("[QR] Gerado");
+        } else {
+            alert("Erro ao gerar QR");
+        }
+    }catch(e){
+        console.error(e);
+    }
+}
+
+function closeQR(){
+    document.getElementById('qr-modal').classList.remove('active');
+}
+
+// ============================================
+// CANVAS PREVIEW
+// ============================================
+const canvas = document.getElementById('cvs');
+const ctx = canvas.getContext('2d', {alpha:false});
+let canvasWidth = 0, canvasHeight = 0, renderScheduled = false;
+let bgImage = null;
+let hpAnimTime = 0, boxOpacity = 0, targetBoxOpacity = 0;
+
+function resizeCanvas(){
+    const rect = canvas.parentElement.getBoundingClientRect();
+    const nw = rect.width, nh = rect.height - 35;
+    const dpr = window.devicePixelRatio || 1;
+    if(canvasWidth !== nw || canvasHeight !== nh){
+        canvas.width = nw * dpr;
+        canvas.height = nh * dpr;
+        canvas.style.width = nw + 'px';
+        canvas.style.height = nh + 'px';
         ctx.scale(dpr, dpr);
-        cw = w; ch = h;
+        canvasWidth = nw;
+        canvasHeight = nh;
         scheduleRender();
     }
 }
-window.addEventListener('resize', resizeCanvas);
 
-function scheduleRender() { renderReq = true; }
-
-function renderLoop() {
-    if(renderReq) { renderReq = false; drawPreview(); }
-    requestAnimationFrame(renderLoop);
+function scheduleRender(){
+    if(!renderScheduled){
+        renderScheduled = true;
+        requestAnimationFrame(renderPreview);
+    }
 }
 
-function drawPreview() {
-    if(!cw || !ch) return;
-    ctx.fillStyle = '#000'; ctx.fillRect(0,0,cw,ch);
+function renderPreview(){
+    renderScheduled = false;
+    if(!canvasWidth || !canvasHeight) return;
     
-    // Desenha Imagem de Fundo
-    if(bgImage.complete && bgImage.naturalWidth > 0) {
-        const scale = Math.min(cw/bgImage.width, ch/bgImage.height);
-        const w = bgImage.width*scale, h = bgImage.height*scale;
-        ctx.drawImage(bgImage, (cw-w)/2, (ch-h)/2, w, h);
+    ctx.save();
+    ctx.setTransform(window.devicePixelRatio||1, 0, 0, window.devicePixelRatio||1, 0, 0);
+    ctx.fillStyle = '#050505';
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    
+    if(bgImage && bgImage.complete && bgImage.naturalWidth > 0){
+        const s = Math.min(canvasWidth/bgImage.width, canvasHeight/bgImage.height);
+        const w = bgImage.width * s, h = bgImage.height * s;
+        ctx.drawImage(bgImage, (canvasWidth-w)/2, (canvasHeight-h)/2, w, h);
     }
     
-    // Estado Atual
-    const isBox = document.querySelector('[data-key="box"]').classList.contains('on');
-    const isHp = document.querySelector('[data-key="healthbar"]').classList.contains('on');
-    const boxColor = document.getElementById('sw-boxcolor').getAttribute('data-hex');
-    const hpColor = document.getElementById('sw-healthbarcolor').getAttribute('data-hex');
+    const isBox = document.getElementById('tgl-box').classList.contains('on');
+    const isHp = document.getElementById('tgl-healthbar').classList.contains('on');
     
-    // Dimensões ESP
-    const bH = ch * 0.7;
+    const bH = canvasHeight * 0.75;
     const bW = bH * 0.45;
-    const bX = (cw - bW) / 2;
-    const bY = (ch - bH) / 2 + 20;
+    const bX = (canvasWidth - bW) / 2;
+    const bY = (canvasHeight - bH) / 2 + 20;
     
-    // Suavização da Box
-    boxOp += (isBox ? 1 : 0 - boxOp) * 0.2;
+    targetBoxOpacity = isBox ? 1 : 0;
+    boxOpacity = boxOpacity + (targetBoxOpacity - boxOpacity) * 0.08;
     
-    if(boxOp > 0.01) {
-        ctx.globalAlpha = boxOp;
-        ctx.strokeStyle = boxColor;
+    if(boxOpacity > 0.01){
+        ctx.globalAlpha = boxOpacity;
+        ctx.strokeStyle = document.getElementById('sw-boxcolor').getAttribute('data-hex');
         ctx.lineWidth = 2;
-        const l = bW * 0.2;
+        const l = bW * 0.25;
         ctx.beginPath();
         ctx.moveTo(bX, bY+l); ctx.lineTo(bX, bY); ctx.lineTo(bX+l, bY);
+        ctx.stroke();
+        ctx.beginPath();
         ctx.moveTo(bX+bW-l, bY); ctx.lineTo(bX+bW, bY); ctx.lineTo(bX+bW, bY+l);
+        ctx.stroke();
+        ctx.beginPath();
         ctx.moveTo(bX, bY+bH-l); ctx.lineTo(bX, bY+bH); ctx.lineTo(bX+l, bY+bH);
+        ctx.stroke();
+        ctx.beginPath();
         ctx.moveTo(bX+bW-l, bY+bH); ctx.lineTo(bX+bW, bY+bH); ctx.lineTo(bX+bW, bY+bH-l);
         ctx.stroke();
         ctx.globalAlpha = 1;
     }
     
-    // Healthbar
-    if(isHp) {
-        hpTime += 0.05;
-        const pulse = 0.6 + 0.4*Math.sin(hpTime);
+    if(isHp){
+        const bw = 6, bx = bX - 12;
+        hpAnimTime += 0.05;
+        const pulse = 0.5 + 0.5 * Math.sin(hpAnimTime * 2 * Math.PI * 0.3);
         const hpH = bH * pulse;
-        const bw = 6; const bx = bX - 12;
-        ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(bx, bY, bw, bH);
-        ctx.fillStyle = hpColor; ctx.fillRect(bx, bY+(bH-hpH), bw, hpH);
+        ctx.fillStyle = 'rgba(15,15,15,0.8)';
+        ctx.fillRect(bx, bY, bw, bH);
+        ctx.fillStyle = document.getElementById('sw-healthbarcolor').getAttribute('data-hex');
+        ctx.fillRect(bx, bY + (bH - hpH), bw, hpH);
     }
-}
-
-// ==========================================
-// UTILITÁRIOS DE COR
-// ==========================================
-function hexToHsv(hex) {
-    let r=parseInt(hex.slice(1,3),16)/255, g=parseInt(hex.slice(3,5),16)/255, b=parseInt(hex.slice(5,7),16)/255;
-    let max=Math.max(r,g,b), min=Math.min(r,g,b), d=max-min, h=0, s=max===0?0:d/max, v=max;
-    if(d!==0) { switch(max) { case r:h=((g-b)/d)%6;break; case g:h=(b-r)/d+2;break; case b:h=(r-g)/d+4;break; } }
-    return [h<0?h+6:h, s, v];
-}
-function hsvToRgb(h,s,v) {
-    let r,g,b, i=Math.floor(h*6), f=h*6-i, p=v*(1-s), q=v*(1-f*s), t=v*(1-(1-f)*s);
-    switch(i%6) { case 0:r=v;g=t;b=p;break; case 1:r=q;g=v;b=p;break; case 2:r=p;g=v;b=t;break; case 3:r=p;g=q;b=v;break; case 4:r=t;g=p;b=v;break; case 5:r=v;g=p;b=q;break; }
-    return [Math.round(r*255), Math.round(g*255), Math.round(b*255)];
-}
-function rgbToHex(r,g,b) { return "#"+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1); }
-
-// ==========================================
-// QR CODE
-// ==========================================
-async function showQR() {
-    if(!sessionId) return;
-    const modal = document.getElementById('qr-modal');
-    const container = document.getElementById('qrcode');
-    container.innerHTML = '';
-    modal.classList.add('active');
     
-    const { data } = await client.from('n3sk').select('token').eq('id', sessionId).single();
-    if(data && data.token) {
-        new QRCode(container, {
-            text: `${window.location.origin}?token=${data.token}`,
-            width: 180, height: 180, colorDark:"#000", colorLight:"#fff"
-        });
-    }
+    ctx.restore();
+    if(Math.abs(boxOpacity - targetBoxOpacity) > 0.01 || isHp) scheduleRender();
 }
+
+// Carregar imagem apenas quando app inicia
+setTimeout(() => {
+    bgImage = new Image();
+    bgImage.crossOrigin = "anonymous";
+    bgImage.src = 'https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png';
+    bgImage.onload = () => scheduleRender();
+}, 300);
+
+window.addEventListener('resize', resizeCanvas);
 </script>
 </body>
 </html>
