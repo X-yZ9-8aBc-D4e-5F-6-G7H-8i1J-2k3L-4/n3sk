@@ -2,23 +2,31 @@
 <html lang="pt-BR">
 <head>
     <meta charset='utf-8'>
-    <meta name='viewport' content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no'>
+    <meta name='viewport' content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover'>
     <meta name='color-scheme' content='light dark'>
     <title>n3sk</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <style>
         :root{--red:#c73030;--bg:#0a0a0a;--bg2:#111;--bg3:#1a1a1a;--border:#8b2e2e;--text:#e0e0e0;--muted:#888}
-        *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+        *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
         html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;overflow:hidden}
         
-        /* CURSOR GLOBAL - Z-INDEX MÁXIMO */
-        body{cursor:none !important}
-        *{cursor:none !important}
-        #cur{position:fixed;width:18px;height:18px;border:2px solid rgba(199,48,48,0.9);border-radius:50%;pointer-events:none;z-index:9999999;transform:translate(-50%,-50%);transition:transform 0.08s ease;display:block !important}
-        #cur.ck{transform:translate(-50%,-50%) scale(0.65)}
+        /* CURSOR - DESKTOP ONLY */
+        @media (hover:hover) and (pointer:fine) {
+            body{cursor:none !important}
+            *{cursor:none !important}
+            #cur{position:fixed;width:18px;height:18px;border:2px solid rgba(199,48,48,0.9);border-radius:50%;pointer-events:none;z-index:9999999;transform:translate(-50%,-50%);transition:transform 0.08s ease;display:block !important}
+            #cur.ck{transform:translate(-50%,-50%) scale(0.65)}
+        }
         
-        /* LOGIN SCREEN - SUPER MODERNA */
+        /* MOBILE - remove cursor */
+        @media (hover:none) and (pointer:coarse) {
+            #cur{display:none !important}
+            body{cursor:auto !important}
+        }
+        
+        /* LOGIN SCREEN */
         #login-screen{
             position:fixed;inset:0;z-index:99998;
             display:flex;align-items:center;justify-content:center;
@@ -31,7 +39,7 @@
             padding:70px 55px;border-radius:25px;
             border:1px solid rgba(199,48,48,0.25);
             box-shadow:0 30px 120px rgba(0,0,0,0.8),inset 0 1px 0 rgba(199,48,48,0.15),0 0 60px rgba(199,48,48,0.1);
-            text-align:center;max-width:420px;width:95%;
+            text-align:center;max-width:420px;width:90%;
             animation:popIn 0.6s cubic-bezier(0.34,1.56,0.64,1);
         }
         @keyframes popIn{
@@ -72,7 +80,7 @@
         }
         @keyframes spin{to{transform:rotate(360deg)}}
         
-        #app{display:none;height:100%}
+        #app{display:none;height:100%;width:100%}
         @keyframes fadeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
         @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(74,222,128,0.7)}70%{box-shadow:0 0 0 8px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
         
@@ -84,7 +92,7 @@
         .profile-name{font-size:14px;font-weight:700;color:#fff}
         .profile-sub{font-size:10px;color:var(--muted)}
         .logo{text-align:center;padding:10px 0 16px;border-bottom:1.5px solid var(--border)}
-        .stat-box{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;background:var(--bg3);border-radius:6px}
+        .stat-box{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;background:var(--bg3);border-radius:6px;border:1px solid var(--border)}
         .stat-dot{width:10px;height:10px;border-radius:50%;background:#444;transition:all 0.3s}
         .stat-dot.on{background:#4ade80;box-shadow:0 0 10px #4ade80;animation:pulse 2s infinite}
         .stat-txt{font-size:10px;font-weight:700;color:var(--muted);transition:all 0.3s}
@@ -97,33 +105,35 @@
         .main{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
         .panel{background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;overflow:hidden}
         .ph{background:var(--border);padding:8px 14px;font-size:10px;font-weight:700;letter-spacing:2px;color:#fff}
-        .row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid #1c1c1c;user-select:none}
+        .row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid #1c1c1c;user-select:none;transition:all 0.15s}
+        .row:hover{background:rgba(199,48,48,0.05)}
         .row:last-child{border-bottom:none}
         
         .tgl{
             width:50px;height:28px;background:#2a2a2a;border-radius:99px;position:relative;
-            border:1.5px solid #444;transition:all 0.15s ease;cursor:pointer;flex-shrink:0;
+            border:1.5px solid #444;transition:all 0.2s ease;cursor:pointer;flex-shrink:0;
         }
-        .tgl.on{background:var(--red);border-color:#ff6b6b;box-shadow:0 0 15px rgba(199,48,48,0.5)}
+        .tgl.on{background:var(--red);border-color:#ff6b6b;box-shadow:0 0 15px rgba(199,48,48,0.5);transform:scale(1.05)}
         .tgl::after{
             content:'';position:absolute;width:22px;height:22px;border-radius:50%;background:#fff;
-            top:2px;left:2px;transition:all 0.15s ease;box-shadow:0 2px 5px rgba(0,0,0,0.3)
+            top:2px;left:2px;transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 2px 5px rgba(0,0,0,0.3)
         }
-        .tgl.on::after{left:26px;box-shadow:0 2px 8px rgba(0,0,0,0.4)}
+        .tgl.on::after{left:26px;box-shadow:0 2px 8px rgba(0,0,0,0.4);transform:scale(1.1)}
         
-        .sw{width:38px;height:26px;border-radius:5px;border:1.5px solid #555;cursor:pointer;transition:all 0.15s;flex-shrink:0}
-        .sw:hover{border-color:var(--red);box-shadow:0 0 10px rgba(199,48,48,0.25)}
+        .sw{width:38px;height:26px;border-radius:5px;border:1.5px solid #555;cursor:pointer;transition:all 0.2s;flex-shrink:0}
+        .sw:hover{border-color:var(--red);box-shadow:0 0 10px rgba(199,48,48,0.25);transform:scale(1.1)}
         
         .preview{width:420px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
         .preview canvas{flex:1;background:#050505}
         
-        /* QR MODAL - ELEGANTE */
+        /* QR MODAL - CENTRALIZADO */
         #qr-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.96);align-items:center;justify-content:center;z-index:99997;backdrop-filter:blur(15px)}
         #qr-modal.active{display:flex;animation:fadeIn 0.3s ease}
         .qr-box{
             background:rgba(15,15,15,0.99);padding:55px;border-radius:25px;border:1px solid rgba(199,48,48,0.25);
             text-align:center;box-shadow:0 30px 120px rgba(0,0,0,0.9),0 0 60px rgba(199,48,48,0.15);
             animation:slideUp 0.4s cubic-bezier(0.34,1.56,0.64,1);
+            max-width:500px;width:90%;
         }
         @keyframes slideUp{from{opacity:0;transform:translateY(40px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}
         .qr-box h2{color:var(--red);margin-bottom:12px;letter-spacing:2px;font-size:26px;font-weight:900}
@@ -132,26 +142,58 @@
         .qr-close:hover{background:#ff6b6b;box-shadow:0 0 20px rgba(199,48,48,0.5);transform:translateY(-2px)}
         .qr-close:active{transform:translateY(0)}
         
-        /* COLOR PICKER - RESPONSIVO */
+        /* COLOR PICKER - SMOOTH */
         .cp-ol{display:none;position:fixed;inset:0;z-index:9000}
         .cp-ol.open{display:block}
-        .cp-box{position:fixed;background:#161616;border:1.5px solid var(--border);border-radius:12px;padding:14px;display:flex;gap:12px;align-items:flex-start;z-index:9001;box-shadow:0 20px 60px rgba(0,0,0,0.95);user-select:none}
-        .sv{width:200px;height:160px;border-radius:6px;position:relative;overflow:hidden;border:1px solid #222;cursor:crosshair}
-        .sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent)}
-        .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,#000)}
-        .sv-th{position:absolute;width:14px;height:14px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,0.8)}
+        .cp-box{position:fixed;background:#161616;border:1.5px solid var(--border);border-radius:12px;padding:14px;display:flex;gap:12px;align-items:flex-start;z-index:9001;box-shadow:0 20px 60px rgba(0,0,0,0.95);user-select:none;animation:fadeIn 0.2s ease}
+        .sv{width:200px;height:160px;border-radius:6px;position:relative;overflow:hidden;border:1px solid #222;cursor:crosshair;transition:all 0.2s}
+        .sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent);transition:all 0.2s}
+        .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,#000);transition:all 0.2s}
+        .sv-th{position:absolute;width:14px;height:14px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,0.8);transition:all 0.08s ease-out}
         .bars{display:flex;gap:10px}
-        .btr{position:relative;width:16px;height:160px;border-radius:99px;overflow:visible;border:1px solid #222;cursor:pointer}
+        .btr{position:relative;width:16px;height:160px;border-radius:99px;overflow:visible;border:1px solid #222;cursor:pointer;transition:all 0.2s}
         .bin{position:absolute;inset:0;border-radius:99px;overflow:hidden}
-        .bh{width:100%;height:100%;background:linear-gradient(to bottom,#f00 0%,#ff0 17%,#0f0 33%,#0ff 50%,#00f 67%,#f0f 83%,#f00 100%)}
+        .bh{width:100%;height:100%;background:linear-gradient(to bottom,#f00 0%,#ff0 17%,#0f0 33%,#0ff 50%,#00f 67%,#f0f 83%,#f00 100%);transition:all 0.2s}
         .bck{width:100%;height:100%;background:repeating-conic-gradient(#555 0% 25%,#333 0% 50%) 0 0/8px 8px}
-        .bag{position:absolute;inset:0;border-radius:99px;pointer-events:none}
-        .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,0.7);pointer-events:none;z-index:10}
+        .bag{position:absolute;inset:0;border-radius:99px;pointer-events:none;transition:all 0.2s}
+        .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,0.7);pointer-events:none;z-index:10;transition:all 0.08s ease-out}
+        
+        /* MOBILE RESPONSIVO */
+        @media (max-width:768px) {
+            .wrap{flex-direction:column;gap:10px;padding:10px}
+            .sidebar{width:100%;order:3}
+            .main{order:1;gap:10px}
+            .preview{width:100%;order:2}
+            .login-card{padding:50px 40px;width:95%}
+            .login-card h1{font-size:40px}
+            .panel{border-radius:8px}
+            .row{padding:10px 12px}
+            .tgl{width:45px;height:24px}
+            .tgl::after{width:18px;height:18px;top:1px;left:1px}
+            .tgl.on::after{left:22px}
+            .sw{width:32px;height:22px}
+            .cp-box{flex-direction:column;width:90vw}
+            .sv{width:100%;max-width:200px;height:140px}
+            .bars{flex-direction:row;width:100%;justify-content:center}
+            .btr{width:14px;height:140px}
+            .qr-box{padding:40px;width:95%}
+        }
+        
+        @media (max-width:480px) {
+            .login-card{padding:40px 30px}
+            .login-card h1{font-size:32px}
+            .sidebar{padding:12px}
+            .row{padding:9px 10px;font-size:13px}
+            .tgl{width:42px;height:22px}
+            .tgl::after{width:16px;height:16px;top:1px}
+            .tgl.on::after{left:20px}
+            .sw{width:28px;height:20px}
+        }
     </style>
 </head>
 <body>
 
-<!-- CURSOR GLOBAL -->
+<!-- CURSOR GLOBAL (DESKTOP ONLY) -->
 <div id="cur"></div>
 
 <!-- LOGIN SCREEN -->
@@ -193,7 +235,7 @@
 <div class="wrap">
     <div class="sidebar">
         <div class="profile-card">
-            <img src="https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png" class="profile-img" onerror="this.style.background='var(--red)';">
+            <div class="profile-img" id="profile-img" style="background:var(--red)"></div>
             <div class="profile-info"><div class="profile-name">n3sk</div><div class="profile-sub">Anti-cheat</div></div>
         </div>
         <div class="logo"></div>
@@ -203,17 +245,17 @@
     <div class="main">
         <div class="panel">
             <div class="ph">ESP TOGGLES</div>
-            <div class="row"><span>Draw box</span><div class="tgl on" id="tgl-box" data-key="box" onclick="quickToggle(this)"></div></div>
-            <div class="row"><span>Draw skeleton</span><div class="tgl on" id="tgl-skeleton" data-key="skeleton" onclick="quickToggle(this)"></div></div>
-            <div class="row"><span>Draw snapline</span><div class="tgl" id="tgl-snapline" data-key="snapline" onclick="quickToggle(this)"></div></div>
-            <div class="row"><span>Draw healthbar</span><div class="tgl on" id="tgl-healthbar" data-key="healthbar" onclick="quickToggle(this)"></div></div>
+            <div class="row"><span>Draw box</span><div class="tgl on" id="tgl-box" data-key="box" onclick="quickToggle(event)"></div></div>
+            <div class="row"><span>Draw skeleton</span><div class="tgl on" id="tgl-skeleton" data-key="skeleton" onclick="quickToggle(event)"></div></div>
+            <div class="row"><span>Draw snapline</span><div class="tgl" id="tgl-snapline" data-key="snapline" onclick="quickToggle(event)"></div></div>
+            <div class="row"><span>Draw healthbar</span><div class="tgl on" id="tgl-healthbar" data-key="healthbar" onclick="quickToggle(event)"></div></div>
         </div>
         <div class="panel">
             <div class="ph">ESP COLORS</div>
-            <div class="row"><span>Box</span><div class="sw" id="sw-boxcolor" data-hex="#ff0000" onclick="openColorPicker(this)" style="background:#ff0000"></div></div>
-            <div class="row"><span>Skeleton</span><div class="sw" id="sw-skeletoncolor" data-hex="#ffffff" onclick="openColorPicker(this)" style="background:#ffffff"></div></div>
-            <div class="row"><span>Snapline</span><div class="sw" id="sw-snaplinecolor" data-hex="#00ff00" onclick="openColorPicker(this)" style="background:#00ff00"></div></div>
-            <div class="row"><span>Healthbar</span><div class="sw" id="sw-healthbarcolor" data-hex="#00ff00" onclick="openColorPicker(this)" style="background:#00ff00"></div></div>
+            <div class="row"><span>Box</span><div class="sw" id="sw-boxcolor" data-hex="#ff0000" onclick="openColorPicker(event)" style="background:#ff0000"></div></div>
+            <div class="row"><span>Skeleton</span><div class="sw" id="sw-skeletoncolor" data-hex="#ffffff" onclick="openColorPicker(event)" style="background:#ffffff"></div></div>
+            <div class="row"><span>Snapline</span><div class="sw" id="sw-snaplinecolor" data-hex="#00ff00" onclick="openColorPicker(event)" style="background:#00ff00"></div></div>
+            <div class="row"><span>Healthbar</span><div class="sw" id="sw-healthbarcolor" data-hex="#00ff00" onclick="openColorPicker(event)" style="background:#00ff00"></div></div>
         </div>
     </div>
     <div class="preview"><div class="ph">Preview</div><canvas id="cvs"></canvas></div>
@@ -222,10 +264,12 @@
 
 <script>
 // ============================================
-// CURSOR GLOBAL - SEMPRE VISÍVEL
+// CURSOR GLOBAL - DESKTOP ONLY
 // ============================================
 (function(){
     const cur = document.getElementById('cur');
+    if(!cur) return;
+    
     let mx = window.innerWidth/2, my = window.innerHeight/2;
     let cx = mx, cy = my;
     
@@ -280,17 +324,14 @@ window.onload = async function(){
         
         sessionId = data.id;
         
-        // Se é global, buscar main
         if(data.is_global){
             const mainId = data.id.replace('_GLOBAL', '');
             globalSessionId = data.id;
             sessionId = mainId;
         } else {
-            // Se é main, buscar/esperar global
             globalSessionId = `${data.id}_GLOBAL`;
         }
         
-        // Validação IP
         if(!data.is_global && data.ip && data.ip !== "UNKNOWN"){
             try{
                 const res = await fetch('https://api.ipify.org?format=json');
@@ -303,6 +344,16 @@ window.onload = async function(){
         }
         
         localStorage.setItem('n3sk_session', sessionId);
+        
+        // Carregar imagem apenas após login
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.src = 'https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png';
+        img.onload = () => {
+            document.getElementById('profile-img').style.backgroundImage = `url('${img.src}')`;
+            document.getElementById('profile-img').style.backgroundSize = 'cover';
+            document.getElementById('profile-img').style.backgroundPosition = 'center';
+        };
         
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app').style.display = 'block';
@@ -319,24 +370,34 @@ window.onload = async function(){
 };
 
 // ============================================
-// TOGGLE - SEM BUGS
+// TOGGLE - FUNCIONAL 100%
 // ============================================
 let toggleDebounce = {};
+let lastToggleSend = 0;
 
-function quickToggle(el){
+function quickToggle(event){
+    event.stopPropagation();
+    const el = event.currentTarget;
     const key = el.getAttribute('data-key');
+    
     if(toggleDebounce[key]) return;
     
     toggleDebounce[key] = true;
     el.classList.toggle('on');
     scheduleRender();
-    sendState();
     
-    setTimeout(() => delete toggleDebounce[key], 50);
+    // Enviar imediatamente
+    const now = Date.now();
+    if(now - lastToggleSend > 25) {
+        sendState();
+        lastToggleSend = now;
+    }
+    
+    setTimeout(() => delete toggleDebounce[key], 60);
 }
 
 // ============================================
-// COLOR PICKER - REAL-TIME
+// COLOR PICKER - SMOOTH
 // ============================================
 let cpTarget = null;
 let cpH = 0, cpS = 1, cpV = 1, cpA = 1;
@@ -353,7 +414,9 @@ const aTr = document.getElementById('aTr');
 const aGr = document.getElementById('aGr');
 const aTh = document.getElementById('aTh');
 
-function openColorPicker(el){
+function openColorPicker(event){
+    event.stopPropagation();
+    const el = event.currentTarget;
     cpTarget = el;
     const rect = el.getBoundingClientRect();
     cpBox.style.left = Math.min(rect.right + 15, window.innerWidth - 270) + 'px';
@@ -426,9 +489,8 @@ function updateCP(){
         cpTarget.setAttribute('data-hex', hex);
         scheduleRender();
         
-        // Throttle sendState para não sobrecarregar
         const now = Date.now();
-        if(now - lastSendTime > 30){
+        if(now - lastSendTime > 25){
             sendState();
             lastSendTime = now;
         }
@@ -493,19 +555,21 @@ function doA(e){
 }
 
 // ============================================
-// SYNC - 60FPS MÁX
+// SYNC - MANTÉM JOGO ATUALIZADO
 // ============================================
 async function startSync(){
     syncInterval = setInterval(async () => {
         if(!sessionId) return;
-        const {data, error} = await client.from('n3sk').select('state, is_active').eq('id', sessionId).single().catch(() => ({}));
-        if(error || !data || !data.is_active){ 
-            deleteSession();
-            location.reload(); 
-            return; 
-        }
-        if(data.state) applyState(data.state);
-    }, 50);
+        try{
+            const {data, error} = await client.from('n3sk').select('state, is_active').eq('id', sessionId).single();
+            if(error || !data || !data.is_active){ 
+                deleteSession();
+                location.reload(); 
+                return; 
+            }
+            if(data.state) applyState(data.state);
+        }catch(e){}
+    }, 40);
     
     window.addEventListener('beforeunload', () => deleteSession());
 }
@@ -529,7 +593,12 @@ async function sendState(){
         alphas: { boxalpha: cpA, skeletonalpha: 1, snaplinealpha: 1, healthbaralpha: 1 }
     };
     
-    client.from('n3sk').update({state}).eq('id', sessionId).select().catch(() => {});
+    try{
+        await client.from('n3sk').update({state}).eq('id', sessionId).select();
+        console.log("[SEND] Estado enviado");
+    }catch(e){
+        console.error("[SEND] Erro:", e);
+    }
 }
 
 function applyState(s){
@@ -566,7 +635,7 @@ function setConn(c){
 }
 
 // ============================================
-// DELETE - APENAS PRÓPRIAS SESSÕES
+// DELETE SESSION
 // ============================================
 async function deleteSession(){
     if(!sessionId) return;
@@ -583,7 +652,7 @@ async function deleteSession(){
 }
 
 // ============================================
-// QR CODE - CORRIGIDO
+// QR CODE - CENTRALIZADO
 // ============================================
 async function showQR(){
     if(!globalSessionId){
@@ -607,13 +676,12 @@ async function showQR(){
                 colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.H
             });
-            console.log("[QR] Link gerado");
+            console.log("[QR] Gerado");
         } else {
-            alert("Erro ao gerar QR");
+            alert("Erro ao gerar");
         }
     }catch(e){
         console.error(e);
-        alert("Erro ao gerar QR");
     }
 }
 
@@ -624,16 +692,11 @@ function closeQR(){
 // ============================================
 // CANVAS PREVIEW
 // ============================================
-const PREVIEW_IMG = 'https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png';
 const canvas = document.getElementById('cvs');
 const ctx = canvas.getContext('2d', {alpha:false});
 let canvasWidth = 0, canvasHeight = 0, renderScheduled = false;
-let bgImage = new Image();
+let bgImage = null;
 let hpAnimTime = 0, boxOpacity = 0, targetBoxOpacity = 0;
-
-bgImage.crossOrigin = "anonymous";
-bgImage.src = PREVIEW_IMG;
-bgImage.onload = () => scheduleRender();
 
 function resizeCanvas(){
     const rect = canvas.parentElement.getBoundingClientRect();
@@ -667,7 +730,7 @@ function renderPreview(){
     ctx.fillStyle = '#050505';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
     
-    if(bgImage.complete && bgImage.naturalWidth > 0){
+    if(bgImage && bgImage.complete && bgImage.naturalWidth > 0){
         const s = Math.min(canvasWidth/bgImage.width, canvasHeight/bgImage.height);
         const w = bgImage.width * s, h = bgImage.height * s;
         ctx.drawImage(bgImage, (canvasWidth-w)/2, (canvasHeight-h)/2, w, h);
@@ -718,6 +781,14 @@ function renderPreview(){
     ctx.restore();
     if(Math.abs(boxOpacity - targetBoxOpacity) > 0.01 || isHp) scheduleRender();
 }
+
+// Carregar imagem apenas quando app inicia
+setTimeout(() => {
+    bgImage = new Image();
+    bgImage.crossOrigin = "anonymous";
+    bgImage.src = 'https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png';
+    bgImage.onload = () => scheduleRender();
+}, 300);
 
 window.addEventListener('resize', resizeCanvas);
 </script>
