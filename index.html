@@ -3,10 +3,9 @@
 <head>
     <meta charset='utf-8'>
     <meta name='viewport' content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no'>
+    <meta name='color-scheme' content='light dark'>
     <title>n3sk</title>
-    <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- QR Code JS -->
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <style>
         :root{ 
@@ -73,7 +72,7 @@
         .preview-panel{width:420px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;flex-shrink:0}
         .preview-canvas{flex:1;background:#050505;width:100%;height:100%;display:block}
 
-        /* TOGGLE ORIGINAL COM SMOOTH */
+        /* TOGGLE ORIGINAL */
         .tgl{width:46px;height:26px;background:#2a2a2a;border-radius:99px;position:relative;border:1.5px solid #444;transition:all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);user-select:none;flex-shrink:0}
         .tgl.on{background:var(--red);border-color:#ff6b6b;box-shadow:0 0 8px rgba(199,48,48,.4)}
         .tgl::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#ffffff;top:2px;left:2px;transition:all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);box-shadow:0 1px 4px rgba(0,0,0,.5)}
@@ -86,20 +85,21 @@
         }
         .sw-svg { width: 100%; height: 100%; display: block; mix-blend-mode: normal !important; }
 
-        /* COLOR PICKER ORIGINAL */
+        /* COLOR PICKER OVERLAY ORIGINAL */
         .cp-ol{display:none;position:fixed;inset:0;z-index:9000} .cp-ol.open{display:block}
         .cp-box{position:fixed;background:#161616;border:1.5px solid var(--border);border-radius:10px;padding:12px;display:flex;gap:10px;align-items:flex-start;z-index:901;box-shadow:0 16px 48px rgba(0,0,0,.9);user-select:none;touch-action:none}
         .sv{width:190px;height:152px;border-radius:5px;position:relative;overflow:hidden;flex-shrink:0;border:1px solid #222}
         .sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent)}
         .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,#000)}
-        .sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,.7),0 2px 5px rgba(0,0,0,.8)}
+        /* SMOOTH NAS BOLINHAS */
+        .sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,.7),0 2px 5px rgba(0,0,0,.8); transition: left 0.05s linear, top 0.05s linear;}
         .bars{display:flex;gap:8px}
         .btr{position:relative;width:14px;height:152px;border-radius:99px;overflow:visible;flex-shrink:0;border:1px solid #222}
         .bin{position:absolute;inset:0;border-radius:99px;overflow:hidden}
         .bh{width:100%;height:100%;background:linear-gradient(to bottom,#f00 0%,#ff0 17%,#0f0 33%,#0ff 50%,#00f 67%,#f0f 83%,#f00 100%)}
         .bck{width:100%;height:100%;background:repeating-conic-gradient(#555 0% 25%,#333 0% 50%) 0 0/8px 8px}
         .bag{position:absolute;inset:0;border-radius:99px;pointer-events:none}
-        .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,.6),0 2px 5px rgba(0,0,0,.7);pointer-events:none;z-index:10; transition: top 0.1s linear, background 0.1s linear;}
+        .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,.6),0 2px 5px rgba(0,0,0,.7);pointer-events:none;z-index:10; transition: top 0.05s linear, background 0.05s linear;}
 
         /* LOGIN SCREEN */
         #login-screen {
@@ -160,6 +160,9 @@
 </head>
 <body>
 
+<!-- CURSOR -->
+<div id='cur'></div>
+
 <!-- LOGIN SCREEN -->
 <div id="login-screen">
     <div class="login-card">
@@ -179,10 +182,7 @@
     </div>
 </div>
 
-<!-- CURSOR -->
-<div id='cur'></div>
-
-<!-- COLOR PICKER OVERLAY -->
+<!-- COLOR PICKER OVERLAY ORIGINAL -->
 <div class='cp-ol' id='cpOl'>
   <div class='cp-box' id='cpBox'>
     <div class='sv' id='sv'><div class='sv-w'></div><div class='sv-b'></div><div class='sv-th' id='svTh'></div></div>
@@ -198,7 +198,7 @@
 <div class='wrap'>
   <div class='sidebar'>
     <div class='profile-card'>
-      <img src='https://i.pinimg.com/474x/ff/c1/a5/ffc1a5f503e31b814ff8953ec6f50c7c.jpg' class='profile-img' alt='Profile' />
+      <img src='https://i.pinimg.com/474x/ff/c1/a5/ffc1a5f503e31b814ff8953ec6f50c7c.jpg' class='profile-img' alt='Profile' onerror="this.src='https://via.placeholder.com/100/c73030/ffffff?text=SP'" />
       <div class='profile-info'>
         <div class='profile-name'>n3sk</div>
         <div class='profile-sub'>Fuck any Anti-cheat</div>
@@ -222,6 +222,7 @@
     <div class='panel'>
       <div class='ph'>ESP COLORS</div>
       <div class='pgrid'>
+        <!-- Usando SVG Inline igual ao original -->
         <div class='row'><span>Box color</span><div class='sw-container' id='sw-boxcolor' data-k='boxcolor' onclick='openCP(this)'><svg class='sw-svg' viewBox='0 0 100 100' preserveAspectRatio='none'><rect width='100' height='100' fill='#ffffff'/></svg></div></div>
         <div class='row'><span>Skeleton color</span><div class='sw-container' id='sw-skeletoncolor' data-k='skeletoncolor' onclick='openCP(this)'><svg class='sw-svg' viewBox='0 0 100 100' preserveAspectRatio='none'><rect width='100' height='100' fill='#ff0000'/></svg></div></div>
         <div class='row'><span>Snapline color</span><div class='sw-container' id='sw-snaplinecolor' data-k='snaplinecolor' onclick='openCP(this)'><svg class='sw-svg' viewBox='0 0 100 100' preserveAspectRatio='none'><rect width='100' height='100' fill='#00ff00'/></svg></div></div>
@@ -238,196 +239,99 @@
 </div>
 
 <script>
-// ==========================================
+// ============================================
 // CONFIGURAÇÃO SUPABASE
-// ==========================================
+// ============================================
 const SUPA_URL = "https://gkzxuerurfedfwuxhimf.supabase.co";
 const SUPA_KEY = "sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6";
 const client = supabase.createClient(SUPA_URL, SUPA_KEY);
+const PREVIEW_IMG_URL = 'https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png?ex=6a3dcbea&is=6a3c7a6a&hm=95ab23192fdc65d73e612fadc773aac107802e9a93602097a289073aabc498b2&=&format=webp&quality=lossless&width=800&height=968';
 
 let sessionId = null;
 let isGlobal = false;
+let bgImage = null;
 let isUpdatingLocally = false; // TRAVA PARA EVITAR BUG DE TOGGLE
 
-// ==========================================
-// INICIALIZAÇÃO E LOGIN
-// ==========================================
-window.onload = function() {
-    initCursor();
-    init();
-    resizeCanvas(); 
-    scheduleRender();
-};
-
-async function init() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
+// ============================================
+// CURSOR (INICIA IMEDIATAMENTE)
+// ============================================
+(function(){
+    const cur = document.getElementById('cur');
+    if(!cur || window.innerWidth <= 900) return; 
     
-    if (!token) {
-        showLoginError("Nenhum token fornecido na URL.");
-        return;
+    let mx = window.innerWidth/2, my = window.innerHeight/2;
+    let cx = mx, cy = my;
+    
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; }, {passive:true});
+    document.addEventListener('mousedown', () => cur.classList.add('ck'));
+    document.addEventListener('mouseup', () => cur.classList.remove('ck'));
+    
+    function loop(){
+        cx += (mx-cx)*0.13;
+        cy += (my-cy)*0.13;
+        cur.style.left = cx+'px';
+        cur.style.top = cy+'px';
+        requestAnimationFrame(loop);
+    }
+    loop();
+})();
+
+// ============================================
+// INICIALIZAÇÃO
+// ============================================
+window.onload = async function(){
+    if(PREVIEW_IMG_URL){
+        bgImage = new Image();
+        bgImage.crossOrigin = "Anonymous";
+        bgImage.src = PREVIEW_IMG_URL;
+        bgImage.onload = () => scheduleRender();
     }
 
-    try {
-        const { data, error } = await client
-            .from('n3sk')
-            .select('*')
-            .eq('token', token)
-            .eq('is_active', true)
-            .single();
-
-        if (error || !data) {
-            showLoginError("Token inválido ou sessão expirada.");
-            return;
-        }
-
+    const token = new URLSearchParams(window.location.search).get('token');
+    if(!token){ showLoginError("Token não encontrado"); return; }
+    
+    try{
+        const {data, error} = await client.from('n3sk').select('*').eq('token', token).eq('is_active', true).single();
+        if(error || !data){ showLoginError("Token inválido ou expirado"); return; }
+        
         sessionId = data.id;
         isGlobal = data.is_global;
-
-        if (!isGlobal && data.ip && data.ip !== "UNKNOWN") {
-            try {
-                const ipRes = await fetch('https://api.ipify.org?format=json');
-                const ipData = await ipRes.json();
-                if (ipData.ip !== data.ip) {
-                    showLoginError("Acesso negado. Este link é exclusivo para o dispositivo original.");
-                    return;
-                }
-            } catch (e) { console.warn("IP check failed"); }
+        
+        if(!isGlobal && data.ip && data.ip !== "UNKNOWN"){
+            try{
+                const res = await fetch('https://api.ipify.org?format=json');
+                const ipData = await res.json();
+                if(ipData.ip !== data.ip){ showLoginError("Acesso negado - Dispositivo diferente"); return; }
+            }catch(e){ console.warn("IP check failed", e); }
         }
-
+        
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app').style.display = 'block';
         setConn(true);
-        startStateSync();
-    } catch (e) {
-        showLoginError("Erro ao conectar: " + e.message);
-    }
-}
+        startSync();
+        resizeCanvas();
+        scheduleRender();
+    }catch(e){ showLoginError("Erro: "+e.message); }
+};
 
-function showLoginError(msg) {
+function showLoginError(msg){
     document.getElementById('login-msg').textContent = msg;
     document.getElementById('login-loader').style.display = 'none';
-    document.querySelector('.login-card').classList.add('error');
+    document.querySelector('.login-card').style.borderColor = 'var(--red)';
 }
 
-// ==========================================
-// CURSOR ORIGINAL
-// ==========================================
-function initCursor() {
-    var cur=document.getElementById('cur');
-    if(!cur || window.innerWidth <= 900) return;
-    
-    var mx=innerWidth/2,my=innerHeight/2,cx=mx,cy=my;
-    document.addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY});
-    document.addEventListener('mousedown',function(){if(cur)cur.classList.add('ck')});
-    document.addEventListener('mouseup',function(){if(cur)cur.classList.remove('ck')});
-    (function loop(){cx+=(mx-cx)*.13;cy+=(my-cy)*.13;if(cur){cur.style.left=cx+'px';cur.style.top=cy+'px';}requestAnimationFrame(loop)})();
-}
-
-// ==========================================
-// SYNC E ESTADO (SUPABASE)
-// ==========================================
-async function startStateSync() {
-    setInterval(async () => {
-        if (!sessionId) return;
-        try {
-            const { data, error } = await client
-                .from('n3sk')
-                .select('state, is_active')
-                .eq('id', sessionId)
-                .single();
-            
-            if (error || !data || !data.is_active) { 
-                if(error && error.code === 'PGRST116') return; // Não recarrega se não achar (primeira vez)
-                location.reload(); 
-                return; 
-            }
-            if (data.state) applyState(data.state);
-        } catch (e) {}
-    }, 200);
-}
-
-async function sendStateUpdate() {
-    if (!sessionId) return;
-    
-    // Trava o sync por 500ms após clique local
-    isUpdatingLocally = true;
-    setTimeout(() => { isUpdatingLocally = false; }, 500);
-
-    const state = {
-        toggles: {
-            box: document.getElementById('tgl-box').classList.contains('on'),
-            skeleton: document.getElementById('tgl-skeleton').classList.contains('on'),
-            snapline: document.getElementById('tgl-snapline').classList.contains('on'),
-            healthbar: document.getElementById('tgl-healthbar').classList.contains('on')
-        },
-        colors: {
-            boxcolor: getSvgColor('sw-boxcolor'),
-            skeletoncolor: getSvgColor('sw-skeletoncolor'),
-            snaplinecolor: getSvgColor('sw-snaplinecolor'),
-            healthbarcolor: getSvgColor('sw-healthbarcolor')
-        },
-        alphas: {
-            boxalpha: cpA,
-            skeletonalpha: 1.0,
-            snaplinealpha: 1.0,
-            healthbaralpha: 1.0
-        }
-    };
-    
-    await client.from('n3sk').update({ state: state }).eq('id', sessionId);
-}
-
-function applyState(d){
-  if(isUpdatingLocally) return; // Ignora sync se estiver atualizando localmente
-  
-  setConn(true);
-  var tm={box:'tgl-box',skeleton:'tgl-skeleton',snapline:'tgl-snapline',healthbar:'tgl-healthbar'};
-  for(var k in tm){var el=document.getElementById(tm[k]);if(el)el.classList.toggle('on',!!d.toggles[k]);}
-  
-  var cm={boxcolor:'sw-boxcolor',skeletoncolor:'sw-skeletoncolor',snaplinecolor:'sw-snaplinecolor',healthbarcolor:'sw-healthbarcolor'};
-  for(var k in cm){
-    var el=document.getElementById(cm[k]);
-    if(el&&d.colors[k]){ 
-        var rect = el.querySelector('rect');
-        if(rect) rect.setAttribute('fill', d.colors[k]);
-    }
-  }
-  
-  if(d.alphas) {
-      if(d.alphas.boxalpha !== undefined) cpA = d.alphas.boxalpha;
-      aCY = 1 - cpA;
-      var aH=aTr.getBoundingClientRect().height||152;
-      aTh.style.top=(aCY*aH)+'px';
-  }
-  scheduleRender();
-}
-
-function setConn(c){
-  var d=document.getElementById('dot'),t=document.getElementById('txt');
-  if(c){d.classList.add('on');t.classList.add('on');t.textContent='CONECTADO';}
-  else{d.classList.remove('on');t.classList.remove('on');t.textContent='OFFLINE';}
-}
-
-// ==========================================
-// TOGGLES (COM TRAVA)
-// ==========================================
-var toggleDebounce = {};
+// ============================================
+// TOGGLES (BLINDADO CONTRA BUG)
+// ============================================
 function tg(el){
-  el.classList.toggle('on'); 
-  scheduleRender();
-  var key = el.dataset.k;
-  if (toggleDebounce[key]) clearTimeout(toggleDebounce[key]);
-  
-  // Pequeno debounce apenas para evitar múltiplos cliques acidentais, mas mantendo resposta rápida
-  toggleDebounce[key] = setTimeout(function() {
-    sendStateUpdate();
-  }, 50);
+    el.classList.toggle('on'); 
+    scheduleRender();
+    sendState(); // Envia imediatamente sem debounce
 }
 
-// ==========================================
-// COLOR PICKER (LÓGICA ORIGINAL DO SEU CÓDIGO)
-// ==========================================
+// ============================================
+// COLOR PICKER ORIGINAL (TEMPO REAL + SMOOTH)
+// ============================================
 var cpTarget=null,cpH=0,cpS=1,cpV=1,cpA=1;
 var svTX=1,svTY=0,svCX=1,svCY=0;
 var hTY=0,hCY=0,aCY=0; 
@@ -451,7 +355,6 @@ function hex2hsv(hex){
 }
 function lerp(a,b,t){return a+(b-a)*t}
 
-// ANIMAÇÃO SUAVE DAS BOLINHAS (LERP VIA JS)
 function runAnim(){
   var sp=0.28;
   svCX=lerp(svCX,svTX,sp);svCY=lerp(svCY,svTY,sp);
@@ -476,6 +379,7 @@ function updateCP(){
   aTh.style.background='rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+','+cpA+')';
   if(cpTarget){
     var hex=r2h(rgb[0],rgb[1],rgb[2]);
+    // Atualiza o atributo 'fill' do SVG igual ao original
     var rect = cpTarget.querySelector('rect');
     if(rect) rect.setAttribute('fill', hex);
     scheduleRender();
@@ -490,15 +394,16 @@ function openCP(el){
   if(top+popH>innerHeight)top=innerHeight-popH-10;
   if(left<4)left=4;if(top<4)top=4;
   cpBox.style.left=left+'px';cpBox.style.top=top+'px';
-  
+
+  // Pega a cor atual do SVG
   var svgRect = el.querySelector('rect');
   var currentColor = svgRect ? svgRect.getAttribute('fill') : '#ff0000';
-  
+
   if(currentColor){
       var hsv=hex2hsv(currentColor);
       cpH=hsv[0];cpS=hsv[1];cpV=hsv[2];cpA=1;
   }
-  
+
   svCX=cpS;svTX=cpS;svCY=1-cpV;svTY=1-cpV;hCY=cpH;hTY=cpH;aCY=1-cpA;
   updateCP();
   svTh.style.left=(svCX*100)+'%';svTh.style.top=(svCY*100)+'%';
@@ -510,66 +415,23 @@ function openCP(el){
 }
 
 cpOl.addEventListener('mousedown',function(e){
-  if(e.target===cpOl){cpOl.classList.remove('open');if(cpTarget){sendFinalColor();}}
+  if(e.target===cpOl){cpOl.classList.remove('open');sendState();}
 });
 cpOl.addEventListener('touchstart',function(e){
-  if(e.target===cpOl){cpOl.classList.remove('open');if(cpTarget){sendFinalColor();}}
+  if(e.target===cpOl){cpOl.classList.remove('open');sendState();}
 },{passive:true});
-
-function sendFinalColor(){
-    if(!cpTarget) return;
-    var rgb=h2r(cpH,cpS,cpV);
-    var hex=r2h(rgb[0],rgb[1],rgb[2]);
-    sendColor(cpTarget, hex);
-    sendAlpha(cpTarget, cpA);
-}
-
-function sendColor(el,hex){
-  // Atualiza estado local imediatamente
-  var rect = el.querySelector('rect');
-  if(rect) rect.setAttribute('fill', hex);
-  scheduleRender();
-  
-  // Envia para Supabase
-  sendStateUpdate();
-}
-
-function sendAlpha(el, val){
-    // Atualiza alpha local
-    cpA = val;
-    aCY = 1 - cpA;
-    var aH=aTr.getBoundingClientRect().height||152;
-    aTh.style.top=(aCY*aH)+'px';
-    
-    // Envia para Supabase
-    sendStateUpdate();
-}
 
 var dSV=false,dH=false,dA=false;
 function cl(v,a,b){return Math.max(a,Math.min(b,v))}
-var lastSendTime = 0;
-
-// THROTTLE PARA ENVIO EM TEMPO REAL (EVITA SPAM NO BANCO)
-function throttledSend() {
-    var now = Date.now();
-    if (now - lastSendTime > 50) {
-        lastSendTime = now;
-        if(cpTarget){
-            var rgb=h2r(cpH,cpS,cpV);
-            sendColor(cpTarget,r2h(rgb[0],rgb[1],rgb[2]));
-            sendAlpha(cpTarget, cpA);
-        }
-    }
-}
 
 svEl.addEventListener('mousedown',function(e){e.preventDefault();dSV=true;doSV(e)});
 hueTr.addEventListener('mousedown',function(e){e.preventDefault();dH=true;doH(e)});
 aTr.addEventListener('mousedown',function(e){e.preventDefault();dA=true;doA(e)});
 document.addEventListener('mousemove',function(e){if(dSV)doSV(e);if(dH)doH(e);if(dA)doA(e)});
-document.addEventListener('mouseup',function(){ dSV=false;dH=false;dA=false; });
+document.addEventListener('mouseup',function(){ dSV=false;dH=false;dA=false; sendState(); });
 
-function doSV(e){var r=svEl.getBoundingClientRect();cpS=cl((e.clientX-r.left)/r.width,0,1);cpV=cl(1-(e.clientY-r.top)/r.height,0,1);svTX=cpS;svTY=1-cpV;updateCP();startAnim();throttledSend();}
-function doH(e){var r=hueTr.getBoundingClientRect();cpH=cl((e.clientY-r.top)/r.height,0,.9999);hTY=cpH;updateCP();startAnim();throttledSend();}
+function doSV(e){var r=svEl.getBoundingClientRect();cpS=cl((e.clientX-r.left)/r.width,0,1);cpV=cl(1-(e.clientY-r.top)/r.height,0,1);svTX=cpS;svTY=1-cpV;updateCP();startAnim();}
+function doH(e){var r=hueTr.getBoundingClientRect();cpH=cl((e.clientY-r.top)/r.height,0,.9999);hTY=cpH;updateCP();startAnim();}
 function doA(e){
     var r=aTr.getBoundingClientRect();
     var height = r.height || 152;
@@ -577,7 +439,6 @@ function doA(e){
     aCY = 1 - cpA; 
     updateCP();
     startAnim();
-    throttledSend();
 }
 
 function tm(e){return{clientX:e.touches[0].clientX,clientY:e.touches[0].clientY}}
@@ -587,49 +448,113 @@ aTr.addEventListener('touchstart',function(e){e.preventDefault();dA=true;doA(tm(
 document.addEventListener('touchmove',function(e){
   if(dSV||dH||dA){e.preventDefault();var m=tm(e);if(dSV)doSV(m);if(dH)doH(m);if(dA)doA(m);}
 },{passive:false});
-document.addEventListener('touchend',function(){ dSV=false;dH=false;dA=false; });
+document.addEventListener('touchend',function(){ dSV=false;dH=false;dA=false; sendState(); });
 
-// ==========================================
-// QR CODE GLOBAL
-// ==========================================
-function showGlobalQr() {
-    client.from('n3sk').select('token').eq('id', sessionId + '_GLOBAL').single()
+// ============================================
+// SYNC & STATE (ZERO DELAY + PROTEÇÃO)
+// ============================================
+async function startSync(){
+    setInterval(async () => {
+        if(!sessionId) return;
+        const {data, error} = await client.from('n3sk').select('state, is_active').eq('id', sessionId).single();
+        if(error || !data || !data.is_active){ location.reload(); return; }
+        if(data.state) applyState(data.state);
+    }, 500);
+}
+
+async function sendState(){
+    if(!sessionId) return;
+    
+    isUpdatingLocally = true;
+    setTimeout(() => { isUpdatingLocally = false; }, 300);
+
+    const state = {
+        toggles: {
+            box: document.getElementById('tgl-box').classList.contains('on'),
+            skeleton: document.getElementById('tgl-skeleton').classList.contains('on'),
+            snapline: document.getElementById('tgl-snapline').classList.contains('on'),
+            healthbar: document.getElementById('tgl-healthbar').classList.contains('on')
+        },
+        colors: {
+            boxcolor: getSvgColor('sw-boxcolor'),
+            skeletoncolor: getSvgColor('sw-skeletoncolor'),
+            snaplinecolor: getSvgColor('sw-snaplinecolor'),
+            healthbarcolor: getSvgColor('sw-healthbarcolor')
+        },
+        alphas: { boxalpha: cpA, skeletonalpha: 1, snaplinealpha: 1, healthbaralpha: 1 }
+    };
+    await client.from('n3sk').update({state}).eq('id', sessionId);
+}
+
+function getSvgColor(id) {
+    var el = document.getElementById(id);
+    var rect = el ? el.querySelector('rect') : null;
+    return rect ? rect.getAttribute('fill') : '#ffffff';
+}
+
+function applyState(s){
+    if(isUpdatingLocally) return;
+
+    setConn(true);
+    var tm={box:'tgl-box',skeleton:'tgl-skeleton',snapline:'tgl-snapline',healthbar:'tgl-healthbar'};
+    for(var k in tm){
+        var el=document.getElementById(tm[k]);
+        if(el && s.toggles) el.classList.toggle('on', !!s.toggles[k]);
+    }
+    var cm={boxcolor:'sw-boxcolor',skeletoncolor:'sw-skeletoncolor',snaplinecolor:'sw-snaplinecolor',healthbarcolor:'sw-healthbarcolor'};
+    for(var k in cm){
+        var el=document.getElementById(cm[k]);
+        if(el && s.colors && s.colors[k]){ 
+            // Atualiza o SVG com a cor recebida igual ao original
+            var rect = el.querySelector('rect');
+            if(rect) rect.setAttribute('fill', s.colors[k]);
+        }
+    }
+    if(s.alphas) {
+        if(s.alphas.boxalpha !== undefined) cpA = s.alphas.boxalpha;
+        aCY = 1 - cpA;
+        var aH=aTr.getBoundingClientRect().height||152;
+        if(aTh) aTh.style.top=(aCY*aH)+'px';
+    }
+    scheduleRender();
+}
+
+function setConn(c){
+    var d=document.getElementById('dot'),t=document.getElementById('txt');
+    if(c){d.classList.add('on');t.classList.add('on');t.textContent='CONECTADO';}
+    else{d.classList.remove('on');t.classList.remove('on');t.textContent='OFFLINE';}
+}
+
+// ============================================
+// QR CODE
+// ============================================
+function showGlobalQr(){
+    const globalId = sessionId.includes('_GLOBAL') ? sessionId : sessionId + '_GLOBAL';
+    client.from('n3sk').select('token').eq('id', globalId).single()
     .then(({data, error}) => {
-        if (data && data.token) {
+        if(data && data.token){
             const globalLink = `https://n3sk.xyz/?token=${data.token}`;
             document.getElementById('qr-modal').classList.add('active');
             document.getElementById('qrcode-global').innerHTML = ''; 
             new QRCode(document.getElementById("qrcode-global"), {
-                text: globalLink,
-                width: 200,
-                height: 200,
-                colorDark : "#000000",
-                colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.H
+                text: globalLink, width: 200, height: 200,
+                colorDark: "#000000", colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
             });
         }
     });
 }
+function closeGlobalQr(){ document.getElementById('qr-modal').classList.remove('active'); }
 
-function closeGlobalQr() {
-    document.getElementById('qr-modal').classList.remove('active');
-}
-
-// ==========================================
-// PREVIEW CANVAS (ORIGINAL)
-// ==========================================
-const PREVIEW_IMG_URL = 'https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png?ex=6a3dcbea&is=6a3c7a6a&hm=95ab23192fdc65d73e612fadc773aac107802e9a93602097a289073aabc498b2&=&format=webp&quality=lossless&width=800&height=968';
+// ============================================
+// PREVIEW CANVAS ORIGINAL
+// ============================================
 var canvas = document.getElementById('espCanvas');
 var ctx = canvas.getContext('2d', { alpha: false });
-var canvasWidth = 0, canvasHeight = 0, renderScheduled = false, bgImage = null;
+var canvasWidth = 0, canvasHeight = 0, renderScheduled = false;
 var hpAnimTime = 0;
 var boxOpacity = 0;
 var targetBoxOpacity = 0;
-
-if (PREVIEW_IMG_URL && PREVIEW_IMG_URL.length > 5) {
-    bgImage = new Image(); bgImage.crossOrigin = "Anonymous"; bgImage.src = PREVIEW_IMG_URL;
-    bgImage.onload = function() { scheduleRender(); };
-}
 
 function resizeCanvas() {
   var rect = canvas.parentElement.getBoundingClientRect();
@@ -650,31 +575,25 @@ function renderPreview() {
   ctx.save();
   ctx.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0);
   ctx.fillStyle = '#050505'; ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-  
+
   if (bgImage && bgImage.complete && bgImage.naturalWidth > 0) {
       var s = Math.min(canvasWidth / bgImage.width, canvasHeight / bgImage.height);
       var w = bgImage.width * s, h = bgImage.height * s;
       ctx.drawImage(bgImage, (canvasWidth - w)/2, (canvasHeight - h)/2, w, h);
   }
-  
+
   var isBox = document.getElementById('tgl-box').classList.contains('on');
   var isHp = document.getElementById('tgl-healthbar').classList.contains('on');
-  
-  function getSvgColor(id) {
-      var el = document.getElementById(id);
-      var rect = el ? el.querySelector('rect') : null;
-      return rect ? rect.getAttribute('fill') : '#ffffff';
-  }
-  
+
   var bC = getSvgColor('sw-boxcolor');
   var hC = getSvgColor('sw-healthbarcolor');
-  
+
   var bH = canvasHeight * 0.75, bW = bH * 0.45;
   var bX = (canvasWidth - bW) / 2, bY = (canvasHeight - bH) / 2 + 20;
-  
+
   targetBoxOpacity = isBox ? 1 : 0;
   boxOpacity = lerp(boxOpacity, targetBoxOpacity, 0.05);
-  
+
   if (boxOpacity > 0.01) {
     ctx.globalAlpha = boxOpacity;
     ctx.strokeStyle = bC; ctx.lineWidth = 2; var l = bW * 0.25;
@@ -684,7 +603,7 @@ function renderPreview() {
     ctx.beginPath(); ctx.moveTo(bX + bW - l, bY + bH); ctx.lineTo(bX + bW, bY + bH); ctx.lineTo(bX + bW, bY + bH - l); ctx.stroke();
     ctx.globalAlpha = 1.0;
   }
-  
+
   if (isHp) {
     var bw = 6, bx = bX - 12; 
     hpAnimTime += 0.05; 
