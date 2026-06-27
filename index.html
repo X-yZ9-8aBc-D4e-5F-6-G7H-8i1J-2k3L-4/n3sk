@@ -11,69 +11,66 @@
         *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
         html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;overflow:hidden}
         
-        /* CURSOR - SEMPRE VISÍVEL */
+        /* CURSOR */
         body{cursor:none!important}
-        #cur{position:fixed;width:18px;height:18px;border:2px solid rgba(199,48,48,0.9);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:transform 0.12s ease}
-        #cur.ck{transform:translate(-50%,-50%) scale(0.65)}
+        #cur{position:fixed;width:18px;height:18px;border:2px solid rgba(199,48,48,0.9);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:transform 0.1s ease}
+        #cur.ck{transform:translate(-50%,-50%) scale(0.6)}
         
-        /* LOGIN SCREEN */
-        #login-screen{
-            position:fixed;inset:0;z-index:99999;
-            display:flex;align-items:center;justify-content:center;
-            background:radial-gradient(circle at center,#1a0505 0%,#000000 100%);
-            font-family:'Segoe UI',sans-serif;color:white;
-        }
-        .login-card{
-            background:rgba(20,20,20,0.8);backdrop-filter:blur(12px);
-            padding:50px 40px;border-radius:30px;
-            border:1px solid rgba(255,255,255,0.08);
-            box-shadow:0 20px 80px rgba(0,0,0,0.6),0 0 40px rgba(199,48,48,0.2);
-            text-align:center;max-width:340px;width:100%;
-            animation:floatUp 0.8s cubic-bezier(0.2,0.8,0.2,1);
-        }
-        @keyframes floatUp{from{opacity:0;transform:translateY(40px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}
-        .login-card h1{font-size:32px;margin:0 0 15px;letter-spacing:3px;text-transform:uppercase;font-weight:800}
+        /* LOGIN */
+        #login-screen{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center,#1a0505 0%,#000000 100%);color:white}
+        .login-card{background:rgba(20,20,20,0.8);backdrop-filter:blur(12px);padding:50px 40px;border-radius:30px;border:1px solid rgba(255,255,255,0.08);box-shadow:0 20px 80px rgba(0,0,0,0.6);text-align:center;max-width:340px;width:90%;animation:floatUp 0.8s cubic-bezier(0.2,0.8,0.2,1)}
+        @keyframes floatUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+        .login-card h1{font-size:32px;margin-bottom:15px;letter-spacing:3px;text-transform:uppercase;font-weight:800}
         .login-card h1 span{color:var(--red);text-shadow:0 0 20px rgba(199,48,48,0.4)}
         .login-card p{color:#aaa;font-size:14px;margin-bottom:20px}
-        .login-card.error{border-color:var(--red);animation:shake 0.5s}
-        @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
         .loader{width:40px;height:40px;margin:0 auto;border:4px solid #333;border-top-color:var(--red);border-radius:50%;animation:spin 1s linear infinite}
         @keyframes spin{to{transform:rotate(360deg)}}
         
+        /* APP LAYOUT */
         #app{display:none;height:100%}
-        @keyframes fadeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-        @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(74,222,128,0.7)}70%{box-shadow:0 0 0 8px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
-        
         .wrap{display:flex;height:100%;gap:12px;padding:12px;animation:fadeIn 0.5s ease}
-        .sidebar{width:240px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:14px}
+        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+        
+        /* SIDEBAR */
+        .sidebar{width:240px;flex-shrink:0;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:14px}
         .profile-card{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px}
         .profile-img{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--red);box-shadow:0 0 10px rgba(199,48,48,0.3)}
         .profile-info{display:flex;flex-direction:column;gap:2px}
         .profile-name{font-size:14px;font-weight:700;color:#fff}
-        .profile-sub{font-size:10px;color:var(--muted)}
+        .profile-sub{font-size:10px;color:var(--muted);letter-spacing:0.5px}
         .logo{text-align:center;padding:10px 0 16px;border-bottom:1.5px solid var(--border)}
         .stat-box{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;background:var(--bg3);border-radius:6px}
-        .stat-dot{width:10px;height:10px;border-radius:50%;background:#444}
+        .stat-dot{width:10px;height:10px;border-radius:50%;background:#444;transition:all 0.3s}
         .stat-dot.on{background:#4ade80;box-shadow:0 0 8px #4ade80;animation:pulse 2s infinite}
-        .stat-txt{font-size:10px;font-weight:700;color:var(--muted)}
+        @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(74,222,128,0.7)}70%{box-shadow:0 0 0 8px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
+        .stat-txt{font-size:10px;font-weight:700;color:var(--muted);transition:color 0.3s}
         .stat-txt.on{color:#4ade80}
-        
-        .btn-qr{width:100%;padding:12px;background:transparent;border:1.5px solid var(--red);color:var(--red);font-weight:700;border-radius:8px;cursor:pointer;margin-top:10px;transition:all 0.3s}
+        .btn-qr{width:100%;padding:12px;background:transparent;border:1.5px solid var(--red);color:var(--red);font-weight:700;border-radius:8px;cursor:pointer;margin-top:auto;transition:all 0.3s;text-transform:uppercase;font-size:11px;letter-spacing:1px}
         .btn-qr:hover{background:var(--red);color:#fff;box-shadow:0 0 15px rgba(199,48,48,0.4)}
         
-        .main{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+        /* MAIN CONTENT */
+        .main{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding-right:4px}
+        .main::-webkit-scrollbar{width:3px}
+        .main::-webkit-scrollbar-thumb{background:#333;border-radius:99px}
         .panel{background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;overflow:hidden}
-        .ph{background:var(--border);padding:8px 14px;font-size:10px;font-weight:700;letter-spacing:2px;color:#fff}
-        .row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid #1c1c1c}
+        .ph{background:var(--border);padding:8px 14px;font-size:10px;font-weight:700;letter-spacing:2px;color:#fff;text-transform:uppercase}
+        .row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #1c1c1c}
         .row:last-child{border-bottom:none}
-        .tgl{width:46px;height:26px;background:#2a2a2a;border-radius:99px;position:relative;border:1.5px solid #444;transition:all 0.3s;cursor:pointer}
-        .tgl.on{background:var(--red);border-color:#ff6b6b}
-        .tgl::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:2px;left:2px;transition:all 0.3s}
-        .tgl.on::after{left:22px}
-        .sw{width:36px;height:24px;border-radius:4px;border:1.5px solid #555;cursor:pointer}
+        .row span{font-size:12px;color:var(--text)}
         
-        .preview{width:420px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
-        .preview canvas{flex:1;background:#050505}
+        /* TOGGLES - SMOOTH & FIXED */
+        .tgl{width:46px;height:26px;background:#2a2a2a;border-radius:99px;position:relative;border:1.5px solid #444;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);cursor:pointer;flex-shrink:0}
+        .tgl.on{background:var(--red);border-color:#ff6b6b;box-shadow:0 0 8px rgba(199,48,48,0.4)}
+        .tgl::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:2px;left:2px;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);box-shadow:0 1px 3px rgba(0,0,0,0.5)}
+        .tgl.on::after{left:22px}
+        
+        /* COLOR SWATCHES */
+        .sw{width:36px;height:24px;border-radius:4px;border:1.5px solid #555;cursor:pointer;transition:transform 0.2s;flex-shrink:0}
+        .sw:active{transform:scale(0.9)}
+        
+        /* PREVIEW PANEL */
+        .preview-panel{width:420px;flex-shrink:0;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+        .preview-canvas{flex:1;background:#050505;width:100%;display:block}
         
         /* QR MODAL */
         #qr-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);align-items:center;justify-content:center;z-index:99998;backdrop-filter:blur(8px)}
@@ -81,24 +78,39 @@
         .qr-box{background:#111;padding:40px;border-radius:20px;border:1.5px solid var(--red);text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.8)}
         .qr-box h2{color:var(--red);margin-bottom:10px;letter-spacing:2px}
         .qr-box #qrcode{background:#fff;padding:15px;border-radius:12px;margin:20px auto;display:inline-block;min-height:200px;min-width:200px}
-        .qr-close{background:var(--red);color:#fff;border:none;padding:10px 30px;border-radius:8px;font-weight:700;cursor:pointer;margin-top:15px}
+        .qr-close{background:var(--red);color:#fff;border:none;padding:10px 30px;border-radius:8px;font-weight:700;cursor:pointer;margin-top:15px;transition:background 0.2s}
         .qr-close:hover{background:#ff6b6b}
         
-        /* COLOR PICKER */
+        /* COLOR PICKER OVERLAY */
         .cp-ol{display:none;position:fixed;inset:0;z-index:9000}
         .cp-ol.open{display:block}
         .cp-box{position:fixed;background:#161616;border:1.5px solid var(--border);border-radius:10px;padding:12px;display:flex;gap:10px;align-items:flex-start;z-index:901;box-shadow:0 16px 48px rgba(0,0,0,0.9)}
-        .sv{width:190px;height:152px;border-radius:5px;position:relative;overflow:hidden;border:1px solid #222}
+        .sv{width:190px;height:152px;border-radius:5px;position:relative;overflow:hidden;border:1px solid #222;cursor:crosshair}
         .sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent)}
         .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,#000)}
         .sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,0.7);transition:left 0.05s linear,top 0.05s linear}
         .bars{display:flex;gap:8px}
-        .btr{position:relative;width:14px;height:152px;border-radius:99px;overflow:visible;border:1px solid #222}
+        .btr{position:relative;width:14px;height:152px;border-radius:99px;overflow:visible;border:1px solid #222;cursor:ns-resize}
         .bin{position:absolute;inset:0;border-radius:99px;overflow:hidden}
         .bh{width:100%;height:100%;background:linear-gradient(to bottom,#f00 0%,#ff0 17%,#0f0 33%,#0ff 50%,#00f 67%,#f0f 83%,#f00 100%)}
         .bck{width:100%;height:100%;background:repeating-conic-gradient(#555 0% 25%,#333 0% 50%) 0 0/8px 8px}
         .bag{position:absolute;inset:0;border-radius:99px;pointer-events:none}
         .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,0.6);pointer-events:none;z-index:10;transition:top 0.05s linear}
+        
+        /* MOBILE RESPONSIVE - IGUAL BASE ORIGINAL */
+        @media(max-width:900px){
+            html,body{height:auto;min-height:100%;overflow-y:auto}
+            .wrap{flex-direction:column;padding:8px;gap:8px;height:auto;min-height:100vh}
+            .sidebar{width:100%;flex-direction:row;flex-wrap:wrap;gap:10px;padding:12px;order:1}
+            .profile-card{flex:1 1 100%}
+            .logo{display:none}
+            .stat-box{flex:1}
+            .btn-qr{flex:1 1 100%;margin-top:0}
+            .main{flex:none;order:2;width:100%}
+            .preview-panel{width:100%;height:50vh;min-height:300px;order:3;flex-shrink:0;margin-bottom:20px}
+            #cur{display:none!important} /* Esconde cursor custom no mobile */
+            body{cursor:auto!important}
+        }
     </style>
 </head>
 <body>
@@ -139,15 +151,24 @@
 <!-- APP -->
 <div id="app" style="display:none">
 <div class="wrap">
+    <!-- SIDEBAR -->
     <div class="sidebar">
         <div class="profile-card">
-            <img src="https://via.placeholder.com/100/c73030/ffffff?text=SP" class="profile-img">
-            <div class="profile-info"><div class="profile-name">n3sk</div><div class="profile-sub">Fuck any Anti-cheat</div></div>
+            <img src="https://via.placeholder.com/100/c73030/ffffff?text=SP" class="profile-img" alt="Profile">
+            <div class="profile-info">
+                <div class="profile-name">n3sk</div>
+                <div class="profile-sub">Fuck any Anti-cheat</div>
+            </div>
         </div>
         <div class="logo"></div>
-        <div class="stat-box"><div class="stat-dot" id="dot"></div><div class="stat-txt" id="txt">OFFLINE</div></div>
+        <div class="stat-box">
+            <div class="stat-dot" id="dot"></div>
+            <div class="stat-txt" id="txt">OFFLINE</div>
+        </div>
         <button class="btn-qr" onclick="showQR()">GERAR QR GLOBAL</button>
     </div>
+
+    <!-- MAIN CONTROLS -->
     <div class="main">
         <div class="panel">
             <div class="ph">ESP TOGGLES</div>
@@ -164,20 +185,34 @@
             <div class="row"><span>Healthbar color</span><div class="sw" id="sw-healthbarcolor" onclick="openColorPicker(this,'#00ff00')" style="background:#00ff00"></div></div>
         </div>
     </div>
-    <div class="preview"><div class="ph">Preview</div><canvas id="cvs"></canvas></div>
+
+    <!-- PREVIEW -->
+    <div class="preview-panel">
+        <div class="ph">Preview</div>
+        <canvas id="cvs" class="preview-canvas"></canvas>
+    </div>
 </div>
 </div>
 
 <script>
 // ============================================
-// CURSOR - INICIA IMEDIATAMENTE
+// CONFIGURAÇÃO
+// ============================================
+const SUPA_URL = "https://gkzxuerurfedfwuxhimf.supabase.co";
+const SUPA_KEY = "sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6";
+const client = supabase.createClient(SUPA_URL, SUPA_KEY);
+const PREVIEW_IMG_URL = 'https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png?ex=6a3dcbea&is=6a3c7a6a&hm=95ab23192fdc65d73e612fadc773aac107802e9a93602097a289073aabc498b2&=&format=webp&quality=lossless&width=800&height=968';
+
+let sessionId = null;
+let isGlobal = false;
+let bgImage = null;
+
+// ============================================
+// CURSOR (INICIA IMEDIATAMENTE)
 // ============================================
 (function(){
     const cur = document.getElementById('cur');
-    if(!cur){
-        console.error("[CURSOR] Elemento #cur não encontrado!");
-        return;
-    }
+    if(!cur || window.innerWidth <= 900) return; // Não ativa no mobile
     
     let mx = window.innerWidth/2, my = window.innerHeight/2;
     let cx = mx, cy = my;
@@ -187,60 +222,44 @@
     document.addEventListener('mouseup', () => cur.classList.remove('ck'));
     
     function loop(){
-        cx += (mx-cx)*0.13;
-        cy += (my-cy)*0.13;
+        cx += (mx-cx)*0.15;
+        cy += (my-cy)*0.15;
         cur.style.left = cx+'px';
         cur.style.top = cy+'px';
         requestAnimationFrame(loop);
     }
     loop();
-    console.log("[CURSOR] Ativado com sucesso");
 })();
-
-// ============================================
-// SUPABASE
-// ============================================
-const SUPA_URL = "https://gkzxuerurfedfwuxhimf.supabase.co";
-const SUPA_KEY = "sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6";
-const client = supabase.createClient(SUPA_URL, SUPA_KEY);
-
-let sessionId = null;
-let isGlobal = false;
 
 // ============================================
 // INICIALIZAÇÃO
 // ============================================
 window.onload = async function(){
-    const token = new URLSearchParams(window.location.search).get('token');
-    console.log("[INIT] Token:", token);
-    
-    if(!token){
-        document.getElementById('login-msg').textContent = "Token não encontrado";
-        return;
+    // Carregar imagem de preview
+    if(PREVIEW_IMG_URL){
+        bgImage = new Image();
+        bgImage.crossOrigin = "Anonymous";
+        bgImage.src = PREVIEW_IMG_URL;
+        bgImage.onload = () => scheduleRender();
     }
+
+    const token = new URLSearchParams(window.location.search).get('token');
+    if(!token){ showLoginError("Token não encontrado"); return; }
     
     try{
-        const {data, error} = await client.from('n3sk').select('*').eq('token', token).eq('is_active', true).eq('is_global', false).single();
-        console.log("[INIT] Dados:", data, "Erro:", error);
-        
-        if(error || !data){
-            document.getElementById('login-msg').textContent = "Token inválido";
-            return;
-        }
+        const {data, error} = await client.from('n3sk').select('*').eq('token', token).eq('is_active', true).single();
+        if(error || !data){ showLoginError("Token inválido ou expirado"); return; }
         
         sessionId = data.id;
         isGlobal = data.is_global;
         
-        // Validação de IP
+        // Validação de IP (apenas para token principal)
         if(!isGlobal && data.ip && data.ip !== "UNKNOWN"){
             try{
                 const res = await fetch('https://api.ipify.org?format=json');
                 const ipData = await res.json();
-                if(ipData.ip !== data.ip){
-                    document.getElementById('login-msg').textContent = "Acesso negado - IP diferente";
-                    return;
-                }
-            }catch(e){}
+                if(ipData.ip !== data.ip){ showLoginError("Acesso negado - Dispositivo diferente"); return; }
+            }catch(e){ console.warn("IP check failed", e); }
         }
         
         document.getElementById('login-screen').style.display = 'none';
@@ -249,24 +268,26 @@ window.onload = async function(){
         startSync();
         resizeCanvas();
         scheduleRender();
-        console.log("[INIT] App iniciado!");
-    }catch(e){
-        console.error("[INIT] Erro:", e);
-        document.getElementById('login-msg').textContent = "Erro: "+e.message;
-    }
+    }catch(e){ showLoginError("Erro: "+e.message); }
 };
 
+function showLoginError(msg){
+    document.getElementById('login-msg').textContent = msg;
+    document.getElementById('login-loader').style.display = 'none';
+    document.querySelector('.login-card').style.borderColor = 'var(--red)';
+}
+
 // ============================================
-// TOGGLES
+// TOGGLES (SEM DELAY, SEM BUG)
 // ============================================
 function toggleSwitch(el, key){
     el.classList.toggle('on');
     scheduleRender();
-    sendState();
+    sendState(); // Envia IMEDIATAMENTE
 }
 
 // ============================================
-// COLOR PICKER - CORRIGIDO COM SMOOTH
+// COLOR PICKER (SEM DELAY, SMOOTH)
 // ============================================
 let cpTarget = null;
 let cpH = 0, cpS = 1, cpV = 1, cpA = 1;
@@ -288,8 +309,17 @@ const aTh = document.getElementById('aTh');
 function openColorPicker(el, defaultColor){
     cpTarget = el;
     const rect = el.getBoundingClientRect();
-    cpBox.style.left = (rect.right + 10) + 'px';
-    cpBox.style.top = rect.top + 'px';
+    
+    // Posicionamento inteligente
+    let left = rect.right + 10;
+    let top = rect.top;
+    if(left + 240 > window.innerWidth) left = rect.left - 250;
+    if(top + 190 > window.innerHeight) top = window.innerHeight - 200;
+    if(left < 5) left = 5;
+    if(top < 5) top = 5;
+    
+    cpBox.style.left = left + 'px';
+    cpBox.style.top = top + 'px';
     
     const currentColor = el.style.backgroundColor || defaultColor;
     const hex = rgbToHex(currentColor);
@@ -304,11 +334,10 @@ function openColorPicker(el, defaultColor){
     updateCP();
     updateHandles();
     cpOl.classList.add('open');
-    console.log("[CP] Aberto com cor:", hex);
 }
 
 function rgbToHex(rgb){
-    if(rgb.startsWith('#')) return rgb;
+    if(rgb.startsWith('#')) return rgb.length === 7 ? rgb : '#ff0000';
     const values = rgb.match(/\d+/g);
     if(!values) return '#ff0000';
     return '#' + values.slice(0,3).map(x => parseInt(x).toString(16).padStart(2,'0')).join('');
@@ -350,9 +379,7 @@ function hsvToRgb(h,s,v){
     return [Math.round(r*255), Math.round(g*255), Math.round(b*255)];
 }
 
-function rgbToHex2(r,g,b){
-    return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
-}
+function rgbToHex2(r,g,b){ return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join(''); }
 
 function updateCP(){
     const rgb = hsvToRgb(cpH, cpS, cpV);
@@ -382,78 +409,69 @@ function updateHandles(){
 }
 
 function runAnim(){
-    const sp = 0.28;
+    const sp = 0.3; // Smooth speed
     svCX += (svTX - svCX) * sp;
     svCY += (svTY - svCY) * sp;
     hCY += (hTY - hCY) * sp;
-    
     updateHandles();
-    
     if(Math.abs(svCX-svTX)>0.0005 || Math.abs(svCY-svTY)>0.0005 || Math.abs(hCY-hTY)>0.0005)
         requestAnimationFrame(runAnim);
     else animRun = false;
 }
 
-function startAnim(){
-    if(!animRun){ animRun = true; requestAnimationFrame(runAnim); }
-}
-
-function lerp(a,b,t){ return a + (b-a)*t; }
+function startAnim(){ if(!animRun){ animRun = true; requestAnimationFrame(runAnim); } }
 function clamp(v,a,b){ return Math.max(a, Math.min(b,v)); }
 
-cpOl.addEventListener('mousedown', e => {
-    if(e.target === cpOl){
-        cpOl.classList.remove('open');
-        if(cpTarget) sendState();
-    }
-});
-
+// Event Listeners Color Picker
+cpOl.addEventListener('mousedown', e => { if(e.target === cpOl){ cpOl.classList.remove('open'); sendState(); } });
 svEl.addEventListener('mousedown', e => { e.preventDefault(); dSV = true; doSV(e); });
 hueTr.addEventListener('mousedown', e => { e.preventDefault(); dH = true; doH(e); });
 aTr.addEventListener('mousedown', e => { e.preventDefault(); dA = true; doA(e); });
 
-document.addEventListener('mousemove', e => {
-    if(dSV) doSV(e);
-    if(dH) doH(e);
-    if(dA) doA(e);
-});
-
-document.addEventListener('mouseup', () => {
-    if(dSV || dH || dA){
-        dSV = false; dH = false; dA = false;
-        if(cpTarget) sendState();
-    }
+document.addEventListener('mousemove', e => { if(dSV) doSV(e); if(dH) doH(e); if(dA) doA(e); });
+document.addEventListener('mouseup', () => { 
+    const wasDragging = dSV || dH || dA;
+    dSV = false; dH = false; dA = false; 
+    if(wasDragging) sendState(); // Envia ao soltar
 });
 
 function doSV(e){
     const r = svEl.getBoundingClientRect();
     cpS = clamp((e.clientX - r.left)/r.width, 0, 1);
     cpV = clamp(1 - (e.clientY - r.top)/r.height, 0, 1);
-    svTX = cpS;
-    svTY = 1 - cpV;
-    updateCP();
-    startAnim();
+    svTX = cpS; svTY = 1 - cpV;
+    updateCP(); startAnim();
 }
-
 function doH(e){
     const r = hueTr.getBoundingClientRect();
     cpH = clamp((e.clientY - r.top)/r.height, 0, 0.9999);
     hTY = cpH;
-    updateCP();
-    startAnim();
+    updateCP(); startAnim();
 }
-
 function doA(e){
     const r = aTr.getBoundingClientRect();
     const height = r.height || 152;
     cpA = clamp(1 - (e.clientY - r.top)/height, 0, 1);
     aCY = 1 - cpA;
-    updateHandles();
-    updateCP();
+    updateHandles(); updateCP();
 }
 
+// Touch support para mobile
+function tm(e){ return {clientX:e.touches[0].clientX, clientY:e.touches[0].clientY}; }
+svEl.addEventListener('touchstart', e => { e.preventDefault(); dSV=true; doSV(tm(e)); }, {passive:false});
+hueTr.addEventListener('touchstart', e => { e.preventDefault(); dH=true; doH(tm(e)); }, {passive:false});
+aTr.addEventListener('touchstart', e => { e.preventDefault(); dA=true; doA(tm(e)); }, {passive:false});
+document.addEventListener('touchmove', e => { 
+    if(dSV||dH||dA){ e.preventDefault(); const m=tm(e); if(dSV)doSV(m); if(dH)doH(m); if(dA)doA(m); } 
+}, {passive:false});
+document.addEventListener('touchend', () => { 
+    const wasDragging = dSV || dH || dA;
+    dSV=false; dH=false; dA=false; 
+    if(wasDragging) sendState(); 
+});
+
 // ============================================
-// SYNC E ESTADO
+// SYNC & STATE (ZERO DELAY)
 // ============================================
 async function startSync(){
     setInterval(async () => {
@@ -479,28 +497,27 @@ async function sendState(){
             snaplinecolor: rgbToHex(document.getElementById('sw-snaplinecolor').style.backgroundColor),
             healthbarcolor: rgbToHex(document.getElementById('sw-healthbarcolor').style.backgroundColor)
         },
-        alphas: { 
-            boxalpha: cpA, 
-            skeletonalpha: 1, 
-            snaplinealpha: 1, 
-            healthbaralpha: 1 
-        }
+        alphas: { boxalpha: cpA, skeletonalpha: 1, snaplinealpha: 1, healthbaralpha: 1 }
     };
-    console.log("[STATE] Enviando:", state);
+    // Envio direto sem debounce/delay
     await client.from('n3sk').update({state}).eq('id', sessionId);
 }
 
 function applyState(s){
     setConn(true);
-    const toggles = {box:'tgl-box', skeleton:'tgl-skeleton', snapline:'tgl-snapline', healthbar:'tgl-healthbar'};
-    for(let k in toggles){
-        const el = document.getElementById(toggles[k]);
-        if(el && s.toggles) el.classList.toggle('on', !!s.toggles[k]);
+    if(s.toggles){
+        const map = {box:'tgl-box', skeleton:'tgl-skeleton', snapline:'tgl-snapline', healthbar:'tgl-healthbar'};
+        for(let k in map){
+            const el = document.getElementById(map[k]);
+            if(el) el.classList.toggle('on', !!s.toggles[k]);
+        }
     }
-    const colors = {boxcolor:'sw-boxcolor', skeletoncolor:'sw-skeletoncolor', snaplinecolor:'sw-snaplinecolor', healthbarcolor:'sw-healthbarcolor'};
-    for(let k in colors){
-        const el = document.getElementById(colors[k]);
-        if(el && s.colors && s.colors[k]) el.style.background = s.colors[k];
+    if(s.colors){
+        const map = {boxcolor:'sw-boxcolor', skeletoncolor:'sw-skeletoncolor', snaplinecolor:'sw-snaplinecolor', healthbarcolor:'sw-healthbarcolor'};
+        for(let k in map){
+            const el = document.getElementById(map[k]);
+            if(el && s.colors[k]) el.style.background = s.colors[k];
+        }
     }
     scheduleRender();
 }
@@ -512,41 +529,34 @@ function setConn(c){
 }
 
 // ============================================
-// QR CODE - CORRIGIDO
+// QR CODE
 // ============================================
 function showQR(){
-    console.log("[QR] Gerando QR...");
-    client.from('n3sk').select('token').eq('id', sessionId + '_GLOBAL').single()
+    // Busca o token global usando o ID composto
+    const globalId = sessionId.includes('_GLOBAL') ? sessionId : sessionId + '_GLOBAL';
+    
+    client.from('n3sk').select('token').eq('id', globalId).single()
     .then(({data, error}) => {
-        console.log("[QR] Dados:", data, "Erro:", error);
         if(data && data.token){
             const globalLink = `https://n3sk.xyz/?token=${data.token}`;
             document.getElementById('qr-modal').classList.add('active');
             const qrDiv = document.getElementById('qrcode');
             qrDiv.innerHTML = '';
-            try{
-                new QRCode(qrDiv, {
-                    text: globalLink,
-                    width: 200,
-                    height: 200,
-                    colorDark: "#000000",
-                    colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.H
-                });
-                console.log("[QR] Gerado com sucesso!");
-            }catch(e){
-                console.error("[QR] Erro ao gerar:", e);
-                qrDiv.innerHTML = '<p style="color:red">Erro ao gerar QR</p>';
-            }
+            new QRCode(qrDiv, {
+                text: globalLink,
+                width: 200,
+                height: 200,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
         } else {
-            console.error("[QR] Token global não encontrado");
+            alert("Token global não encontrado. Verifique se o loader está rodando.");
         }
     });
 }
 
-function closeQR(){
-    document.getElementById('qr-modal').classList.remove('active');
-}
+function closeQR(){ document.getElementById('qr-modal').classList.remove('active'); }
 
 // ============================================
 // PREVIEW CANVAS
@@ -571,6 +581,7 @@ function resizeCanvas(){
         scheduleRender();
     }
 }
+window.addEventListener('resize', resizeCanvas);
 
 function scheduleRender(){
     if(!renderScheduled){
@@ -578,6 +589,8 @@ function scheduleRender(){
         requestAnimationFrame(renderPreview);
     }
 }
+
+function lerp(a,b,t){ return a + (b-a)*t; }
 
 function renderPreview(){
     renderScheduled = false;
@@ -588,6 +601,13 @@ function renderPreview(){
     ctx.fillStyle = '#050505';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
     
+    // Desenhar imagem de fundo
+    if(bgImage && bgImage.complete && bgImage.naturalWidth > 0){
+        const s = Math.min(canvasWidth/bgImage.width, canvasHeight/bgImage.height);
+        const w = bgImage.width * s, h = bgImage.height * s;
+        ctx.drawImage(bgImage, (canvasWidth-w)/2, (canvasHeight-h)/2, w, h);
+    }
+    
     const isBox = document.getElementById('tgl-box').classList.contains('on');
     const isHp = document.getElementById('tgl-healthbar').classList.contains('on');
     
@@ -596,36 +616,45 @@ function renderPreview(){
     const bX = (canvasWidth - bW) / 2;
     const bY = (canvasHeight - bH) / 2 + 20;
     
+    // Box ESP
     targetBoxOpacity = isBox ? 1 : 0;
-    boxOpacity = lerp(boxOpacity, targetBoxOpacity, 0.05);
+    boxOpacity = lerp(boxOpacity, targetBoxOpacity, 0.1);
     
     if(boxOpacity > 0.01){
         ctx.globalAlpha = boxOpacity;
         ctx.strokeStyle = document.getElementById('sw-boxcolor').style.backgroundColor || '#ff0000';
         ctx.lineWidth = 2;
         const l = bW * 0.25;
+        
         ctx.beginPath();
         ctx.moveTo(bX, bY+l); ctx.lineTo(bX, bY); ctx.lineTo(bX+l, bY);
         ctx.stroke();
+        
         ctx.beginPath();
         ctx.moveTo(bX+bW-l, bY); ctx.lineTo(bX+bW, bY); ctx.lineTo(bX+bW, bY+l);
         ctx.stroke();
+        
         ctx.beginPath();
         ctx.moveTo(bX, bY+bH-l); ctx.lineTo(bX, bY+bH); ctx.lineTo(bX+l, bY+bH);
         ctx.stroke();
+        
         ctx.beginPath();
         ctx.moveTo(bX+bW-l, bY+bH); ctx.lineTo(bX+bW, bY+bH); ctx.lineTo(bX+bW, bY+bH-l);
         ctx.stroke();
+        
         ctx.globalAlpha = 1;
     }
     
+    // Healthbar ESP
     if(isHp){
         const bw = 6, bx = bX - 12;
         hpAnimTime += 0.05;
         const pulse = 0.5 + 0.5 * Math.sin(hpAnimTime * 2 * Math.PI * 0.3);
         const hpH = bH * pulse;
+        
         ctx.fillStyle = 'rgba(15,15,15,0.8)';
         ctx.fillRect(bx, bY, bw, bH);
+        
         ctx.fillStyle = document.getElementById('sw-healthbarcolor').style.backgroundColor || '#00ff00';
         ctx.fillRect(bx, bY + (bH - hpH), bw, hpH);
     }
