@@ -47,7 +47,7 @@
         .stat-box{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;background:var(--bg3);border-radius:6px}
         .stat-dot{width:10px;height:10px;border-radius:50%;background:#444;transition:all 0.3s}
         .stat-dot.on{background:#4ade80;box-shadow:0 0 8px #4ade80;animation:pulse 2s infinite}
-        @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(74,222,128,0.7)}70%{box-shadow:0 0 0 8px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
+        @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(74,222,128,0.7)}70%{box-shadow:0 0 0 8px rgba(74,222,128,0)}}
         .stat-txt{font-size:10px;font-weight:700;color:var(--muted);transition:color 0.3s}
         .stat-txt.on{color:#4ade80}
         .btn-qr{width:100%;padding:12px;background:transparent;border:1.5px solid var(--red);color:var(--red);font-weight:700;border-radius:8px;cursor:pointer;margin-top:auto;transition:all 0.3s;text-transform:uppercase;font-size:11px;letter-spacing:1px}
@@ -219,6 +219,7 @@ let bgImage = null;
 let isUpdatingLocally = false; // TRAVA PARA EVITAR BUG DE TOGGLE
 let toggleLocked = false; // BLOQUEIA CLIQUES DUPLOS
 let lastToggleTime = 0; // REGISTRA ÚLTIMO CLIQUE EM TOGGLE
+let pendingState = null; // Armazena o estado que está sendo enviado
 
 // ============================================
 // CURSOR (INICIA IMEDIATAMENTE)
@@ -289,7 +290,7 @@ function showLoginError(msg){
 }
 
 // ============================================
-// TOGGLES (BLINDADO CONTRA BUG - PROTEÇÃO MÁXIMA)
+// TOGGLES (BLINDADO CONTRA BUG - PROTEÇÃO MÁXIMA v2)
 // ============================================
 function toggleSwitch(el, key){
     // Proteção dupla contra cliques rápidos
@@ -311,9 +312,9 @@ function toggleSwitch(el, key){
     
     scheduleRender();
     
-    // TRAVA FORTE para não deixar sync interferir (1 segundo!)
+    // TRAVA FORTE para não deixar sync interferir (2.5 segundos!)
     isUpdatingLocally = true;
-    setTimeout(() => { isUpdatingLocally = false; }, 1000);
+    setTimeout(() => { isUpdatingLocally = false; }, 2500);
     
     // Envia estado imediatamente
     sendState();
@@ -367,6 +368,10 @@ function openColorPicker(el, defaultColor){
     updateCP();
     updateHandles();
     cpOl.classList.add('open');
+    
+    // Protege contra sync enquanto tá abrindo color picker
+    isUpdatingLocally = true;
+    setTimeout(() => { isUpdatingLocally = false; }, 3000);
 }
 
 function rgbToHex(rgb){
@@ -524,7 +529,7 @@ document.addEventListener('touchend', () => {
 });
 
 // ============================================
-// SYNC & STATE (ZERO DELAY + PROTEÇÃO)
+// SYNC & STATE (ZERO DELAY + PROTEÇÃO v2)
 // ============================================
 async function startSync(){
     setInterval(async () => {
@@ -532,7 +537,7 @@ async function startSync(){
         const {data, error} = await client.from('n3sk').select('state, is_active').eq('id', sessionId).single();
         if(error || !data || !data.is_active){ location.reload(); return; }
         if(data.state) applyState(data.state);
-    }, 200); // Sincroniza a cada 200ms (evita conflitos)
+    }, 250); // Aumentado para 250ms para dar mais tempo ao servidor
 }
 
 async function sendState(){
@@ -553,6 +558,10 @@ async function sendState(){
         },
         alphas: { boxalpha: cpA, skeletonalpha: 1, snaplinealpha: 1, healthbaralpha: 1 }
     };
+    
+    // Armazena o estado pendente para validação
+    pendingState = JSON.stringify(state);
+    
     // Envia imediatamente sem await para não bloquear
     client.from('n3sk').update({state}).eq('id', sessionId).catch(e => console.error('Send error:', e));
 }
