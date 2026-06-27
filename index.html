@@ -58,7 +58,7 @@
         .row:last-child{border-bottom:none}
         .row span{font-size:12px;color:var(--text)}
         
-        /* TOGGLES - SMOOTH & INSTANT */
+        /* TOGGLES - SMOOTH & BLINDADO CONTRA BUG */
         .tgl{width:46px;height:26px;background:#2a2a2a;border-radius:99px;position:relative;border:1.5px solid #444;transition:all 0.2s cubic-bezier(0.4,0,0.2,1);cursor:pointer;flex-shrink:0}
         .tgl.on{background:var(--red);border-color:#ff6b6b;box-shadow:0 0 8px rgba(199,48,48,0.4)}
         .tgl::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:2px;left:2px;transition:all 0.2s cubic-bezier(0.4,0,0.2,1);box-shadow:0 1px 3px rgba(0,0,0,0.5)}
@@ -208,6 +208,7 @@ const PREVIEW_IMG_URL = 'https://media.discordapp.net/attachments/11843230479315
 let sessionId = null;
 let isGlobal = false;
 let bgImage = null;
+let isUpdatingLocally = false; // TRAVA PARA EVITAR BUG DE TOGGLE
 
 // ============================================
 // CURSOR (INICIA IMEDIATAMENTE)
@@ -278,12 +279,15 @@ function showLoginError(msg){
 }
 
 // ============================================
-// TOGGLES (INSTANTÂNEO - SEM BUG)
+// TOGGLES (BLINDADO CONTRA BUG)
 // ============================================
 function toggleSwitch(el, key){
+    // Trava visual imediata
     el.classList.toggle('on');
     scheduleRender();
-    sendState(); // Envia IMEDIATAMENTE sem delay/debounce
+    
+    // Envia estado imediatamente
+    sendState();
 }
 
 // ============================================
@@ -477,7 +481,7 @@ document.addEventListener('touchend', () => {
 });
 
 // ============================================
-// SYNC & STATE (ZERO DELAY)
+// SYNC & STATE (ZERO DELAY + PROTEÇÃO)
 // ============================================
 async function startSync(){
     setInterval(async () => {
@@ -490,6 +494,11 @@ async function startSync(){
 
 async function sendState(){
     if(!sessionId) return;
+    
+    // Bloqueia o sync temporariamente para evitar conflito visual
+    isUpdatingLocally = true;
+    setTimeout(() => { isUpdatingLocally = false; }, 300);
+
     const state = {
         toggles: {
             box: document.getElementById('tgl-box').classList.contains('on'),
@@ -509,6 +518,9 @@ async function sendState(){
 }
 
 function applyState(s){
+    // Se estivermos atualizando localmente, ignora o sync para não causar glitch
+    if(isUpdatingLocally) return;
+
     setConn(true);
     if(s.toggles){
         const map = {box:'tgl-box', skeleton:'tgl-skeleton', snapline:'tgl-snapline', healthbar:'tgl-healthbar'};
