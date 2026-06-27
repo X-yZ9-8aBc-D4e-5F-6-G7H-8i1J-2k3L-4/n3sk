@@ -1,158 +1,3 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="color-scheme" content="light dark">
-<title>n3sk Remote</title>
-<style>
-:root{ --red:#c73030; --bg:#0a0a0a; --bg2:#111; --bg3:#1a1a1a; --border:#8b2e2e; --text:#e0e0e0; --muted:#888; color-scheme: light dark; }
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;cursor:none}
-@media(hover:hover){ body{cursor:none} #cur{position:fixed;width:18px;height:18px;border:2px solid rgba(199,48,48,.9);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:transform .12s ease,border-color .15s ease} #cur.ck{transform:translate(-50%,-50%) scale(.65);border-color:#ff6b6b} }
-@media(hover:none),(max-width:900px){ *{cursor:auto!important} #cur{display:none!important} }
-
-/* TELA DE ESPERA */
-#waiting-screen { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; transition: opacity 0.5s; }
-.loader-ring { width: 48px; height: 48px; border: 4px solid #333; border-top: 4px solid var(--red); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-.wait-text { font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;}
-.wait-sub { font-size: 11px; color: #666; max-width: 80%; text-align: center; word-break: break-all; line-height: 1.4; }
-
-#app{display:none;height:100%}
-@keyframes fadeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(74,222,128,.7)}70%{box-shadow:0 0 0 8px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
-.wrap{display:flex;height:100%;gap:12px;padding:12px;animation:fadeIn .5s ease}
-.sidebar{width:240px;flex-shrink:0;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:14px}
-.profile-card{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px}
-.profile-img{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--red);box-shadow:0 0 10px rgba(199,48,48,0.3)}
-.profile-info{display:flex;flex-direction:column;gap:2px}
-.profile-name{font-size:14px;font-weight:700;color:#fff}
-.profile-sub{font-size:10px;color:var(--muted);letter-spacing:0.5px}
-.logo{text-align:center;padding:10px 0 16px;border-bottom:1.5px solid var(--border)}
-.stat-box{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;background:var(--bg3);border-radius:6px;border:1.5px solid #333}
-.stat-dot{width:10px;height:10px;border-radius:50%;background:#444;transition:all .3s}
-.stat-dot.on{background:#4ade80;box-shadow:0 0 8px #4ade80;animation:pulse 2s infinite}
-.stat-txt{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1px;transition:color .3s}
-.stat-txt.on{color:#4ade80}
-.main{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
-.main::-webkit-scrollbar{width:3px} .main::-webkit-scrollbar-thumb{background:#333;border-radius:99px}
-.panel{background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;overflow:hidden}
-.ph{background:var(--border);padding:8px 14px;font-size:10px;font-weight:700;letter-spacing:2px;color:#fff}
-.pgrid{display:grid;gap:0}
-.row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid #1c1c1c}
-.row:last-child{border-bottom:none} .row span{font-size:12px;color:var(--text)}
-.preview-panel{width:420px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;flex-shrink:0}
-.preview-canvas{flex:1;background:#050505;width:100%;height:100%;display:block}
-.tgl{width:46px;height:26px;background:#2a2a2a;border-radius:99px;position:relative;border:1.5px solid #444;transition:all 0.4s cubic-bezier(0.4,0,0.2,1);user-select:none;flex-shrink:0}
-.tgl.on{background:var(--red);border-color:#ff6b6b;box-shadow:0 0 8px rgba(199,48,48,.4)}
-.tgl::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:2px;left:2px;transition:all 0.4s cubic-bezier(0.4,0,0.2,1);box-shadow:0 1px 4px rgba(0,0,0,.5)}
-.tgl.on::after{left:22px}
-.sw-container{width:36px;height:24px;flex-shrink:0;border-radius:4px;overflow:hidden;border:1.5px solid #555;position:relative;cursor:pointer;isolation:isolate}
-.sw-svg{width:100%;height:100%;display:block;mix-blend-mode:normal!important}
-.cp-ol{display:none;position:fixed;inset:0;z-index:9000} .cp-ol.open{display:block}
-.cp-box{position:fixed;background:#161616;border:1.5px solid var(--border);border-radius:10px;padding:12px;display:flex;gap:10px;align-items:flex-start;z-index:901;box-shadow:0 16px 48px rgba(0,0,0,.9);user-select:none;touch-action:none}
-.sv{width:190px;height:152px;border-radius:5px;position:relative;overflow:hidden;flex-shrink:0;border:1px solid #222}
-.sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent)}
-.sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,#000)}
-.sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,.7),0 2px 5px rgba(0,0,0,.8)}
-.bars{display:flex;gap:8px}
-.btr{position:relative;width:14px;height:152px;border-radius:99px;overflow:visible;flex-shrink:0;border:1px solid #222}
-.bin{position:absolute;inset:0;border-radius:99px;overflow:hidden}
-.bh{width:100%;height:100%;background:linear-gradient(to bottom,#f00 0%,#ff0 17%,#0f0 33%,#0ff 50%,#00f 67%,#f0f 83%,#f00 100%)}
-.bck{width:100%;height:100%;background:repeating-conic-gradient(#555 0% 25%,#333 0% 50%) 0 0/8px 8px}
-.bag{position:absolute;inset:0;border-radius:99px;pointer-events:none}
-.bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,.6),0 2px 5px rgba(0,0,0,.7);pointer-events:none;z-index:10;transition:top 0.1s linear,background 0.1s linear}
-
-/* MODAL QR CODE GLOBAL */
-.qr-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:10001; align-items:center; justify-content:center; backdrop-filter:blur(5px); }
-.qr-modal.active { display:flex; }
-.qr-content { background:var(--bg2); border:1.5px solid var(--border); border-radius:12px; padding:24px; text-align:center; max-width:90%; width:320px; }
-.qr-content h3 { margin-bottom:16px; font-size:14px; letter-spacing:1px; color:var(--text); }
-.qr-content img { width:200px; height:200px; border-radius:8px; border:1px solid #333; margin-bottom:16px; }
-.qr-close { background:var(--border); color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer; font-size:12px; letter-spacing:1px; }
-.qr-close:hover { background:#a03535; }
-
-@media(max-width:900px){ html,body{height:auto;min-height:100%;overflow-y:auto} .wrap{flex-direction:column;padding:8px;gap:8px;height:auto;min-height:100%} .sidebar{width:100%;flex-direction:row;flex-wrap:wrap;gap:10px;padding:12px;order:1} .profile-card{flex:1 1 100%} .logo{padding:8px 0 10px;flex:1 1 100%} .stat-box{flex:1} .main{flex:none;order:2;width:100%} .preview-panel{width:100%;height:60vh;min-height:500px;order:3;flex-shrink:0;margin-bottom:20px} }
-</style>
-</head>
-<body>
-
-<!-- TELA DE ESPERA -->
-<div id='waiting-screen'>
-    <div class='loader-ring'></div>
-    <div class='wait-text' id='status-msg'>AGUARDANDO TOKEN...</div>
-    <div class='wait-sub' id='status-detail'>Acesse n3sk.xyz/?token=SEU_TOKEN para entrar.</div>
-</div>
-
-<!-- MODAL QR CODE GLOBAL -->
-<div class='qr-modal' id='qrModal'>
-    <div class='qr-content'>
-        <h3>QR CODE DE ACESSO GLOBAL</h3>
-        <p style="font-size:11px;color:#888;margin-bottom:12px">Compartilhe para controle remoto</p>
-        <img id='qrImage' src='' alt='QR Code' />
-        <button class='qr-close' onclick='closeQR()'>FECHAR</button>
-    </div>
-</div>
-
-<div id='cur'></div>
-<div class='cp-ol' id='cpOl'>
-  <div class='cp-box' id='cpBox'>
-    <div class='sv' id='sv'><div class='sv-w'></div><div class='sv-b'></div><div class='sv-th' id='svTh'></div></div>
-    <div class='bars'>
-      <div class='btr' id='hueTr'><div class='bin'><div class='bh'></div></div><div class='bth' id='hueTh'></div></div>
-      <div class='btr' id='aTr'><div class='bin'><div class='bck'></div></div><div class='bag' id='aGr'></div><div class='bth' id='aTh'></div></div>
-    </div>
-  </div>
-</div>
-
-<div id='app' style='display:block'>
-<div class='wrap'>
-  <div class='sidebar'>
-    <div class='profile-card'>
-      <img src='https://via.placeholder.com/100/c73030/ffffff?text=SP' class='profile-img' alt='Profile' onerror="this.src='https://i.pinimg.com/474x/ff/c1/a5/ffc1a5f503e31b814ff8953ec6f50c7c.jpg'" />
-      <div class='profile-info'><div class='profile-name'>n3sk</div><div class='profile-sub'>Fuck any Anti-cheat</div></div>
-    </div>
-    <div class='logo'></div>
-    <div class='stat-box'>
-        <div class='stat-dot' id='dot'></div>
-        <div class='stat-txt' id='txt'>OFFLINE</div>
-    </div>
-    <!-- BOTÃO QR CODE GLOBAL -->
-    <button onclick='openGlobalQR()' style="width:100%;padding:10px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:6px;cursor:pointer;font-size:11px;letter-spacing:1px;display:flex;align-items:center;justify-content:center;gap:8px;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-        GERAR QR GLOBAL
-    </button>
-  </div>
-
-  <div class='main'>
-    <div class='panel'>
-      <div class='ph'>ESP TOGGLES</div>
-      <div class='pgrid'>
-        <div class='row'><span>Draw box</span><div class='tgl on' id='tgl-box' data-k='box' onclick='tg(this)'></div></div>
-        <div class='row'><span>Draw skeleton</span><div class='tgl on' id='tgl-skeleton' data-k='skeleton' onclick='tg(this)'></div></div>
-        <div class='row'><span>Draw snapline</span><div class='tgl' id='tgl-snapline' data-k='snapline' onclick='tg(this)'></div></div>
-        <div class='row'><span>Draw healthbar</span><div class='tgl on' id='tgl-healthbar' data-k='healthbar' onclick='tg(this)'></div></div>
-      </div>
-    </div>
-    <div class='panel'>
-      <div class='ph'>ESP COLORS</div>
-      <div class='pgrid'>
-        <div class='row'><span>Box color</span><div class='sw-container' id='sw-boxcolor' data-k='boxcolor' onclick='openCP(this)'><svg class='sw-svg' viewBox='0 0 100 100' preserveAspectRatio='none'><rect width='100' height='100' fill='#ffffff'/></svg></div></div>
-        <div class='row'><span>Skeleton color</span><div class='sw-container' id='sw-skeletoncolor' data-k='skeletoncolor' onclick='openCP(this)'><svg class='sw-svg' viewBox='0 0 100 100' preserveAspectRatio='none'><rect width='100' height='100' fill='#ff0000'/></svg></div></div>
-        <div class='row'><span>Snapline color</span><div class='sw-container' id='sw-snaplinecolor' data-k='snaplinecolor' onclick='openCP(this)'><svg class='sw-svg' viewBox='0 0 100 100' preserveAspectRatio='none'><rect width='100' height='100' fill='#00ff00'/></svg></div></div>
-        <div class='row'><span>Healthbar color</span><div class='sw-container' id='sw-healthbarcolor' data-k='healthbarcolor' onclick='openCP(this)'><svg class='sw-svg' viewBox='0 0 100 100' preserveAspectRatio='none'><rect width='100' height='100' fill='#00ff00'/></svg></div></div>
-      </div>
-    </div>
-  </div>
-
-  <div class='preview-panel'>
-    <div class='ph'>Preview</div>
-    <canvas id='espCanvas' class='preview-canvas'></canvas>
-  </div>
-</div>
-</div>
-
 <script>
 const PREVIEW_IMG_URL = 'https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png?ex=6a3dcbea&is=6a3c7a6a&hm=95ab23192fdc65d73e612fadc773aac107802e9a93602097a289073aabc498b2&=&format=webp&quality=lossless&width=800&height=968';
 const SUPA_URL = 'https://gkzxuerurfedfwuxhimf.supabase.co';
@@ -165,21 +10,24 @@ let SESSION_TOKEN = urlParams.get('token');
 let currentState = null;
 let isConnected = false;
 let lastPollTime = 0;
+let errorCount = 0;
 
 const statusEl = document.getElementById('status-msg');
 const detailEl = document.getElementById('status-detail');
-function updateStatus(msg, isError = false) {
+
+function updateStatus(msg, sub = '', isError = false) {
     if(statusEl) {
         statusEl.innerText = msg;
         statusEl.style.color = isError ? '#ff4444' : '#555';
     }
-    console.log(isError ? "[ERRO] " + msg : "[INFO] " + msg);
+    if(detailEl && sub) detailEl.innerText = sub;
+    console.log(isError ? "[ERRO] " + msg : "[INFO] " + msg, sub);
 }
 
 if (!SESSION_TOKEN) {
-    updateStatus("TOKEN NÃO ENCONTRADO NA URL", true);
+    updateStatus("TOKEN NÃO ENCONTRADO", "A URL não contém ?token=...", true);
 } else {
-    updateStatus("Validando sessão...");
+    updateStatus("Conectando...", `Token: ${SESSION_TOKEN.substring(0,8)}...`);
 }
 
 // --- CURSOR ORIGINAL SEM LAG ---
@@ -194,7 +42,9 @@ document.addEventListener('mouseup',function(){if(cur)cur.classList.remove('ck')
 var canvas = document.getElementById('espCanvas');
 var ctx = canvas.getContext('2d', { alpha: false });
 var canvasWidth = 0, canvasHeight = 0, renderScheduled = false, bgImage = null;
-var hpAnimTime = 0; var boxOpacity = 0; var targetBoxOpacity = 0;
+var hpAnimTime = 0;
+var boxOpacity = 0;
+var targetBoxOpacity = 0;
 
 if (PREVIEW_IMG_URL && PREVIEW_IMG_URL.length > 5) {
     bgImage = new Image(); bgImage.crossOrigin = "Anonymous"; bgImage.src = PREVIEW_IMG_URL;
@@ -268,7 +118,7 @@ function renderPreview() {
   if (Math.abs(boxOpacity - targetBoxOpacity) > 0.01 || isHp) scheduleRender();
 }
 
-// --- COLOR PICKER ORIGINAL ---
+// --- COLOR PICKER ORIGINAL RESTAURADO ---
 var cpTarget=null,cpH=0,cpS=1,cpV=1,cpA=1;
 var svTX=1,svTY=0,svCX=1,svCY=0;
 var hTY=0,hCY=0,aCY=0; 
@@ -290,6 +140,7 @@ function hex2hsv(hex){
   if(d===0)h=0;else if(mx===r)h=((g-b)/d)%6;else if(mx===g)h=(b-r)/d+2;else h=(r-g)/d+4;
   return[h/6,s,v];
 }
+function lerp(a,b,t){return a+(b-a)*t}
 
 function runAnim(){
   var sp=0.28;
@@ -363,33 +214,49 @@ function sendFinalColor(){
     sendAlpha(cpTarget, cpA);
 }
 
-// --- INTEGRAÇÃO SUPABASE CORRIGIDA ---
+// --- COMUNICAÇÃO SUPABASE CORRIGIDA ---
 async function fetchState() {
     try {
-        const url = `${SUPA_URL}/rest/v1/${TABLE}?token=eq.${SESSION_TOKEN}&select=id,state,is_active,hwid&order=created_at.desc&limit=1`;
+        // Busca direta pelo token. Se falhar, mostra erro na tela.
+        const url = `${SUPA_URL}/rest/v1/${TABLE}?token=eq.${SESSION_TOKEN}&select=id,state,is_active&order=created_at.desc&limit=1`;
+        
         const res = await fetch(url, {
             headers: { 
                 'apikey': SUPA_KEY, 
                 'Authorization': `Bearer ${SUPA_KEY}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation' // Força retorno dos dados
             }
         });
         
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (!res.ok) {
+            throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+        }
+        
         const data = await res.json();
         
-        if (data.length > 0 && data[0].state && data[0].is_active) {
+        // Debug visual
+        if(data.length === 0) {
+            errorCount++;
+            if(errorCount > 3) updateStatus("Token inválido ou Loader fechado", "Verifique se o C# está rodando.", true);
+            return null;
+        }
+        
+        errorCount = 0; // Reset contador de erros se funcionar
+        
+        if (data[0].state && data[0].is_active) {
             return data[0].state;
         }
         return null;
     } catch(e) { 
-        updateStatus(`Erro de conexão: ${e.message}`, true);
+        updateStatus("Erro de conexão", e.message, true);
         return null; 
     }
 }
 
 async function updateState(newState) {
     try {
+        // Encontra ID pelo token antes de atualizar
         const findRes = await fetch(`${SUPA_URL}/rest/v1/${TABLE}?token=eq.${SESSION_TOKEN}&select=id&order=created_at.desc&limit=1`, {
             headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}` }
         });
@@ -404,32 +271,22 @@ async function updateState(newState) {
                 'Content-Type': 'application/json',
                 'Prefer': 'resolution=merge-duplicates'
             },
-            body: JSON.stringify({ 
-                id: findData[0].id, 
-                token: SESSION_TOKEN, 
-                state: newState 
-            })
+            body: JSON.stringify({ id: findData[0].id, token: SESSION_TOKEN, state: newState })
         });
     } catch(e) { console.error("Update error:", e); }
 }
 
 function applyState(d){
   if(!d) return;
-  
   if (!isConnected) {
       isConnected = true;
-      updateStatus("Conectado! Interface liberada.");
-      
-      const waitScreen = document.getElementById('waiting-screen');
-      if(waitScreen) {
-          waitScreen.style.opacity = '0';
-          setTimeout(() => {
-              waitScreen.style.display = 'none';
-              document.getElementById('app').style.display = 'block';
-          }, 500);
-      }
+      updateStatus("Conectado!", "Interface liberada.");
+      document.getElementById('waiting-screen').style.opacity = '0';
+      setTimeout(() => {
+          document.getElementById('waiting-screen').style.display = 'none';
+          document.getElementById('app').style.display = 'block';
+      }, 500);
   }
-
   setConn(true);
   currentState = d; 
   
@@ -458,67 +315,107 @@ function setConn(c){
   else{d.classList.remove('on');t.classList.remove('on');t.textContent='OFFLINE';}
 }
 
+// Polling otimizado
 function poll(){
   var now = Date.now();
-  const interval = isConnected ? 100 : 1000;
-  if (now - lastPollTime < interval) return;
+  if (now - lastPollTime < (isConnected ? 100 : 1000)) return;
   lastPollTime = now;
-  
   fetchState().then(state => {
-      if (state) {
-          applyState(state);
-      } else {
-          if(!isConnected) updateStatus("Aguardando Loader C#...");
-          else {
-              setConn(false);
-              updateStatus("Loader fechado ou token inválido.", true);
-          }
-      }
+      if (state) applyState(state);
+      else if(!isConnected) updateStatus("Aguardando Loader C#...");
+      else setConn(false);
   });
 }
 
+// --- INTERAÇÕES INSTANTÂNEAS (SEM DEBOUNCE/THROTTLE) ---
 function tg(el){
-  if (!currentState) return;
-  el.classList.toggle('on'); scheduleRender();
+  el.classList.toggle('on'); 
+  scheduleRender();
   const key = el.dataset.k;
-  currentState.toggles[key] = el.classList.contains('on');
-  updateState(currentState);
+  if(currentState) {
+      currentState.toggles[key] = el.classList.contains('on');
+      updateState(currentState);
+  }
 }
 
 function sendColor(el, hex){
-    if (!currentState) return;
+    if(!currentState) return;
     currentState.colors[el.dataset.k] = hex;
     updateState(currentState);
 }
 
 function sendAlpha(el, val){
-    if (!currentState) return;
+    if(!currentState) return;
     const alphaKey = el.dataset.k.replace('color', 'alpha');
     currentState.alphas[alphaKey] = parseFloat(val.toFixed(4));
     updateState(currentState);
 }
 
+// Color Picker Drag Events (Original)
+var dSV=false,dH=false,dA=false;
+function cl(v,a,b){return Math.max(a,Math.min(b,v))}
+
+svEl.addEventListener('mousedown',function(e){e.preventDefault();dSV=true;doSV(e)});
+hueTr.addEventListener('mousedown',function(e){e.preventDefault();dH=true;doH(e)});
+aTr.addEventListener('mousedown',function(e){e.preventDefault();dA=true;doA(e)});
+document.addEventListener('mousemove',function(e){if(dSV)doSV(e);if(dH)doH(e);if(dA)doA(e)});
+document.addEventListener('mouseup',function(){ dSV=false;dH=false;dA=false; });
+
+function doSV(e){
+    var r=svEl.getBoundingClientRect();
+    cpS=cl((e.clientX-r.left)/r.width,0,1);
+    cpV=cl(1-(e.clientY-r.top)/r.height,0,1);
+    svTX=cpS;svTY=1-cpV;
+    updateCP();startAnim();
+    if(cpTarget){
+        var rgb=h2r(cpH,cpS,cpV);
+        sendColor(cpTarget,r2h(rgb[0],rgb[1],rgb[2]));
+        sendAlpha(cpTarget, cpA);
+    }
+}
+function doH(e){
+    var r=hueTr.getBoundingClientRect();
+    cpH=cl((e.clientY-r.top)/r.height,0,.9999);
+    hTY=cpH;updateCP();startAnim();
+    if(cpTarget){
+        var rgb=h2r(cpH,cpS,cpV);
+        sendColor(cpTarget,r2h(rgb[0],rgb[1],rgb[2]));
+        sendAlpha(cpTarget, cpA);
+    }
+}
+function doA(e){
+    var r=aTr.getBoundingClientRect();
+    var height = r.height || 152;
+    cpA = cl(1 - ((e.clientY - r.top) / height), 0, 1);
+    aCY = 1 - cpA; 
+    updateCP();startAnim();
+    if(cpTarget) sendAlpha(cpTarget, cpA);
+}
+
+// Touch Events
+function tm(e){return{clientX:e.touches[0].clientX,clientY:e.touches[0].clientY}}
+svEl.addEventListener('touchstart',function(e){e.preventDefault();dSV=true;doSV(tm(e))},{passive:false});
+hueTr.addEventListener('touchstart',function(e){e.preventDefault();dH=true;doH(tm(e))},{passive:false});
+aTr.addEventListener('touchstart',function(e){e.preventDefault();dA=true;doA(tm(e))},{passive:false});
+document.addEventListener('touchmove',function(e){
+  if(dSV||dH||dA){e.preventDefault();var m=tm(e);if(dSV)doSV(m);if(dH)doH(m);if(dA)doA(m);}
+},{passive:false});
+document.addEventListener('touchend',function(){ dSV=false;dH=false;dA=false; });
+
 // --- QR CODE GLOBAL ---
 function openGlobalQR(){
-    if(!isConnected){
-        alert("Conecte-se primeiro!");
-        return;
-    }
+    if(!isConnected){ alert("Conecte-se primeiro!"); return; }
     const url = `${window.location.origin}${window.location.pathname}?token=${SESSION_TOKEN}`;
     const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
     document.getElementById('qrImage').src = qrApi;
     document.getElementById('qrModal').classList.add('active');
 }
 
-function closeQR(){
-    document.getElementById('qrModal').classList.remove('active');
-}
+function closeQR(){ document.getElementById('qrModal').classList.remove('active'); }
 
-// Inicia Polling Imediatamente
+// Inicia imediatamente
 poll(); 
 setInterval(poll, 100);
 resizeCanvas(); 
 scheduleRender();
 </script>
-</body>
-</html>
