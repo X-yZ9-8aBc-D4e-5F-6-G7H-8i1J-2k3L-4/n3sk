@@ -85,18 +85,18 @@
         .cp-ol{display:none;position:fixed;inset:0;z-index:9000}
         .cp-ol.open{display:block}
         .cp-box{position:fixed;background:#161616;border:1.5px solid var(--border);border-radius:10px;padding:12px;display:flex;gap:10px;align-items:flex-start;z-index:901;box-shadow:0 16px 48px rgba(0,0,0,0.9)}
-        .sv{width:190px;height:152px;border-radius:5px;position:relative;overflow:hidden;border:1px solid #222;cursor:none} /* Cursor none para usar o custom */
+        .sv{width:190px;height:152px;border-radius:5px;position:relative;overflow:hidden;border:1px solid #222;cursor:none}
         .sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent)}
         .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,#000)}
-        /* SMOOTH NAS BOLINHAS */
-        .sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,0.7);transition:left 0.1s linear,top 0.1s linear}
+        /* SMOOTH NAS BOLINHAS DO COLOR PICKER */
+        .sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,0.7);transition:left 0.05s linear,top 0.05s linear}
         .bars{display:flex;gap:8px}
-        .btr{position:relative;width:14px;height:152px;border-radius:99px;overflow:visible;border:1px solid #222;cursor:none} /* Cursor none */
+        .btr{position:relative;width:14px;height:152px;border-radius:99px;overflow:visible;border:1px solid #222;cursor:none}
         .bin{position:absolute;inset:0;border-radius:99px;overflow:hidden}
         .bh{width:100%;height:100%;background:linear-gradient(to bottom,#f00 0%,#ff0 17%,#0f0 33%,#0ff 50%,#00f 67%,#f0f 83%,#f00 100%)}
         .bck{width:100%;height:100%;background:repeating-conic-gradient(#555 0% 25%,#333 0% 50%) 0 0/8px 8px}
         .bag{position:absolute;inset:0;border-radius:99px;pointer-events:none}
-        .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,0.6);pointer-events:none;z-index:10;transition:top 0.1s linear}
+        .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,0.6);pointer-events:none;z-index:10;transition:top 0.05s linear}
         
         /* MOBILE RESPONSIVE */
         @media(max-width:900px){
@@ -156,7 +156,7 @@
     <div class="sidebar">
         <div class="profile-card">
             <!-- IMAGEM PROFILE CORRIGIDA -->
-            <img src="https://ui-avatars.com/api/?name=N3SK&background=c73030&color=fff&size=128" class="profile-img" alt="Profile">
+            <img src="https://i.pinimg.com/474x/ff/c1/a5/ffc1a5f503e31b814ff8953ec6f50c7c.jpg" class="profile-img" alt="Profile">
             <div class="profile-info">
                 <div class="profile-name">n3sk</div>
                 <div class="profile-sub">Fuck any Anti-cheat</div>
@@ -237,7 +237,6 @@ let bgImage = null;
 // INICIALIZAÇÃO
 // ============================================
 window.onload = async function(){
-    // Carregar imagem de preview
     if(PREVIEW_IMG_URL){
         bgImage = new Image();
         bgImage.crossOrigin = "Anonymous";
@@ -255,7 +254,6 @@ window.onload = async function(){
         sessionId = data.id;
         isGlobal = data.is_global;
         
-        // Validação de IP
         if(!isGlobal && data.ip && data.ip !== "UNKNOWN"){
             try{
                 const res = await fetch('https://api.ipify.org?format=json');
@@ -280,16 +278,16 @@ function showLoginError(msg){
 }
 
 // ============================================
-// TOGGLES (INSTANTÂNEO)
+// TOGGLES (INSTANTÂNEO - SEM BUG)
 // ============================================
 function toggleSwitch(el, key){
     el.classList.toggle('on');
     scheduleRender();
-    sendState(); // Envia IMEDIATAMENTE sem delay
+    sendState(); // Envia IMEDIATAMENTE sem delay/debounce
 }
 
 // ============================================
-// COLOR PICKER (CURSOR CUSTOM + SMOOTH)
+// COLOR PICKER (CURSOR CUSTOM + SMOOTH + TEMPO REAL)
 // ============================================
 let cpTarget = null;
 let cpH = 0, cpS = 1, cpV = 1, cpA = 1;
@@ -429,7 +427,11 @@ svEl.addEventListener('mousedown', e => { e.preventDefault(); dSV = true; doSV(e
 hueTr.addEventListener('mousedown', e => { e.preventDefault(); dH = true; doH(e); });
 aTr.addEventListener('mousedown', e => { e.preventDefault(); dA = true; doA(e); });
 
-document.addEventListener('mousemove', e => { if(dSV) doSV(e); if(dH) doH(e); if(dA) doA(e); });
+document.addEventListener('mousemove', e => { 
+    if(dSV) doSV(e); 
+    if(dH) doH(e); 
+    if(dA) doA(e); 
+});
 document.addEventListener('mouseup', () => { 
     const wasDragging = dSV || dH || dA;
     dSV = false; dH = false; dA = false; 
@@ -441,20 +443,23 @@ function doSV(e){
     cpS = clamp((e.clientX - r.left)/r.width, 0, 1);
     cpV = clamp(1 - (e.clientY - r.top)/r.height, 0, 1);
     svTX = cpS; svTY = 1 - cpV;
-    updateCP(); startAnim();
+    updateCP(); // Atualiza EM TEMPO REAL enquanto arrasta
+    startAnim();
 }
 function doH(e){
     const r = hueTr.getBoundingClientRect();
     cpH = clamp((e.clientY - r.top)/r.height, 0, 0.9999);
     hTY = cpH;
-    updateCP(); startAnim();
+    updateCP(); // Atualiza EM TEMPO REAL
+    startAnim();
 }
 function doA(e){
     const r = aTr.getBoundingClientRect();
     const height = r.height || 152;
     cpA = clamp(1 - (e.clientY - r.top)/height, 0, 1);
     aCY = 1 - cpA;
-    updateHandles(); updateCP();
+    updateHandles(); 
+    updateCP(); // Atualiza EM TEMPO REAL
 }
 
 // Touch support
@@ -643,16 +648,15 @@ function renderPreview(){
         ctx.globalAlpha = 1;
     }
     
-    // Healthbar ESP (ESTÁTICO - SEM ANIMAÇÃO)
+    // Healthbar ESP (ESTÁTICO - SEM ANIMAÇÃO DE PULSO)
     if(isHp){
         const bw = 6, bx = bX - 12;
-        // Remove a animação de pulso, deixa fixo em 100%
         
         ctx.fillStyle = 'rgba(15,15,15,0.8)';
         ctx.fillRect(bx, bY, bw, bH);
         
         ctx.fillStyle = document.getElementById('sw-healthbarcolor').style.backgroundColor || '#00ff00';
-        ctx.fillRect(bx, bY, bw, bH); // Desenha a barra cheia
+        ctx.fillRect(bx, bY, bw, bH); // Barra cheia e estática
     }
     
     ctx.restore();
