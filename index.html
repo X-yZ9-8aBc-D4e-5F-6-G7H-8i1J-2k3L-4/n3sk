@@ -58,7 +58,7 @@
         .row:last-child{border-bottom:none}
         .row span{font-size:12px;color:var(--text)}
         
-        /* TOGGLES - SMOOTH & BLINDADO */
+        /* TOGGLES - SMOOTH & BLINDADO CONTRA BUG */
         .tgl{width:46px;height:26px;background:#2a2a2a;border-radius:99px;position:relative;border:1.5px solid #444;transition:all 0.2s cubic-bezier(0.4,0,0.2,1);cursor:pointer;flex-shrink:0}
         .tgl.on{background:var(--red);border-color:#ff6b6b;box-shadow:0 0 8px rgba(199,48,48,0.4)}
         .tgl::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:2px;left:2px;transition:all 0.2s cubic-bezier(0.4,0,0.2,1);box-shadow:0 1px 3px rgba(0,0,0,0.5)}
@@ -72,51 +72,17 @@
         .preview-panel{width:420px;flex-shrink:0;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
         .preview-canvas{flex:1;background:#050505;width:100%;display:block}
         
-        /* QR MODAL - CENTRALIZADO E BONITO */
-        #qr-modal{
-            display:none;
-            position:fixed;
-            inset:0;
-            background:rgba(0,0,0,0.9);
-            align-items:center;
-            justify-content:center;
-            z-index:99998;
-            backdrop-filter:blur(8px);
-        }
+        /* QR MODAL - MELHORADO */
+        #qr-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);align-items:center;justify-content:center;z-index:99998;backdrop-filter:blur(10px)}
         #qr-modal.active{display:flex}
-        .qr-box{
-            background:#111;
-            padding:40px;
-            border-radius:20px;
-            border:1.5px solid var(--red);
-            text-align:center;
-            box-shadow:0 0 40px rgba(199,48,48,0.3), 0 20px 60px rgba(0,0,0,0.8);
-            min-width:300px;
-            animation:popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes popIn{from{transform:scale(0.8);opacity:0}to{transform:scale(1);opacity:1}}
-        .qr-box h2{color:var(--red);margin-bottom:10px;letter-spacing:2px;font-size:24px}
-        .qr-box p{color:#aaa;font-size:13px;margin-bottom:20px}
-        .qr-box #qrcode{
-            background:#fff;
-            padding:15px;
-            border-radius:12px;
-            margin:0 auto 20px auto;
-            display:inline-block;
-            box-shadow:0 4px 15px rgba(0,0,0,0.5);
-        }
-        .qr-close{
-            background:var(--red);
-            color:#fff;
-            border:none;
-            padding:10px 30px;
-            border-radius:8px;
-            font-weight:700;
-            cursor:pointer;
-            transition:all 0.2s;
-            letter-spacing:1px;
-        }
-        .qr-close:hover{background:#ff6b6b;transform:translateY(-2px);box-shadow:0 4px 12px rgba(199,48,48,0.4)}
+        .qr-box{background:linear-gradient(135deg, rgba(30,30,30,0.95) 0%, rgba(20,20,20,0.95) 100%);padding:60px 50px;border-radius:25px;border:2px solid var(--red);text-align:center;box-shadow:0 25px 100px rgba(199,48,48,0.2),0 0 60px rgba(199,48,48,0.1);animation:qrPop 0.3s cubic-bezier(0.34,1.56,0.64,1);max-width:420px;width:90%}
+        @keyframes qrPop{from{opacity:0;transform:scale(0.8)}to{opacity:1;transform:scale(1)}}
+        .qr-box h2{color:var(--red);margin-bottom:8px;letter-spacing:3px;font-size:24px;text-transform:uppercase;text-shadow:0 0 20px rgba(199,48,48,0.3)}
+        .qr-box p{color:#aaa;font-size:13px;margin-bottom:30px;letter-spacing:0.5px}
+        .qr-box #qrcode{background:linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);padding:20px;border-radius:16px;margin:0 auto;display:inline-block;min-height:240px;min-width:240px;box-shadow:0 10px 40px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.3);border:2px solid rgba(255,255,255,0.1)}
+        .qr-close{background:linear-gradient(135deg, var(--red) 0%, #ff5555 100%);color:#fff;border:none;padding:12px 40px;border-radius:10px;font-weight:700;cursor:pointer;margin-top:25px;transition:all 0.3s;text-transform:uppercase;letter-spacing:1px;font-size:12px;box-shadow:0 8px 20px rgba(199,48,48,0.3)}
+        .qr-close:hover{background:linear-gradient(135deg, #ff5555 0%, #ff7777 100%);transform:translateY(-2px);box-shadow:0 12px 30px rgba(199,48,48,0.4)}
+        .qr-close:active{transform:translateY(0)}
         
         /* COLOR PICKER OVERLAY */
         .cp-ol{display:none;position:fixed;inset:0;z-index:9000}
@@ -126,14 +92,14 @@
         .sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent)}
         .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,#000)}
         /* SMOOTH NAS BOLINHAS DO COLOR PICKER */
-        .sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,0.7);transition:left 0.05s linear,top 0.05s linear}
+        .sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,0.7);transition:all 0.08s cubic-bezier(0.25,0.46,0.45,0.94)}
         .bars{display:flex;gap:8px}
         .btr{position:relative;width:14px;height:152px;border-radius:99px;overflow:visible;border:1px solid #222;cursor:none}
         .bin{position:absolute;inset:0;border-radius:99px;overflow:hidden}
         .bh{width:100%;height:100%;background:linear-gradient(to bottom,#f00 0%,#ff0 17%,#0f0 33%,#0ff 50%,#00f 67%,#f0f 83%,#f00 100%)}
         .bck{width:100%;height:100%;background:repeating-conic-gradient(#555 0% 25%,#333 0% 50%) 0 0/8px 8px}
         .bag{position:absolute;inset:0;border-radius:99px;pointer-events:none}
-        .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,0.6);pointer-events:none;z-index:10;transition:top 0.05s linear}
+        .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,0.6);pointer-events:none;z-index:10;transition:all 0.08s cubic-bezier(0.25,0.46,0.45,0.94)}
         
         /* MOBILE RESPONSIVE */
         @media(max-width:900px){
@@ -192,6 +158,7 @@
     <!-- SIDEBAR -->
     <div class="sidebar">
         <div class="profile-card">
+            <!-- IMAGEM PROFILE CORRIGIDA -->
             <img src="https://i.pinimg.com/474x/ff/c1/a5/ffc1a5f503e31b814ff8953ec6f50c7c.jpg" class="profile-img" alt="Profile">
             <div class="profile-info">
                 <div class="profile-name">n3sk</div>
@@ -318,13 +285,16 @@ function showLoginError(msg){
 // TOGGLES (BLINDADO CONTRA BUG)
 // ============================================
 function toggleSwitch(el, key){
+    // Trava visual imediata
     el.classList.toggle('on');
     scheduleRender();
+    
+    // Envia estado imediatamente
     sendState();
 }
 
 // ============================================
-// COLOR PICKER (TEMPO REAL + SMOOTH)
+// COLOR PICKER (CURSOR CUSTOM + SMOOTH + TEMPO REAL MELHORADO)
 // ============================================
 let cpTarget = null;
 let cpH = 0, cpS = 1, cpV = 1, cpA = 1;
@@ -431,7 +401,7 @@ function updateCP(){
     
     if(cpTarget){
         cpTarget.style.background = hex;
-        scheduleRender(); // Atualiza preview EM TEMPO REAL
+        scheduleRender();
     }
 }
 
@@ -445,7 +415,7 @@ function updateHandles(){
 }
 
 function runAnim(){
-    const sp = 0.3; 
+    const sp = 0.25; 
     svCX += (svTX - svCX) * sp;
     svCY += (svTY - svCY) * sp;
     hCY += (hTY - hCY) * sp;
@@ -483,6 +453,7 @@ function doSV(e){
     updateCP(); // Atualiza EM TEMPO REAL enquanto arrasta
     startAnim();
 }
+
 function doH(e){
     const r = hueTr.getBoundingClientRect();
     cpH = clamp((e.clientY - r.top)/r.height, 0, 0.9999);
@@ -490,6 +461,7 @@ function doH(e){
     updateCP(); // Atualiza EM TEMPO REAL
     startAnim();
 }
+
 function doA(e){
     const r = aTr.getBoundingClientRect();
     const height = r.height || 152;
@@ -528,6 +500,7 @@ async function startSync(){
 async function sendState(){
     if(!sessionId) return;
     
+    // Bloqueia o sync temporariamente para evitar conflito visual
     isUpdatingLocally = true;
     setTimeout(() => { isUpdatingLocally = false; }, 300);
 
@@ -550,6 +523,7 @@ async function sendState(){
 }
 
 function applyState(s){
+    // Se estivermos atualizando localmente, ignora o sync para não causar glitch
     if(isUpdatingLocally) return;
 
     setConn(true);
@@ -606,7 +580,7 @@ function showQR(){
 function closeQR(){ document.getElementById('qr-modal').classList.remove('active'); }
 
 // ============================================
-// PREVIEW CANVAS
+// PREVIEW CANVAS (HEALTHBAR ESTÁTICO)
 // ============================================
 const canvas = document.getElementById('cvs');
 const ctx = canvas.getContext('2d', {alpha:false});
@@ -662,6 +636,7 @@ function renderPreview(){
     const bX = (canvasWidth - bW) / 2;
     const bY = (canvasHeight - bH) / 2 + 20;
     
+    // Box ESP
     targetBoxOpacity = isBox ? 1 : 0;
     boxOpacity = lerp(boxOpacity, targetBoxOpacity, 0.1);
     
@@ -690,6 +665,7 @@ function renderPreview(){
         ctx.globalAlpha = 1;
     }
     
+    // Healthbar ESP (ESTÁTICO - SEM ANIMAÇÃO DE PULSO)
     if(isHp){
         const bw = 6, bx = bX - 12;
         
@@ -697,7 +673,7 @@ function renderPreview(){
         ctx.fillRect(bx, bY, bw, bH);
         
         ctx.fillStyle = document.getElementById('sw-healthbarcolor').style.backgroundColor || '#00ff00';
-        ctx.fillRect(bx, bY, bw, bH);
+        ctx.fillRect(bx, bY, bw, bH); // Barra cheia e estática
     }
     
     ctx.restore();
