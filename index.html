@@ -58,121 +58,36 @@
         .row:last-child{border-bottom:none}
         .row span{font-size:12px;color:var(--text)}
         
-        /* TOGGLES - SMOOTH & BLINDADO */
+        /* TOGGLES */
         .tgl{width:46px;height:26px;background:#2a2a2a;border-radius:99px;position:relative;border:1.5px solid #444;transition:all 0.2s cubic-bezier(0.4,0,0.2,1);cursor:pointer;flex-shrink:0}
         .tgl.on{background:var(--red);border-color:#ff6b6b;box-shadow:0 0 8px rgba(199,48,48,0.4)}
         .tgl::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:2px;left:2px;transition:all 0.2s cubic-bezier(0.4,0,0.2,1);box-shadow:0 1px 3px rgba(0,0,0,0.5)}
         .tgl.on::after{left:22px}
         
-        /* COLOR SWATCHES */
-        .sw{width:36px;height:24px;border-radius:4px;border:1.5px solid #555;cursor:pointer;transition:transform 0.2s;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.3)}
-        .sw:active{transform:scale(0.9)}
+        /* COLOR SWATCHES (SVG BASED LIKE C# CODE) */
+        .sw-container {
+            width: 36px; height: 24px; flex-shrink: 0; border-radius: 4px; overflow: hidden;
+            border: 1.5px solid #555; position: relative; cursor: pointer; isolation: isolate;
+        }
+        .sw-svg { width: 100%; height: 100%; display: block; mix-blend-mode: normal !important; }
         
         /* PREVIEW PANEL */
         .preview-panel{width:420px;flex-shrink:0;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
         .preview-canvas{flex:1;background:#050505;width:100%;display:block}
         
-        /* QR MODAL - MELHORADO E CENTRALIZADO */
-        #qr-modal{
-            display:none;
-            position:fixed;
-            inset:0;
-            background:rgba(0,0,0,0.95);
-            align-items:center;
-            justify-content:center;
-            z-index:99998;
-            backdrop-filter:blur(12px);
-        }
+        /* QR MODAL */
+        #qr-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);align-items:center;justify-content:center;z-index:99998;backdrop-filter:blur(12px)}
         #qr-modal.active{display:flex}
-        .qr-box{
-            background:linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
-            padding:60px;
-            border-radius:25px;
-            border:2px solid var(--red);
-            text-align:center;
-            box-shadow:0 0 60px rgba(199,48,48,0.5), 0 0 120px rgba(199,48,48,0.2), 0 20px 60px rgba(0,0,0,0.9);
-            min-width:380px;
-            animation:popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position:relative;
-            overflow:hidden;
-        }
-        .qr-box::before{
-            content:'';
-            position:absolute;
-            top:-50%;
-            right:-50%;
-            width:300px;
-            height:300px;
-            background:radial-gradient(circle, rgba(199,48,48,0.1) 0%, transparent 70%);
-            pointer-events:none;
-        }
-        .qr-box::after{
-            content:'';
-            position:absolute;
-            bottom:-50%;
-            left:-50%;
-            width:300px;
-            height:300px;
-            background:radial-gradient(circle, rgba(199,48,48,0.1) 0%, transparent 70%);
-            pointer-events:none;
-        }
+        .qr-box{background:linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);padding:60px;border-radius:25px;border:2px solid var(--red);text-align:center;box-shadow:0 0 60px rgba(199,48,48,0.5), 0 0 120px rgba(199,48,48,0.2), 0 20px 60px rgba(0,0,0,0.9);min-width:380px;animation:popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);position:relative;overflow:hidden}
+        .qr-box::before{content:'';position:absolute;top:-50%;right:-50%;width:300px;height:300px;background:radial-gradient(circle, rgba(199,48,48,0.1) 0%, transparent 70%);pointer-events:none}
+        .qr-box::after{content:'';position:absolute;bottom:-50%;left:-50%;width:300px;height:300px;background:radial-gradient(circle, rgba(199,48,48,0.1) 0%, transparent 70%);pointer-events:none}
         @keyframes popIn{from{transform:scale(0.7);opacity:0}to{transform:scale(1);opacity:1}}
-        .qr-box h2{
-            color:var(--red);
-            margin-bottom:15px;
-            letter-spacing:3px;
-            font-size:28px;
-            font-weight:800;
-            text-transform:uppercase;
-            position:relative;
-            z-index:1;
-        }
-        .qr-box p{
-            color:#aaa;
-            font-size:14px;
-            margin-bottom:30px;
-            position:relative;
-            z-index:1;
-            font-weight:500;
-        }
-        .qr-box #qrcode{
-            background:#fff;
-            padding:20px;
-            border-radius:15px;
-            margin:0 auto 30px auto;
-            display:inline-block;
-            box-shadow:0 8px 32px rgba(199,48,48,0.3), 0 0 20px rgba(199,48,48,0.1);
-            position:relative;
-            z-index:1;
-            border:3px solid var(--red);
-        }
-        .qr-buttons{
-            display:flex;
-            gap:15px;
-            justify-content:center;
-            position:relative;
-            z-index:1;
-        }
-        .qr-close{
-            background:linear-gradient(135deg, var(--red) 0%, #ff4444 100%);
-            color:#fff;
-            border:none;
-            padding:12px 40px;
-            border-radius:10px;
-            font-weight:700;
-            cursor:pointer;
-            transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
-            letter-spacing:1px;
-            text-transform:uppercase;
-            font-size:12px;
-            box-shadow:0 4px 15px rgba(199,48,48,0.3);
-        }
-        .qr-close:hover{
-            background:linear-gradient(135deg, #ff4444 0%, var(--red) 100%);
-            transform:translateY(-3px);
-            box-shadow:0 8px 25px rgba(199,48,48,0.5);
-        }
-        .qr-close:active{transform:translateY(-1px)}
+        .qr-box h2{color:var(--red);margin-bottom:15px;letter-spacing:3px;font-size:28px;font-weight:800;text-transform:uppercase;position:relative;z-index:1}
+        .qr-box p{color:#aaa;font-size:14px;margin-bottom:30px;position:relative;z-index:1;font-weight:500}
+        .qr-box #qrcode{background:#fff;padding:20px;border-radius:15px;margin:0 auto 30px auto;display:inline-block;box-shadow:0 8px 32px rgba(199,48,48,0.3), 0 0 20px rgba(199,48,48,0.1);position:relative;z-index:1;border:3px solid var(--red)}
+        .qr-buttons{display:flex;gap:15px;justify-content:center;position:relative;z-index:1}
+        .qr-close{background:linear-gradient(135deg, var(--red) 0%, #ff4444 100%);color:#fff;border:none;padding:12px 40px;border-radius:10px;font-weight:700;cursor:pointer;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);letter-spacing:1px;text-transform:uppercase;font-size:12px;box-shadow:0 4px 15px rgba(199,48,48,0.3)}
+        .qr-close:hover{background:linear-gradient(135deg, #ff4444 0%, var(--red) 100%);transform:translateY(-3px);box-shadow:0 8px 25px rgba(199,48,48,0.5)}
         
         /* COLOR PICKER OVERLAY */
         .cp-ol{display:none;position:fixed;inset:0;z-index:9000}
@@ -182,7 +97,7 @@
         .sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent)}
         .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,#000)}
         
-        /* BOLINHAS DO COLOR PICKER - COM SMOOTH TRANSITION */
+        /* BOLINHAS DO COLOR PICKER - SMOOTH VIA JS (LERP) */
         .sv-th{
             position:absolute;
             width:13px; height:13px;
@@ -191,7 +106,7 @@
             transform:translate(-50%,-50%);
             pointer-events:none;
             box-shadow:0 0 8px rgba(255,255,255,0.6), 0 0 0 1.5px rgba(0,0,0,0.7);
-            transition:all 0.08s cubic-bezier(0.4,0,0.2,1);
+            /* Removemos transition CSS aqui pois o JS controla o movimento suavemente */
         }
         
         .bars{display:flex;gap:8px}
@@ -201,7 +116,7 @@
         .bck{width:100%;height:100%;background:repeating-conic-gradient(#555 0% 25%,#333 0% 50%) 0 0/8px 8px}
         .bag{position:absolute;inset:0;border-radius:99px;pointer-events:none}
         
-        /* BOLINHA ALPHA/HUE - COM SMOOTH TRANSITION */
+        /* BOLINHA ALPHA/HUE - SMOOTH VIA JS (LERP) */
         .bth{
             position:absolute;
             left:50%;
@@ -213,7 +128,7 @@
             box-shadow:0 0 8px rgba(255,255,255,0.6), 0 0 0 1.5px rgba(0,0,0,0.6);
             pointer-events:none;
             z-index:10;
-            transition:all 0.08s cubic-bezier(0.4,0,0.2,1);
+            /* Removemos transition CSS aqui pois o JS controla o movimento suavemente */
         }
         
         /* MOBILE RESPONSIVE */
@@ -301,10 +216,11 @@
         </div>
         <div class="panel">
             <div class="ph">ESP COLORS</div>
-            <div class="row"><span>Box color</span><div class="sw" id="sw-boxcolor" onclick="openColorPicker(this,'#ff0000')" style="background:#ff0000"></div></div>
-            <div class="row"><span>Skeleton color</span><div class="sw" id="sw-skeletoncolor" onclick="openColorPicker(this,'#ffffff')" style="background:#ffffff"></div></div>
-            <div class="row"><span>Snapline color</span><div class="sw" id="sw-snaplinecolor" onclick="openColorPicker(this,'#00ff00')" style="background:#00ff00"></div></div>
-            <div class="row"><span>Healthbar color</span><div class="sw" id="sw-healthbarcolor" onclick="openColorPicker(this,'#00ff00')" style="background:#00ff00"></div></div>
+            <!-- Usando SVG Inline como no código C# para precisão de cor -->
+            <div class="row"><span>Box color</span><div class="sw-container" id="sw-boxcolor" onclick="openColorPicker(this)" data-k="boxcolor"><svg class="sw-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><rect width="100" height="100" fill="#ff0000"/></svg></div></div>
+            <div class="row"><span>Skeleton color</span><div class="sw-container" id="sw-skeletoncolor" onclick="openColorPicker(this)" data-k="skeletoncolor"><svg class="sw-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><rect width="100" height="100" fill="#ffffff"/></svg></div></div>
+            <div class="row"><span>Snapline color</span><div class="sw-container" id="sw-snaplinecolor" onclick="openColorPicker(this)" data-k="snaplinecolor"><svg class="sw-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><rect width="100" height="100" fill="#00ff00"/></svg></div></div>
+            <div class="row"><span>Healthbar color</span><div class="sw-container" id="sw-healthbarcolor" onclick="openColorPicker(this)" data-k="healthbarcolor"><svg class="sw-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><rect width="100" height="100" fill="#00ff00"/></svg></div></div>
         </div>
     </div>
 
@@ -328,22 +244,19 @@ const PREVIEW_IMG_URL = 'https://media.discordapp.net/attachments/11843230479315
 let sessionId = null;
 let isGlobal = false;
 let bgImage = null;
-let isUpdatingLocally = false; // TRAVA PARA EVITAR BUG DE TOGGLE
+let isUpdatingLocally = false;
 
 // ============================================
-// CURSOR (INICIA IMEDIATAMENTE)
+// CURSOR
 // ============================================
 (function(){
     const cur = document.getElementById('cur');
     if(!cur || window.innerWidth <= 900) return; 
-    
     let mx = window.innerWidth/2, my = window.innerHeight/2;
     let cx = mx, cy = my;
-    
     document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; }, {passive:true});
     document.addEventListener('mousedown', () => cur.classList.add('ck'));
     document.addEventListener('mouseup', () => cur.classList.remove('ck'));
-    
     function loop(){
         cx += (mx-cx)*0.15;
         cy += (my-cy)*0.15;
@@ -399,7 +312,7 @@ function showLoginError(msg){
 }
 
 // ============================================
-// TOGGLES (BLINDADO CONTRA BUG)
+// TOGGLES
 // ============================================
 function toggleSwitch(el, key){
     el.classList.toggle('on');
@@ -408,12 +321,20 @@ function toggleSwitch(el, key){
 }
 
 // ============================================
-// COLOR PICKER (TEMPO REAL + SMOOTH MATEMÁTICO)
+// COLOR PICKER COM EFEITO SMOOTH (LERP)
 // ============================================
 let cpTarget = null;
 let cpH = 0, cpS = 1, cpV = 1, cpA = 1;
+
+// Posições Alvo (onde o mouse está)
 let svTX = 1, svTY = 0;
 let hTY = 0, aTY = 0;
+
+// Posições Atuais (onde a bolinha está visualmente)
+let svCX = 1, svCY = 0;
+let hCY = 0, aCY = 0;
+
+let animRun = false;
 
 const cpOl = document.getElementById('cpOl');
 const cpBox = document.getElementById('cpBox');
@@ -425,7 +346,44 @@ const aTr = document.getElementById('aTr');
 const aGr = document.getElementById('aGr');
 const aTh = document.getElementById('aTh');
 
-function openColorPicker(el, defaultColor){
+// Função de Interpolação Linear (A mágica do Smooth)
+function lerp(a, b, t) { return a + (b - a) * t; }
+
+// Loop de Animação
+function runAnim(){
+    const sp = 0.28; // Fator de suavização (igual ao código C#)
+    
+    svCX = lerp(svCX, svTX, sp);
+    svCY = lerp(svCY, svTY, sp);
+    hCY = lerp(hCY, hTY, sp);
+    // Alpha não precisa de lerp complexo, mas podemos adicionar se quiser
+    
+    // Aplica as posições interpoladas
+    svTh.style.left = (svCX * 100) + '%';
+    svTh.style.top = (svCY * 100) + '%';
+    
+    const hH = 152; // Altura fixa definida no CSS
+    const aH = 152;
+    
+    hueTh.style.top = (hCY * hH) + 'px';
+    aTh.style.top = (aCY * aH) + 'px';
+    
+    // Continua a animação se ainda houver diferença significativa
+    if(Math.abs(svCX - svTX) > 0.0005 || Math.abs(svCY - svTY) > 0.0005 || Math.abs(hCY - hTY) > 0.0005){
+        requestAnimationFrame(runAnim);
+    } else {
+        animRun = false;
+    }
+}
+
+function startAnim(){
+    if(!animRun){
+        animRun = true;
+        requestAnimationFrame(runAnim);
+    }
+}
+
+function openColorPicker(el){
     cpTarget = el;
     const rect = el.getBoundingClientRect();
     
@@ -439,27 +397,30 @@ function openColorPicker(el, defaultColor){
     cpBox.style.left = left + 'px';
     cpBox.style.top = top + 'px';
     
-    const currentColor = el.style.backgroundColor || defaultColor;
-    const hex = rgbToHex(currentColor);
-    const hsv = hexToHsv(hex);
+    // Pega a cor atual do SVG
+    const svgRect = el.querySelector('rect');
+    const currentColor = svgRect ? svgRect.getAttribute('fill') : '#ff0000';
+    
+    const hsv = hexToHsv(currentColor);
     cpH = hsv[0]; cpS = hsv[1]; cpV = hsv[2]; cpA = 1;
     
-    svTX = cpS;
-    svTY = 1 - cpV;
-    hTY = cpH;
-    aTY = 1 - cpA;
+    // Define posições alvo E atuais (para iniciar sem pulo)
+    svTX = cpS; svCX = cpS;
+    svTY = 1 - cpV; svCY = 1 - cpV;
+    hTY = cpH; hCY = cpH;
+    aTY = 1 - cpA; aCY = 1 - cpA;
     
     updateCP();
-    updateHandles();
+    // Força atualização inicial das posições
+    svTh.style.left = (svCX*100)+'%';
+    svTh.style.top = (svCY*100)+'%';
+    hueTh.style.top = (hCY*152)+'px';
+    aTh.style.top = (aCY*152)+'px';
+    
     cpOl.classList.add('open');
 }
 
-function rgbToHex(rgb){
-    if(rgb.startsWith('#')) return rgb.length === 7 ? rgb : '#ff0000';
-    const values = rgb.match(/\d+/g);
-    if(!values) return '#ff0000';
-    return '#' + values.slice(0,3).map(x => parseInt(x).toString(16).padStart(2,'0')).join('');
-}
+function rgbToHex(r,g,b){ return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join(''); }
 
 function hexToHsv(hex){
     const r = parseInt(hex.slice(1,3),16)/255;
@@ -497,13 +458,11 @@ function hsvToRgb(h,s,v){
     return [Math.round(r*255), Math.round(g*255), Math.round(b*255)];
 }
 
-function rgbToHex2(r,g,b){ return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join(''); }
-
 function updateCP(){
     const rgb = hsvToRgb(cpH, cpS, cpV);
-    const hex = rgbToHex2(rgb[0], rgb[1], rgb[2]);
+    const hex = rgbToHex(rgb[0], rgb[1], rgb[2]);
     const hRgb = hsvToRgb(cpH, 1, 1);
-    const hHex = rgbToHex2(hRgb[0], hRgb[1], hRgb[2]);
+    const hHex = rgbToHex(hRgb[0], hRgb[1], hRgb[2]);
     
     svEl.style.background = hHex;
     svTh.style.background = hex;
@@ -512,45 +471,36 @@ function updateCP(){
     aTh.style.background = 'rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+','+cpA+')';
     
     if(cpTarget){
-        cpTarget.style.background = hex;
+        // Atualiza o SVG da cor selecionada
+        const rect = cpTarget.querySelector('rect');
+        if(rect) rect.setAttribute('fill', hex);
         scheduleRender(); // Atualiza preview EM TEMPO REAL
     }
-}
-
-function updateHandles(){
-    svTh.style.left = (svTX*100)+'%';
-    svTh.style.top = (svTY*100)+'%';
-    const hH = hueTr.getBoundingClientRect().height || 152;
-    const aH = aTr.getBoundingClientRect().height || 152;
-    hueTh.style.top = (hTY*hH)+'px';
-    aTh.style.top = (aTY*aH)+'px';
 }
 
 function clamp(v,a,b){ return Math.max(a, Math.min(b,v)); }
 
 // Event Listeners Color Picker
 cpOl.addEventListener('mousedown', e => { if(e.target === cpOl){ cpOl.classList.remove('open'); sendState(); } });
-svEl.addEventListener('mousedown', e => { e.preventDefault(); doSV(e); });
-hueTr.addEventListener('mousedown', e => { e.preventDefault(); doH(e); });
-aTr.addEventListener('mousedown', e => { e.preventDefault(); doA(e); });
+
+// Drag Logic
+let dSV=false, dH=false, dA=false;
+
+svEl.addEventListener('mousedown', e => { e.preventDefault(); dSV=true; doSV(e); });
+hueTr.addEventListener('mousedown', e => { e.preventDefault(); dH=true; doH(e); });
+aTr.addEventListener('mousedown', e => { e.preventDefault(); dA=true; doA(e); });
 
 document.addEventListener('mousemove', e => { 
-    if(svEl.dataset.dragging) doSV(e); 
-    if(hueTr.dataset.dragging) doH(e); 
-    if(aTr.dataset.dragging) doA(e); 
+    if(dSV) doSV(e); 
+    if(dH) doH(e); 
+    if(dA) doA(e); 
 });
 
 document.addEventListener('mouseup', () => { 
-    const wasDragging = svEl.dataset.dragging || hueTr.dataset.dragging || aTr.dataset.dragging;
-    delete svEl.dataset.dragging;
-    delete hueTr.dataset.dragging;
-    delete aTr.dataset.dragging;
+    const wasDragging = dSV || dH || dA;
+    dSV=false; dH=false; dA=false; 
     if(wasDragging) sendState(); 
 });
-
-svEl.addEventListener('mousedown', () => { svEl.dataset.dragging = true; });
-hueTr.addEventListener('mousedown', () => { hueTr.dataset.dragging = true; });
-aTr.addEventListener('mousedown', () => { aTr.dataset.dragging = true; });
 
 function doSV(e){
     const r = svEl.getBoundingClientRect();
@@ -559,50 +509,47 @@ function doSV(e){
     svTX = cpS;
     svTY = 1 - cpV;
     updateCP();
-    updateHandles();
+    startAnim(); // Inicia o loop suave
 }
 
 function doH(e){
     const r = hueTr.getBoundingClientRect();
-    cpH = clamp((e.clientY - r.top)/r.height, 0, 0.9999);
+    cpH = clamp((e.clientY - r.top)/152, 0, 0.9999); // Usa altura fixa
     hTY = cpH;
     updateCP();
-    updateHandles();
+    startAnim();
 }
 
 function doA(e){
     const r = aTr.getBoundingClientRect();
-    const height = r.height || 152;
-    cpA = clamp(1 - (e.clientY - r.top)/height, 0, 1);
-    aTY = 1 - cpA;
-    updateHandles();
+    cpA = clamp(1 - (e.clientY - r.top)/152, 0, 1);
+    aCY = 1 - cpA; // Alpha pode ser direto ou ter lerp leve
+    aTh.style.top = (aCY * 152) + 'px';
     updateCP();
 }
 
 // Touch support
 function tm(e){ return {clientX:e.touches[0].clientX, clientY:e.touches[0].clientY}; }
-svEl.addEventListener('touchstart', e => { e.preventDefault(); svEl.dataset.dragging=true; doSV(tm(e)); }, {passive:false});
-hueTr.addEventListener('touchstart', e => { e.preventDefault(); hueTr.dataset.dragging=true; doH(tm(e)); }, {passive:false});
-aTr.addEventListener('touchstart', e => { e.preventDefault(); aTr.dataset.dragging=true; doA(tm(e)); }, {passive:false});
+svEl.addEventListener('touchstart', e => { e.preventDefault(); dSV=true; doSV(tm(e)); }, {passive:false});
+hueTr.addEventListener('touchstart', e => { e.preventDefault(); dH=true; doH(tm(e)); }, {passive:false});
+aTr.addEventListener('touchstart', e => { e.preventDefault(); dA=true; doA(tm(e)); }, {passive:false});
 document.addEventListener('touchmove', e => { 
-    if(svEl.dataset.dragging||hueTr.dataset.dragging||aTr.dataset.dragging){ 
+    if(dSV||dH||dA){ 
         e.preventDefault(); 
         const m=tm(e); 
-        if(svEl.dataset.dragging)doSV(m); 
-        if(hueTr.dataset.dragging)doH(m); 
-        if(aTr.dataset.dragging)doA(m); 
+        if(dSV)doSV(m); 
+        if(dH)doH(m); 
+        if(dA)doA(m); 
     } 
 }, {passive:false});
 document.addEventListener('touchend', () => { 
-    const wasDragging = svEl.dataset.dragging || hueTr.dataset.dragging || aTr.dataset.dragging;
-    delete svEl.dataset.dragging;
-    delete hueTr.dataset.dragging;
-    delete aTr.dataset.dragging;
+    const wasDragging = dSV || dH || dA;
+    dSV=false; dH=false; dA=false; 
     if(wasDragging) sendState(); 
 });
 
 // ============================================
-// SYNC & STATE (ZERO DELAY + PROTEÇÃO)
+// SYNC & STATE
 // ============================================
 async function startSync(){
     setInterval(async () => {
@@ -619,6 +566,13 @@ async function sendState(){
     isUpdatingLocally = true;
     setTimeout(() => { isUpdatingLocally = false; }, 300);
 
+    // Helper para pegar cor do SVG
+    const getSvgColor = (id) => {
+        const el = document.getElementById(id);
+        const rect = el ? el.querySelector('rect') : null;
+        return rect ? rect.getAttribute('fill') : '#ffffff';
+    };
+
     const state = {
         toggles: {
             box: document.getElementById('tgl-box').classList.contains('on'),
@@ -627,10 +581,10 @@ async function sendState(){
             healthbar: document.getElementById('tgl-healthbar').classList.contains('on')
         },
         colors: {
-            boxcolor: rgbToHex(document.getElementById('sw-boxcolor').style.backgroundColor),
-            skeletoncolor: rgbToHex(document.getElementById('sw-skeletoncolor').style.backgroundColor),
-            snaplinecolor: rgbToHex(document.getElementById('sw-snaplinecolor').style.backgroundColor),
-            healthbarcolor: rgbToHex(document.getElementById('sw-healthbarcolor').style.backgroundColor)
+            boxcolor: getSvgColor('sw-boxcolor'),
+            skeletoncolor: getSvgColor('sw-skeletoncolor'),
+            snaplinecolor: getSvgColor('sw-snaplinecolor'),
+            healthbarcolor: getSvgColor('sw-healthbarcolor')
         },
         alphas: { boxalpha: cpA, skeletonalpha: 1, snaplinealpha: 1, healthbaralpha: 1 }
     };
@@ -652,7 +606,10 @@ function applyState(s){
         const map = {boxcolor:'sw-boxcolor', skeletoncolor:'sw-skeletoncolor', snaplinecolor:'sw-snaplinecolor', healthbarcolor:'sw-healthbarcolor'};
         for(let k in map){
             const el = document.getElementById(map[k]);
-            if(el && s.colors[k]) el.style.background = s.colors[k];
+            if(el && s.colors[k]){
+                const rect = el.querySelector('rect');
+                if(rect) rect.setAttribute('fill', s.colors[k]);
+            }
         }
     }
     scheduleRender();
@@ -725,8 +682,6 @@ function scheduleRender(){
     }
 }
 
-function lerp(a,b,t){ return a + (b-a)*t; }
-
 function renderPreview(){
     renderScheduled = false;
     if(!canvasWidth || !canvasHeight) return;
@@ -755,7 +710,10 @@ function renderPreview(){
     
     if(boxOpacity > 0.01){
         ctx.globalAlpha = boxOpacity;
-        ctx.strokeStyle = document.getElementById('sw-boxcolor').style.backgroundColor || '#ff0000';
+        // Pega cor do SVG
+        const boxRect = document.getElementById('sw-boxcolor').querySelector('rect');
+        ctx.strokeStyle = boxRect ? boxRect.getAttribute('fill') : '#ff0000';
+        
         ctx.lineWidth = 2;
         const l = bW * 0.25;
         
@@ -780,11 +738,12 @@ function renderPreview(){
     
     if(isHp){
         const bw = 6, bx = bX - 12;
+        const hpRect = document.getElementById('sw-healthbarcolor').querySelector('rect');
         
         ctx.fillStyle = 'rgba(15,15,15,0.8)';
         ctx.fillRect(bx, bY, bw, bH);
         
-        ctx.fillStyle = document.getElementById('sw-healthbarcolor').style.backgroundColor || '#00ff00';
+        ctx.fillStyle = hpRect ? hpRect.getAttribute('fill') : '#00ff00';
         ctx.fillRect(bx, bY, bw, bH);
     }
     
