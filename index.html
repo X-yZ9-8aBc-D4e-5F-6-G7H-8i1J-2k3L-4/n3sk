@@ -78,26 +78,22 @@
         .tgl::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#ffffff;top:2px;left:2px;transition:all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);box-shadow:0 1px 4px rgba(0,0,0,.5)}
         .tgl.on::after{left:22px}
 
-        /* SWATCH SVG */
+        /* SWATCH SVG - IGUAL AO C# */
         .sw-container {
             width: 36px; height: 24px; flex-shrink: 0; border-radius: 4px; overflow: hidden;
             border: 1.5px solid #555; position: relative; cursor: pointer; isolation: isolate; 
         }
         .sw-svg { width: 100%; height: 100%; display: block; mix-blend-mode: normal !important; }
 
-        /* COLOR PICKER OVERLAY - ESTRUTURA CORRIGIDA */
+        /* COLOR PICKER OVERLAY - ESTRUTURA EXATA DO C# */
         .cp-ol{display:none;position:fixed;inset:0;z-index:9000} .cp-ol.open{display:block}
         .cp-box{position:fixed;background:#161616;border:1.5px solid var(--border);border-radius:10px;padding:12px;display:flex;gap:10px;align-items:flex-start;z-index:901;box-shadow:0 16px 48px rgba(0,0,0,.9);user-select:none;touch-action:none}
         
-        /* Container do seletor principal */
-        .sv{width:190px;height:152px;border-radius:5px;position:relative;overflow:hidden;flex-shrink:0;border:1px solid #222; background: #ff0000;} /* Fundo padrão vermelho */
-        
-        /* Gradientes sobrepostos para criar o efeito de cor */
-        .sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent); z-index: 1;}
-        .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,#000); z-index: 2;}
-        
-        /* Polegar do seletor */
-        .sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,.7),0 2px 5px rgba(0,0,0,.8); z-index: 3; transition: left 0.05s linear, top 0.05s linear;}
+        /* Removido z-index interno para evitar bugs de renderização no mobile */
+        .sv{width:190px;height:152px;border-radius:5px;position:relative;overflow:hidden;flex-shrink:0;border:1px solid #222; background: #ff0000;}
+        .sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent)}
+        .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,#000)}
+        .sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,.7),0 2px 5px rgba(0,0,0,.8); transition: left 0.05s linear, top 0.05s linear;}
         
         .bars{display:flex;gap:8px}
         .btr{position:relative;width:14px;height:152px;border-radius:99px;overflow:visible;flex-shrink:0;border:1px solid #222}
@@ -191,12 +187,7 @@
 <!-- COLOR PICKER OVERLAY -->
 <div class='cp-ol' id='cpOl'>
   <div class='cp-box' id='cpBox'>
-    <!-- Estrutura limpa para garantir renderização correta -->
-    <div class='sv' id='sv'>
-        <div class='sv-w'></div>
-        <div class='sv-b'></div>
-        <div class='sv-th' id='svTh'></div>
-    </div>
+    <div class='sv' id='sv'><div class='sv-w'></div><div class='sv-b'></div><div class='sv-th' id='svTh'></div></div>
     <div class='bars'>
       <div class='btr' id='hueTr'><div class='bin'><div class='bh'></div></div><div class='bth' id='hueTh'></div></div>
       <div class='btr' id='aTr'><div class='bin'><div class='bck'></div></div><div class='bag' id='aGr'></div><div class='bth' id='aTh'></div></div>
@@ -258,7 +249,7 @@ const client = supabase.createClient(SUPA_URL, SUPA_KEY);
 const PREVIEW_IMG_URL = 'https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png?ex=6a3dcbea&is=6a3c7a6a&hm=95ab23192fdc65d73e612fadc773aac107802e9a93602097a289073aabc498b2&=&format=webp&quality=lossless&width=800&height=968';
 
 let sessionId = null;
-let partnerId = null; // ID do parceiro (Main <-> Global)
+let partnerId = null;
 let isGlobal = false;
 let bgImage = null;
 let isUpdatingLocally = false; 
@@ -310,12 +301,9 @@ window.onload = async function(){
         sessionId = data.id;
         isGlobal = data.is_global;
         
-        // Define o ID parceiro para sincronização cruzada
         if(isGlobal) {
-            // Se estou no global, meu parceiro é o main (remove _GLOBAL)
             partnerId = sessionId.replace('_GLOBAL', '');
         } else {
-            // Se estou no main, meu parceiro é o global
             partnerId = sessionId + '_GLOBAL';
         }
 
@@ -398,16 +386,13 @@ function runAnim(){
 function startAnim(){if(!animRun){animRun=true;requestAnimationFrame(runAnim);}}
 
 function updateCP(){
-  // CORREÇÃO CRÍTICA:
-  // Para evitar que fique escuro no celular, forçamos o fundo (svEl) a ser sempre a cor MAIS BRILHANTE (S=1, V=1).
-  // Os gradientes branco e preto por cima fazem o trabalho de escurecer/clarear visualmente.
+  // CORREÇÃO MOBILE: Força o fundo a ser sempre a cor mais brilhante (S=1, V=1)
+  // Isso impede que o gradiente preto deixe tudo escuro no celular
   var hRgb=h2r(cpH,1,1); 
   var hHex=r2h(hRgb[0],hRgb[1],hRgb[2]);
   
-  // Aplica a cor pura como fundo base
   svEl.style.background=hHex;
   
-  // Calcula a cor atual do ponto selecionado apenas para o thumb e alpha
   var rgb=h2r(cpH,cpS,cpV);
   svTh.style.background=r2h(rgb[0],rgb[1],rgb[2]);
   
@@ -509,12 +494,10 @@ async function startSync(){
     setInterval(async () => {
         if(!sessionId) return;
         
-        // Busca estado do MEU ID e do PARCEIRO
         const {data, error} = await client.from('n3sk').select('state, is_active').in('id', [sessionId, partnerId]).limit(1);
         
         if(error || !data || data.length === 0) { location.reload(); return; }
         
-        // Pega o primeiro que tiver estado válido
         const validData = data.find(d => d.state);
         if(validData && validData.state) applyState(validData.state);
     }, 500);
@@ -541,14 +524,12 @@ async function sendState(){
 
     const jsonString = JSON.stringify(currentState);
     
-    // Só envia se algo mudou realmente
     if (jsonString !== lastSentState) {
         lastSentState = jsonString;
         
         isUpdatingLocally = true;
         setTimeout(() => { isUpdatingLocally = false; }, 500);
 
-        // ATUALIZA OS DOIS REGISTROS (MAIN E GLOBAL) PARA GARANTIR SINCRONIA
         await client.from('n3sk').update({state: currentState}).in('id', [sessionId, partnerId]);
     }
 }
@@ -595,7 +576,6 @@ function setConn(c){
 // QR CODE
 // ============================================
 function showGlobalQr(){
-    // Usa o partnerId que já calculamos no login
     const targetId = isGlobal ? sessionId : partnerId; 
     
     client.from('n3sk').select('token').eq('id', targetId).single()
@@ -610,19 +590,19 @@ function showGlobalQr(){
                 correctLevel: QRCode.CorrectLevel.H
             });
         } else {
-            alert("Erro ao gerar QR Global. Verifique se a sessão global foi criada.");
+            alert("Erro ao gerar QR Global.");
         }
     });
 }
 function closeGlobalQr(){ document.getElementById('qr-modal').classList.remove('active'); }
 
 // ============================================
-// PREVIEW CANVAS
+// PREVIEW CANVAS - HEALTH ESTÁTICA
 // ============================================
 var canvas = document.getElementById('espCanvas');
 var ctx = canvas.getContext('2d', { alpha: false });
 var canvasWidth = 0, canvasHeight = 0, renderScheduled = false;
-// Removido hpAnimTime pois a health será estática
+// REMOVIDO: hpAnimTime (saúde agora é estática)
 var boxOpacity = 0;
 var targetBoxOpacity = 0;
 
@@ -676,14 +656,14 @@ function renderPreview() {
 
   if (isHp) {
     var bw = 6, bx = bX - 12; 
-    // Health estática (sem animação de pulso)
-    var currentHpHeight = bH; // Fixo em 100% da altura
+    // SAÚDE ESTÁTICA: Altura fixa em 100% (bH) sem animação
+    var currentHpHeight = bH; 
     
     ctx.fillStyle = 'rgba(15,15,15,0.8)'; ctx.fillRect(bx, bY, bw, bH);
     ctx.fillStyle = hC; ctx.fillRect(bx, bY + (bH - currentHpHeight), bw, currentHpHeight);
   }
   ctx.restore();
-  // Remove a verificação de isHp do agendamento recursivo para parar a animação constante
+  // Remove verificação de isHp para parar re-renderização constante
   if (Math.abs(boxOpacity - targetBoxOpacity) > 0.01) scheduleRender();
 }
 </script>
