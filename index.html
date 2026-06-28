@@ -33,30 +33,7 @@
             font-size: 13px;
         }
 
-        /* TELA DE LOADING - IGUAL IMAGEM 5 */
-        #loading-screen {
-            position: fixed; inset: 0; background: #000; z-index: 10000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.5s ease;
-        }
-        .loader-ring {
-            width: 50px; height: 50px;
-            border: 3px solid #111;
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-        .loader-text {
-            color: #333;
-            font-size: 11px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            font-weight: 500;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* CURSOR CIRCULAR SEM BOLINHA DENTRO */
+        /* CURSOR CIRCULAR */
         #custom-cursor {
             position: fixed; top: 0; left: 0; width: 18px; height: 18px;
             border: 2px solid var(--primary);
@@ -69,6 +46,43 @@
         #custom-cursor.clicking {
             transform: translate(-50%, -50%) scale(0.65);
             border-color: #fff;
+        }
+
+        /* LOADING SCREEN - PULSANDO IGUAL IMAGEM 5 */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            gap: 20px;
+        }
+        .loading-ring {
+            width: 50px;
+            height: 50px;
+            border: 2px solid transparent;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite, pulse 2s ease-in-out infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; transform: scale(0.95); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+        .loading-text {
+            color: var(--primary);
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            animation: blink 2s ease-in-out infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
         }
 
         /* SIDEBAR */
@@ -129,11 +143,10 @@
             padding: 10px; background: #111; border-radius: 6px; border: 1.5px solid #333; margin-top: 10px;
         }
         .stat-dot { width: 10px; height: 10px; border-radius: 50%; background: #444; transition: all 0.3s; }
-        .stat-dot.on { background: #4ade80; box-shadow: 0 0 8px #4ade80; animation: pulse 2s infinite; }
+        .stat-dot.on { background: #4ade80; box-shadow: 0 0 8px #4ade80; animation: pulse-dot 2s infinite; }
         .stat-txt { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 1px; transition: color 0.3s; }
         .stat-txt.on { color: #4ade80; }
-
-        @keyframes pulse {
+        @keyframes pulse-dot {
             0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
             70% { box-shadow: 0 0 0 8px rgba(74, 222, 128, 0); }
             100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
@@ -188,6 +201,7 @@
         }
         .dropdown-btn:hover { border-color: #444; }
 
+        /* TOGGLE - TODOS COMEÇAM DESLIGADOS */
         .tgl {
             width: 46px; height: 26px; background: #2a2a2a; border-radius: 99px; position: relative;
             border: 1.5px solid #444; transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
@@ -202,13 +216,13 @@
         }
         .tgl.on::after { left: 22px; }
 
-        /* LIVE PREVIEW - TAMANHO CORRETO IGUAL IMAGEM 4 */
+        /* LIVE PREVIEW - TAMANHO PEQUENO E CORRETO */
         .live-preview-container {
             position: absolute;
             top: 60px;
             right: 24px;
-            width: 350px; /* TAMANHO AJUSTADO */
-            height: 550px; /* ALTURA AJUSTADA */
+            width: 280px;
+            height: 450px;
             background: var(--card);
             border: 1px solid var(--border);
             border-radius: 8px;
@@ -218,9 +232,9 @@
             z-index: 5;
         }
         .lp-header {
-            padding: 12px 16px;
+            padding: 10px 14px;
             border-bottom: 1px solid var(--border);
-            font-size: 11px;
+            font-size: 10px;
             color: var(--muted);
             font-weight: 600;
             letter-spacing: 0.5px;
@@ -228,11 +242,6 @@
             display: flex;
             align-items: center;
             gap: 8px;
-        }
-        .lp-header svg {
-            width: 14px;
-            height: 14px;
-            opacity: 0.7;
         }
         .lp-canvas-wrap { 
             flex: 1; 
@@ -254,7 +263,7 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* COLOR PICKER - IGUAL IMAGEM 3 (EXATAMENTE) */
+        /* COLOR PICKER - EXATAMENTE IGUAL IMAGEM 3 */
         .cp-overlay {
             display: none; 
             position: fixed; 
@@ -271,7 +280,7 @@
             background: #1a1a1a;
             border-radius: 12px;
             padding: 16px;
-            width: 340px;
+            width: 320px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.8);
             border: 1px solid #2a2a2a;
         }
@@ -317,7 +326,7 @@
         /* Área de Saturação - Quadrado Grande */
         .cp-saturation {
             width: 100%;
-            height: 220px;
+            height: 240px;
             border-radius: 8px;
             position: relative;
             overflow: hidden;
@@ -343,18 +352,10 @@
             transition: transform 0.05s;
         }
         
-        /* Controles Verticais e Horizontais */
-        .cp-controls {
-            display: flex;
-            gap: 12px;
-            align-items: stretch;
-            margin-bottom: 16px;
-        }
-        
-        /* Slider Hue - Vertical */
+        /* Slider Hue - Vertical à direita */
         .cp-hue-slider {
-            width: 20px;
-            height: 220px;
+            width: 24px;
+            height: 240px;
             border-radius: 8px;
             position: relative;
             cursor: pointer;
@@ -367,14 +368,15 @@
                 #ff00ff 83%, 
                 #ff0000 100%
             );
-            overflow: hidden;
+            float: right;
+            margin-left: 12px;
         }
         .cp-hue-handle {
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            width: 24px;
-            height: 8px;
+            width: 28px;
+            height: 10px;
             background: #fff;
             border: 2px solid #fff;
             border-radius: 4px;
@@ -382,16 +384,23 @@
             transition: top 0.05s;
         }
         
+        /* Container dos sliders */
+        .cp-sliders-container {
+            display: flex;
+            align-items: stretch;
+            margin-bottom: 16px;
+        }
+        
         /* Slider Alpha - Horizontal embaixo */
         .cp-alpha-container {
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 12px;
         }
         .cp-alpha-slider {
-            flex: 1;
-            height: 20px;
+            width: 100%;
+            height: 24px;
             border-radius: 8px;
             position: relative;
             cursor: pointer;
@@ -413,13 +422,13 @@
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             background: #fff;
             border: 3px solid #fff;
             border-radius: 50%;
             box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-            margin-left: -12px;
+            margin-left: -14px;
             transition: left 0.05s;
         }
         
@@ -431,6 +440,7 @@
             border-radius: 6px;
             padding: 10px 12px;
             border: 1px solid #2a2a2a;
+            clear: both;
         }
         .cp-hex-input {
             flex: 1;
@@ -505,13 +515,16 @@
 </head>
 <body>
 
-<!-- TELA DE LOADING - IGUAL IMAGEM 5 -->
+<!-- LOADING SCREEN - PULSANDO IGUAL IMAGEM 5 -->
 <div id="loading-screen">
-    <div class="loader-ring"></div>
-    <div class="loader-text">CONNECTING TO N3SK CORE...</div>
+    <div class="loading-ring"></div>
+    <div class="loading-text">CONNECTING TO N3SK CORE...</div>
 </div>
 
-<!-- COLOR PICKER OVERLAY - IGUAL IMAGEM 3 -->
+<!-- CUSTOM CURSOR -->
+<div id="custom-cursor"></div>
+
+<!-- COLOR PICKER - IGUAL IMAGEM 3 -->
 <div class="cp-overlay" id="cpOl">
     <div class="cp-box" id="cpBox">
         <div class="cp-header">
@@ -527,36 +540,34 @@
             </div>
         </div>
         
-        <!-- Área de Saturação Quadrada -->
-        <div class="cp-saturation" id="cpSaturation">
-            <div class="cp-sat-overlay"></div>
-            <div class="cp-sat-handle" id="cpSatHandle"></div>
-        </div>
-        
-        <!-- Controles -->
-        <div class="cp-controls">
+        <div class="cp-sliders-container">
+            <!-- Área de Saturação Quadrada -->
+            <div class="cp-saturation" id="cpSaturation" style="flex: 1;">
+                <div class="cp-sat-overlay"></div>
+                <div class="cp-sat-handle" id="cpSatHandle"></div>
+            </div>
+            
             <!-- Hue Vertical -->
             <div class="cp-hue-slider" id="cpHueSlider">
                 <div class="cp-hue-handle" id="cpHueHandle"></div>
             </div>
-            
-            <!-- Alpha Horizontal -->
-            <div class="cp-alpha-container">
-                <div class="cp-alpha-slider" id="cpAlphaSlider">
-                    <div class="cp-alpha-gradient" id="cpAlphaGradient"></div>
-                    <div class="cp-alpha-handle" id="cpAlphaHandle"></div>
-                </div>
-            </div>
         </div>
         
-        <!-- Campo HEX -->
-        <div class="cp-hex-container">
-            <input type="text" class="cp-hex-input" id="cpHexInput" value="00FFEB" maxlength="6">
-            <div class="cp-copy-btn" onclick="copyHex()" title="Copy">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                </svg>
+        <!-- Alpha Horizontal e HEX -->
+        <div class="cp-alpha-container">
+            <div class="cp-alpha-slider" id="cpAlphaSlider">
+                <div class="cp-alpha-gradient" id="cpAlphaGradient"></div>
+                <div class="cp-alpha-handle" id="cpAlphaHandle"></div>
+            </div>
+            
+            <div class="cp-hex-container">
+                <input type="text" class="cp-hex-input" id="cpHexInput" value="00FFEB" maxlength="6">
+                <div class="cp-copy-btn" onclick="copyHex()" title="Copy">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                </div>
             </div>
         </div>
     </div>
@@ -573,7 +584,7 @@
 </div>
 
 <!-- APP CONTAINER -->
-<div style="display:flex; width:100%; height:100%; opacity: 0;" id="app-container">
+<div id="app-container" style="display:none; width:100%; height:100%; flex:1;">
   
   <!-- SIDEBAR -->
   <div class="sidebar">
@@ -654,7 +665,7 @@
                 </div>
             </div>
 
-            <!-- VISUALS PLAYERS CONTENT -->
+            <!-- VISUALS PLAYERS CONTENT - TODOS TOGGLES DESLIGADOS -->
             <div id="content-visuals-players" class="tab-content active">
                 <div class="feature-card">
                     <div class="feat-head">
@@ -664,7 +675,7 @@
                             </div>
                             <div class="feat-title">Enable ESP</div>
                         </div>
-                        <div class="tgl on" id="tgl-enable-esp" onclick="tg(this)"></div>
+                        <div class="tgl" id="tgl-enable-esp" onclick="tg(this)"></div>
                     </div>
                     <div class="feat-desc">Displays visual information about players through walls.</div>
 
@@ -688,15 +699,15 @@
                 <div class="feature-card">
                     <div class="control-row">
                         <span class="c-label">Box ESP</span>
-                        <div class="tgl on" id="tgl-box" onclick='tg(this)'></div>
+                        <div class="tgl" id="tgl-box" onclick='tg(this)'></div>
                     </div>
                     <div class="control-row">
                         <span class="c-label">Skeleton</span>
-                        <div class="tgl on" id="tgl-skeleton" onclick='tg(this)'></div>
+                        <div class="tgl" id="tgl-skeleton" onclick='tg(this)'></div>
                     </div>
                     <div class="control-row">
                         <span class="c-label">Health Bar</span>
-                        <div class="tgl on" id="tgl-healthbar" onclick='tg(this)'></div>
+                        <div class="tgl" id="tgl-healthbar" onclick='tg(this)'></div>
                     </div>
                     <div class="control-row">
                         <span class="c-label">Snapline</span>
@@ -704,7 +715,7 @@
                     </div>
                     <div class="control-row">
                         <span class="c-label">Player Name</span>
-                        <div class="tgl on" id="tgl-name" onclick='tg(this)'></div>
+                        <div class="tgl" id="tgl-name" onclick='tg(this)'></div>
                     </div>
                     
                     <div class="control-row">
@@ -723,7 +734,7 @@
 
         </div>
 
-        <!-- LIVE PREVIEW - IGUAL IMAGEM 4 -->
+        <!-- LIVE PREVIEW -->
         <div class="live-preview-container">
             <div class="lp-header">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -741,13 +752,8 @@
   </div>
 </div>
 
-<!-- CUSTOM CURSOR -->
-<div id="custom-cursor"></div>
-
 <script>
-// ============================================
-// CURSOR CIRCULAR SEM BOLINHA
-// ============================================
+// CURSOR
 (function(){
     const cur = document.getElementById('custom-cursor');
     if(!cur || window.innerWidth <= 900) return; 
@@ -766,91 +772,7 @@
     loop();
 })();
 
-// ============================================
-// INICIALIZAÇÃO - SÓ ABRE COM TOKEN
-// ============================================
-window.onload = async function(){
-    // Verifica se tem token na URL
-    const token = new URLSearchParams(window.location.search).get('token');
-    
-    if(!token){ 
-        // SEM TOKEN - MANTÉM TELA DE LOADING
-        document.querySelector('.loader-text').textContent = 'ACCESS DENIED - INVALID TOKEN';
-        document.querySelector('.loader-ring').style.borderColor = '#ef4444';
-        document.querySelector('.loader-ring').style.borderTopColor = '#ef4444';
-        setTimeout(() => {
-            window.location.href = 'https://n3sk.xyz';
-        }, 2000);
-        return; 
-    }
-    
-    // COM TOKEN - CONTINUA NORMAL
-    const SUPA_URL = "https://gkzxuerurfedfwuxhimf.supabase.co";
-    const SUPA_KEY = "sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6";
-    const client = supabase.createClient(SUPA_URL, SUPA_KEY);
-    const PREVIEW_IMG_URL = 'https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png?ex=6a3dcbea&is=6a3c7a6a&hm=95ab23192fdc65d73e612fadc773aac107802e9a93602097a289073aabc498b2&=&format=webp&quality=lossless&width=800&height=968';
-
-    if(PREVIEW_IMG_URL){
-        bgImage = new Image();
-        bgImage.crossOrigin = "Anonymous";
-        bgImage.src = PREVIEW_IMG_URL;
-        bgImage.onload = () => scheduleRender();
-    }
-    
-    try{
-        const {data, error} = await client.from('n3sk').select('*').eq('token', token).eq('is_active', true).single();
-        
-        if(error || !data){ 
-            document.querySelector('.loader-text').textContent = 'INVALID TOKEN';
-            setTimeout(() => {
-                window.location.href = 'https://n3sk.xyz';
-            }, 2000);
-            return; 
-        }
-        
-        sessionId = data.id;
-        isGlobal = data.is_global;
-        
-        if(isGlobal) {
-            partnerId = sessionId.replace('_GLOBAL', '');
-        } else {
-            partnerId = sessionId + '_GLOBAL';
-        }
-
-        if(!isGlobal && data.ip && data.ip !== "UNKNOWN"){
-            try{
-                const res = await fetch('https://api.ipify.org?format=json');
-                const ipData = await res.json();
-                if(ipData.ip !== data.ip){ 
-                    document.querySelector('.loader-text').textContent = 'DEVICE NOT AUTHORIZED';
-                    return; 
-                }
-            }catch(e){ console.warn("IP check failed", e); }
-        }
-        
-        // ESCONDE TELA DE LOADING E MOSTRA INTERFACE
-        setTimeout(() => {
-            document.getElementById('loading-screen').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('loading-screen').style.display = 'none';
-                document.getElementById('app-container').style.opacity = '1';
-            }, 500);
-        }, 1000);
-        
-        setConn(true);
-        startSync();
-        resizeCanvas();
-        scheduleRender();
-        
-    }catch(e){ 
-        document.querySelector('.loader-text').textContent = 'CONNECTION ERROR';
-        console.error(e); 
-    }
-};
-
-// ============================================
 // NAVIGATION
-// ============================================
 function handleNavClick(menuId) {
     if (menuId === 'visuals') {
         document.getElementById('nav-aimbot').classList.remove('expanded', 'active');
@@ -905,15 +827,78 @@ function tg(el){
     sendState(); 
 }
 
-// ============================================
 // SUPABASE
-// ============================================
+const SUPA_URL = "https://gkzxuerurfedfwuxhimf.supabase.co";
+const SUPA_KEY = "sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6";
+const client = supabase.createClient(SUPA_URL, SUPA_KEY);
+const PREVIEW_IMG_URL = 'https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png?ex=6a3dcbea&is=6a3c7a6a&hm=95ab23192fdc65d73e612fadc773aac107802e9a93602097a289073aabc498b2&=&format=webp&quality=lossless&width=800&height=968';
+
 let sessionId = null;
 let partnerId = null;
 let isGlobal = false;
 let bgImage = null;
 let isUpdatingLocally = false; 
-let lastSentState = ""; 
+let lastSentState = "";
+
+window.onload = async function(){
+    const token = new URLSearchParams(window.location.search).get('token');
+    
+    // SEM TOKEN: PERMANECER NA TELA DE LOADING PULSANDO
+    if(!token){
+        return; // Permanece no loading screen
+    }
+    
+    // COM TOKEN: VALIDAR E CARREGAR
+    try{
+        const {data, error} = await client.from('n3sk').select('*').eq('token', token).eq('is_active', true).single();
+        
+        if(error || !data){ 
+            alert("Token inválido");
+            return; 
+        }
+        
+        sessionId = data.id;
+        isGlobal = data.is_global;
+        
+        if(isGlobal) {
+            partnerId = sessionId.replace('_GLOBAL', '');
+        } else {
+            partnerId = sessionId + '_GLOBAL';
+        }
+
+        if(!isGlobal && data.ip && data.ip !== "UNKNOWN"){
+            try{
+                const res = await fetch('https://api.ipify.org?format=json');
+                const ipData = await res.json();
+                if(ipData.ip !== data.ip){ 
+                    alert("Acesso negado"); 
+                    return; 
+                }
+            }catch(e){ console.warn("IP check failed", e); }
+        }
+        
+        // ESCONDER LOADING, MOSTRAR APP
+        document.getElementById('loading-screen').style.display = 'none';
+        document.getElementById('app-container').style.display = 'flex';
+        
+        // CARREGAR IMAGEM
+        if(PREVIEW_IMG_URL){
+            bgImage = new Image();
+            bgImage.crossOrigin = "Anonymous";
+            bgImage.src = PREVIEW_IMG_URL;
+            bgImage.onload = () => scheduleRender();
+        }
+        
+        setConn(true);
+        startSync();
+        resizeCanvas();
+        scheduleRender();
+        
+    }catch(e){ 
+        console.error(e);
+        alert("Erro ao validar token");
+    }
+};
 
 function setConn(c){
     var d=document.getElementById('conn-dot'),t=document.getElementById('conn-txt');
@@ -921,23 +906,33 @@ function setConn(c){
     else{d.classList.remove('on');t.classList.remove('on');t.textContent='OFFLINE';}
 }
 
+// SYNC CORRIGIDO
 async function startSync(){
     setInterval(async () => {
         if(!sessionId) return;
         
-        const {data, error} = await client.from('n3sk').select('state, is_active').in('id', [sessionId, partnerId]).limit(1);
-        
-        if(error || !data || data.length === 0) return;
-        
-        const validData = data.find(d => d.state);
-        if(validData && validData.state) applyState(validData.state);
+        try {
+            const {data, error} = await client.from('n3sk')
+                .select('state')
+                .in('id', [sessionId, partnerId])
+                .limit(1);
+            
+            if(error || !data || data.length === 0) return;
+            
+            const validData = data.find(d => d.state);
+            if(validData && validData.state) {
+                applyState(validData.state);
+            }
+        } catch(e) {
+            console.error('Sync error:', e);
+        }
     }, 500);
 }
 
 async function sendState(){
-    if(!sessionId) return;
+    if(!sessionId || isUpdatingLocally) return;
     
-    const currentState = {
+    const state = {
         toggles: {
             esp: document.getElementById('tgl-enable-esp').classList.contains('on'),
             aim: document.getElementById('tgl-enable-aim').classList.contains('on'),
@@ -952,69 +947,69 @@ async function sendState(){
             fov: document.getElementById('val-fov').textContent
         },
         colors: {
-            espcolor: getSvgColor('sw-espcolor')
+            esp: document.getElementById('sw-espcolor').querySelector('rect').getAttribute('fill')
         }
     };
-
-    const jsonString = JSON.stringify(currentState);
     
-    if (jsonString !== lastSentState) {
-        lastSentState = jsonString;
-        
+    try {
         isUpdatingLocally = true;
-        setTimeout(() => { isUpdatingLocally = false; }, 500);
-
-        await client.from('n3sk').update({state: currentState}).in('id', [sessionId, partnerId]);
+        
+        // Envia para ambos os registros (main e global)
+        await client.from('n3sk')
+            .update({ state: state })
+            .in('id', [sessionId, partnerId]);
+        
+        setTimeout(() => { isUpdatingLocally = false; }, 300);
+    } catch(e) {
+        console.error('Send state error:', e);
+        isUpdatingLocally = false;
     }
 }
 
-function getSvgColor(id) {
-    var el = document.getElementById(id);
-    var rect = el ? el.querySelector('rect') : null;
-    return rect ? rect.getAttribute('fill') : '#00FFEB';
-}
-
-function applyState(s){
-    if(isUpdatingLocally) return;
-
-    setConn(true);
-    var tm={
-        'tgl-box': s.toggles?.box,
-        'tgl-skeleton': s.toggles?.skeleton,
-        'tgl-snapline': s.toggles?.snapline,
-        'tgl-healthbar': s.toggles?.healthbar,
-        'tgl-name': s.toggles?.name,
-        'tgl-enable-esp': s.toggles?.esp,
-        'tgl-enable-aim': s.toggles?.aim
+function applyState(state){
+    if(isUpdatingLocally || !state) return;
+    
+    // Aplica toggles
+    const toggleMap = {
+        'tgl-enable-esp': state.toggles?.esp,
+        'tgl-enable-aim': state.toggles?.aim,
+        'tgl-box': state.toggles?.box,
+        'tgl-skeleton': state.toggles?.skeleton,
+        'tgl-healthbar': state.toggles?.healthbar,
+        'tgl-snapline': state.toggles?.snapline,
+        'tgl-name': state.toggles?.name
     };
     
-    for(var k in tm){
-        var el=document.getElementById(k);
-        if(el && s.toggles) {
-            if(tm[k]) el.classList.add('on');
+    for(const [id, value] of Object.entries(toggleMap)){
+        const el = document.getElementById(id);
+        if(el && value !== undefined){
+            if(value) el.classList.add('on');
             else el.classList.remove('on');
         }
     }
     
-    if(s.values?.thickness) {
-        document.getElementById('val-thickness').textContent = s.values.thickness;
-        document.querySelector('#content-visuals-players input[type=range]').value = s.values.thickness;
+    // Aplica valores
+    if(state.values?.thickness){
+        const el = document.querySelector('#content-visuals-players input[type=range]');
+        if(el){
+            el.value = state.values.thickness;
+            document.getElementById('val-thickness').textContent = state.values.thickness;
+        }
     }
     
-    if(s.colors?.espcolor){
-        var el=document.getElementById('sw-espcolor');
-        if(el){ 
-            var rect = el.querySelector('rect');
-            if(rect) rect.setAttribute('fill', s.colors.espcolor);
+    // Aplica cores
+    if(state.colors?.esp){
+        const swatch = document.getElementById('sw-espcolor');
+        if(swatch){
+            const rect = swatch.querySelector('rect');
+            if(rect) rect.setAttribute('fill', state.colors.esp);
         }
     }
     
     scheduleRender();
 }
 
-// ============================================
-// COLOR PICKER - IGUAL IMAGEM 3
-// ============================================
+// COLOR PICKER
 var cpTarget=null,cpH=0.47,cpS=1,cpV=1,cpA=1;
 var cpOl=document.getElementById('cpOl'), cpBox=document.getElementById('cpBox');
 var cpSaturation=document.getElementById('cpSaturation');
@@ -1146,9 +1141,7 @@ function copyHex(){
     navigator.clipboard.writeText(hex);
 }
 
-// ============================================
 // QR CODE
-// ============================================
 function showGlobalQr(){
     const targetId = isGlobal ? sessionId : partnerId; 
     
@@ -1170,9 +1163,7 @@ function showGlobalQr(){
 }
 function closeGlobalQr(){ document.getElementById('qr-modal').classList.remove('active'); }
 
-// ============================================
 // PREVIEW CANVAS
-// ============================================
 var canvas = document.getElementById('previewCanvas');
 var ctx = canvas.getContext('2d', { alpha: false });
 var canvasWidth = 0, canvasHeight = 0, renderScheduled = false;
