@@ -78,30 +78,29 @@
         .tgl::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#ffffff;top:2px;left:2px;transition:all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);box-shadow:0 1px 4px rgba(0,0,0,.5)}
         .tgl.on::after{left:22px}
 
-        /* SWATCH SVG - IGUAL AO C# */
+        /* SWATCH SVG */
         .sw-container {
             width: 36px; height: 24px; flex-shrink: 0; border-radius: 4px; overflow: hidden;
             border: 1.5px solid #555; position: relative; cursor: pointer; isolation: isolate; 
         }
         .sw-svg { width: 100%; height: 100%; display: block; mix-blend-mode: normal !important; }
 
-        /* COLOR PICKER OVERLAY - ESTRUTURA EXATA DO C# */
-        .cp-ol{display:none;position:fixed;inset:0;z-index:9000} .cp-ol.open{display:block}
-        .cp-box{position:fixed;background:#161616;border:1.5px solid var(--border);border-radius:10px;padding:12px;display:flex;gap:10px;align-items:flex-start;z-index:901;box-shadow:0 16px 48px rgba(0,0,0,.9);user-select:none;touch-action:none}
+        /* COLOR PICKER - CORRIGIDO PARA CELULAR */
+        .cp-ol{display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.7)} .cp-ol.open{display:block}
+        .cp-box{position:fixed;background:#2a2a2a;border:1.5px solid var(--border);border-radius:10px;padding:12px;display:flex;gap:10px;align-items:flex-start;z-index:901;box-shadow:0 16px 48px rgba(0,0,0,.9);user-select:none;touch-action:none}
         
-        /* Removido z-index interno para evitar bugs de renderização no mobile */
-        .sv{width:190px;height:152px;border-radius:5px;position:relative;overflow:hidden;flex-shrink:0;border:1px solid #222; background: #ff0000;}
+        .sv{width:190px;height:152px;border-radius:5px;position:relative;overflow:hidden;flex-shrink:0;border:1px solid #333; background: #ff0000;}
         .sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent)}
-        .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,rgba(0,0,0,0.5))}
-        .sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,.9),0 2px 8px rgba(0,0,0,.9); transition: left 0.05s linear, top 0.05s linear;}
+        .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,rgba(0,0,0,0.2))}
+        .sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 2px rgba(0,0,0,.8),0 2px 8px rgba(0,0,0,.9); transition: left 0.05s linear, top 0.05s linear;}
         
         .bars{display:flex;gap:8px}
-        .btr{position:relative;width:14px;height:152px;border-radius:99px;overflow:visible;flex-shrink:0;border:1px solid #222}
+        .btr{position:relative;width:14px;height:152px;border-radius:99px;overflow:visible;flex-shrink:0;border:1px solid #333}
         .bin{position:absolute;inset:0;border-radius:99px;overflow:hidden}
         .bh{width:100%;height:100%;background:linear-gradient(to bottom,#f00 0%,#ff0 17%,#0f0 33%,#0ff 50%,#00f 67%,#f0f 83%,#f00 100%)}
         .bck{width:100%;height:100%;background:repeating-conic-gradient(#555 0% 25%,#333 0% 50%) 0 0/8px 8px}
         .bag{position:absolute;inset:0;border-radius:99px;pointer-events:none}
-        .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,.8),0 2px 8px rgba(0,0,0,.9);pointer-events:none;z-index:10; transition: top 0.05s linear, background 0.05s linear;}
+        .bth{position:absolute;left:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#fff;border:2.5px solid #fff;box-shadow:0 0 0 2px rgba(0,0,0,.8),0 2px 8px rgba(0,0,0,.9);pointer-events:none;z-index:10; transition: top 0.05s linear, background 0.05s linear;}
 
         /* LOGIN SCREEN */
         #login-screen {
@@ -386,8 +385,12 @@ function runAnim(){
 function startAnim(){if(!animRun){animRun=true;requestAnimationFrame(runAnim);}}
 
 function updateCP(){
-  var rgb=h2r(cpH,cpS,cpV),hRgb=h2r(cpH,1,1),hHex=r2h(hRgb[0],hRgb[1],hRgb[2]);
+  var hRgb=h2r(cpH,1,1); 
+  var hHex=r2h(hRgb[0],hRgb[1],hRgb[2]);
+  
   svEl.style.background=hHex;
+  
+  var rgb=h2r(cpH,cpS,cpV);
   svTh.style.background=r2h(rgb[0],rgb[1],rgb[2]);
   
   aGr.style.background='linear-gradient(to bottom,'+hHex+',transparent)';
@@ -596,7 +599,6 @@ function closeGlobalQr(){ document.getElementById('qr-modal').classList.remove('
 var canvas = document.getElementById('espCanvas');
 var ctx = canvas.getContext('2d', { alpha: false });
 var canvasWidth = 0, canvasHeight = 0, renderScheduled = false;
-// REMOVIDO: hpAnimTime (saúde agora é estática)
 var boxOpacity = 0;
 var targetBoxOpacity = 0;
 
@@ -650,14 +652,12 @@ function renderPreview() {
 
   if (isHp) {
     var bw = 6, bx = bX - 12; 
-    // SAÚDE ESTÁTICA: Altura fixa em 100% (bH) sem animação
     var currentHpHeight = bH; 
     
     ctx.fillStyle = 'rgba(15,15,15,0.8)'; ctx.fillRect(bx, bY, bw, bH);
     ctx.fillStyle = hC; ctx.fillRect(bx, bY + (bH - currentHpHeight), bw, currentHpHeight);
   }
   ctx.restore();
-  // Remove verificação de isHp para parar re-renderização constante
   if (Math.abs(boxOpacity - targetBoxOpacity) > 0.01) scheduleRender();
 }
 </script>
