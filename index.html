@@ -85,13 +85,20 @@
         }
         .sw-svg { width: 100%; height: 100%; display: block; mix-blend-mode: normal !important; }
 
-        /* COLOR PICKER OVERLAY */
+        /* COLOR PICKER OVERLAY - ESTRUTURA CORRIGIDA */
         .cp-ol{display:none;position:fixed;inset:0;z-index:9000} .cp-ol.open{display:block}
         .cp-box{position:fixed;background:#161616;border:1.5px solid var(--border);border-radius:10px;padding:12px;display:flex;gap:10px;align-items:flex-start;z-index:901;box-shadow:0 16px 48px rgba(0,0,0,.9);user-select:none;touch-action:none}
-        .sv{width:190px;height:152px;border-radius:5px;position:relative;overflow:hidden;flex-shrink:0;border:1px solid #222}
-        .sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent)}
-        .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,#000)}
-        .sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,.7),0 2px 5px rgba(0,0,0,.8); transition: left 0.05s linear, top 0.05s linear;}
+        
+        /* Container do seletor principal */
+        .sv{width:190px;height:152px;border-radius:5px;position:relative;overflow:hidden;flex-shrink:0;border:1px solid #222; background: #ff0000;} /* Fundo padrão vermelho */
+        
+        /* Gradientes sobrepostos para criar o efeito de cor */
+        .sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent); z-index: 1;}
+        .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,#000); z-index: 2;}
+        
+        /* Polegar do seletor */
+        .sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,.7),0 2px 5px rgba(0,0,0,.8); z-index: 3; transition: left 0.05s linear, top 0.05s linear;}
+        
         .bars{display:flex;gap:8px}
         .btr{position:relative;width:14px;height:152px;border-radius:99px;overflow:visible;flex-shrink:0;border:1px solid #222}
         .bin{position:absolute;inset:0;border-radius:99px;overflow:hidden}
@@ -184,7 +191,12 @@
 <!-- COLOR PICKER OVERLAY -->
 <div class='cp-ol' id='cpOl'>
   <div class='cp-box' id='cpBox'>
-    <div class='sv' id='sv'><div class='sv-w'></div><div class='sv-b'></div><div class='sv-th' id='svTh'></div></div>
+    <!-- Estrutura limpa para garantir renderização correta -->
+    <div class='sv' id='sv'>
+        <div class='sv-w'></div>
+        <div class='sv-b'></div>
+        <div class='sv-th' id='svTh'></div>
+    </div>
     <div class='bars'>
       <div class='btr' id='hueTr'><div class='bin'><div class='bh'></div></div><div class='bth' id='hueTh'></div></div>
       <div class='btr' id='aTr'><div class='bin'><div class='bck'></div></div><div class='bag' id='aGr'></div><div class='bth' id='aTh'></div></div>
@@ -386,12 +398,13 @@ function runAnim(){
 function startAnim(){if(!animRun){animRun=true;requestAnimationFrame(runAnim);}}
 
 function updateCP(){
-  // CORREÇÃO AQUI: Usamos Saturação 1 e Valor 1 para o fundo (hRgb)
-  // Isso garante que o quadrado nunca fique preto/escuro demais no mobile
+  // CORREÇÃO CRÍTICA:
+  // Para evitar que fique escuro no celular, forçamos o fundo (svEl) a ser sempre a cor MAIS BRILHANTE (S=1, V=1).
+  // Os gradientes branco e preto por cima fazem o trabalho de escurecer/clarear visualmente.
   var hRgb=h2r(cpH,1,1); 
   var hHex=r2h(hRgb[0],hRgb[1],hRgb[2]);
   
-  // Aplica a cor pura como fundo
+  // Aplica a cor pura como fundo base
   svEl.style.background=hHex;
   
   // Calcula a cor atual do ponto selecionado apenas para o thumb e alpha
@@ -490,7 +503,7 @@ document.addEventListener('touchmove',function(e){
 document.addEventListener('touchend',function(){ dSV=false;dH=false;dA=false; sendState(); });
 
 // ============================================
-// SYNC & STATE (CORRIGIDO PARA SINCRONIZAR AMBOS)
+// SYNC & STATE
 // ============================================
 async function startSync(){
     setInterval(async () => {
