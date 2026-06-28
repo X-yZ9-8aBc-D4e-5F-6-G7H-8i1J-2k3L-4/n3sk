@@ -11,7 +11,7 @@
 
     <style>
         :root{ 
-            --primary: #00FFEB; /* CIANO - Cor original */
+            --primary: #00FFEB;
             --primary-dim: rgba(0, 255, 235, 0.08);
             --bg: #050505;
             --sidebar: #0a0a0a;
@@ -33,7 +33,7 @@
             font-size: 13px;
         }
 
-        /* --- CURSOR CIRCULAR (IGUAL CÓDIGO ORIGINAL) --- */
+        /* --- CURSOR CIRCULAR SEM BOLINHA INTERNA --- */
         #custom-cursor {
             position: fixed; top: 0; left: 0; width: 18px; height: 18px;
             border: 2px solid var(--primary);
@@ -47,9 +47,43 @@
             transform: translate(-50%, -50%) scale(0.65);
             border-color: #fff;
         }
-        .cursor-dot {
-            position: absolute; top: 7px; left: 7px; width: 4px; height: 4px;
-            background: var(--primary); border-radius: 50%;
+
+        /* --- LOADING SCREEN --- */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            flex-direction: column;
+            gap: 20px;
+        }
+        #loading-screen.hidden {
+            display: none;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--primary);
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loading-text {
+            color: var(--primary);
+            font-size: 13px;
+            letter-spacing: 2px;
+            opacity: 0.8;
+            animation: blink 2s ease-in-out infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
         }
 
         /* --- SIDEBAR --- */
@@ -169,7 +203,7 @@
         }
         .dropdown-btn:hover { border-color: #444; }
 
-        /* TOGGLE IGUAL CÓDIGO ORIGINAL */
+        /* TOGGLE */
         .tgl {
             width: 46px; height: 26px; background: #2a2a2a; border-radius: 99px; position: relative;
             border: 1.5px solid #444; transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
@@ -184,12 +218,12 @@
         }
         .tgl.on::after { left: 22px; }
 
-        /* LIVE PREVIEW - TAMANHO CORRETO (420px igual código original) */
+        /* LIVE PREVIEW - TAMANHO CORRETO */
         .live-preview-container {
             position: absolute;
             top: 60px;
             right: 24px;
-            width: 420px; /* TAMANHO ORIGINAL */
+            width: 320px;
             height: calc(100% - 84px);
             background: var(--card);
             border: 1.5px solid var(--border);
@@ -219,17 +253,31 @@
         
         .cp-box {
             position: fixed; background: #161616; border: 1.5px solid var(--border);
-            border-radius: 10px; padding: 12px; display: flex; gap: 10px;
+            border-radius: 10px; padding: 16px; display: flex; gap: 12px;
             align-items: flex-start; z-index: 901;
             box-shadow: 0 16px 48px rgba(0,0,0,0.9);
             user-select: none; touch-action: none;
+            flex-direction: column;
         }
         
-        /* Área de Saturação - Quadrada */
+        /* Top row: SV + Hue Bar + Alpha Bar */
+        .cp-top-row {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        
+        /* Saturation-Value Picker */
         .sv {
-            width: 190px; height: 152px; border-radius: 5px; position: relative;
-            overflow: hidden; flex-shrink: 0; border: 1px solid #222;
+            width: 200px;
+            height: 160px;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 1px solid #222;
             background-color: #ff0000 !important;
+            cursor: crosshair;
         }
         .sv-w { position: absolute; inset: 0; background: linear-gradient(to right, #fff, transparent); }
         .sv-b { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, #000); }
@@ -238,72 +286,140 @@
             border: 2.5px solid #fff; transform: translate(-50%, -50%); pointer-events: none;
             box-shadow: 0 0 0 1.5px rgba(0,0,0,0.7), 0 2px 5px rgba(0,0,0,0.8);
             transition: left 0.05s linear, top 0.05s linear;
+            z-index: 10;
         }
         
-        /* Barras Verticais e Horizontal */
-        .bars { display: flex; gap: 8px; }
-        .btr {
-            position: relative; width: 14px; height: 152px; border-radius: 99px;
-            overflow: visible; flex-shrink: 0; border: 1px solid #222;
+        /* Hue + Alpha Bars Side by Side */
+        .cp-bars {
+            display: flex;
+            gap: 10px;
+            height: 160px;
         }
-        .bin { position: absolute; inset: 0; border-radius: 99px; overflow: hidden; }
-        .bh {
-            width: 100%; height: 100%;
-            background: linear-gradient(to bottom, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
+        
+        .cp-bar {
+            width: 18px;
+            height: 160px;
+            border-radius: 99px;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 1px solid #222;
+            position: relative;
+            cursor: pointer;
         }
-        .bck {
-            width: 100%; height: 100%;
+        
+        .cp-bar-inner {
+            position: absolute;
+            inset: 0;
+            border-radius: 99px;
+        }
+        
+        .cp-bar-hue {
+            background: linear-gradient(to bottom, 
+                #f00 0%, #ff0 17%, #0f0 33%, 
+                #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
+        }
+        
+        .cp-bar-alpha {
             background: repeating-conic-gradient(#555 0% 25%, #333 0% 50%) 0 0 / 8px 8px;
         }
-        .bag { position: absolute; inset: 0; border-radius: 99px; pointer-events: none; }
-        .bth {
-            position: absolute; left: 50%; transform: translate(-50%, -50%);
-            width: 17px; height: 17px; border-radius: 50%; background: #fff;
-            border: 2.5px solid #fff;
-            box-shadow: 0 0 0 1.5px rgba(0,0,0,0.6), 0 2px 5px rgba(0,0,0,0.7);
-            pointer-events: none; z-index: 10;
-            transition: top 0.05s linear, background 0.05s linear;
+        
+        .cp-bar-alpha-grad {
+            position: absolute;
+            inset: 0;
+            border-radius: 99px;
+            pointer-events: none;
         }
         
-        /* Slider Alpha Horizontal embaixo */
+        .cp-bar-thumb {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2.5px solid #fff;
+            box-shadow: 0 0 0 1.5px rgba(0,0,0,0.6), 0 2px 5px rgba(0,0,0,0.7);
+            pointer-events: none;
+            z-index: 10;
+            transition: top 0.05s linear;
+        }
+        
+        /* Bottom: Horizontal Alpha Slider */
         .cp-alpha-horizontal {
-            width: 190px; height: 12px; border-radius: 6px; position: relative;
-            margin-top: 8px; cursor: pointer;
+            width: 100%;
+            max-width: 220px;
+            height: 14px;
+            border-radius: 7px;
+            position: relative;
+            cursor: pointer;
             background-image: linear-gradient(45deg, #333 25%, transparent 25%), 
                               linear-gradient(-45deg, #333 25%, transparent 25%), 
                               linear-gradient(45deg, transparent 75%, #333 75%), 
                               linear-gradient(-45deg, transparent 75%, #333 75%);
             background-size: 8px 8px;
             background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+            border: 1px solid #222;
         }
-        .cp-alpha-grad {
-            position: absolute; inset: 0; border-radius: 6px;
+        .cp-alpha-grad-h {
+            position: absolute;
+            inset: 0;
+            border-radius: 7px;
             background: linear-gradient(to right, transparent, var(--primary));
         }
-        .cp-alpha-handle {
-            position: absolute; top: 50%; transform: translate(-50%, -50%);
-            width: 16px; height: 16px; background: #fff; border-radius: 50%;
-            border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        .cp-alpha-handle-h {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 18px;
+            height: 18px;
+            background: #fff;
+            border-radius: 50%;
+            border: 2.5px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            z-index: 10;
         }
         
-        /* Campo HEX */
+        /* Hex Input */
         .cp-hex-container {
-            display: flex; align-items: center; gap: 8px; margin-top: 10px;
-            background: #0a0a0a; padding: 8px; border-radius: 6px; border: 1px solid #222;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #0a0a0a;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #222;
         }
         .cp-hex-input {
-            flex: 1; background: transparent; border: none; color: #fff;
-            font-family: monospace; font-size: 12px; outline: none; text-transform: uppercase;
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-family: monospace;
+            font-size: 12px;
+            outline: none;
+            text-transform: uppercase;
         }
         .cp-copy-btn {
-            color: #666; cursor: pointer; padding: 4px; transition: color 0.2s;
+            color: #666;
+            cursor: pointer;
+            padding: 4px;
+            transition: color 0.2s;
+            flex-shrink: 0;
         }
         .cp-copy-btn:hover { color: var(--primary); }
 
         /* SWATCH SVG */
         .sw-container {
-            width: 36px; height: 24px; flex-shrink: 0; border-radius: 4px; overflow: hidden;
-            border: 1.5px solid #555; position: relative; cursor: pointer; isolation: isolate; 
+            width: 36px;
+            height: 24px;
+            flex-shrink: 0;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1.5px solid #555;
+            position: relative;
+            cursor: pointer;
+            isolation: isolate;
         }
         .sw-svg { width: 100%; height: 100%; display: block; mix-blend-mode: normal !important; }
 
@@ -344,32 +460,45 @@
 </head>
 <body>
 
-<!-- CUSTOM CURSOR CIRCULAR -->
-<div id="custom-cursor"><div class="cursor-dot"></div></div>
+<!-- LOADING SCREEN (SEM TOKEN) -->
+<div id="loading-screen">
+    <div class="spinner"></div>
+    <div class="loading-text">CONNECTING TO N3SK CORE...</div>
+</div>
 
-<!-- COLOR PICKER OVERLAY - IGUAL IMAGEM 3 -->
+<!-- CUSTOM CURSOR CIRCULAR -->
+<div id="custom-cursor"></div>
+
+<!-- COLOR PICKER OVERLAY -->
 <div class="cp-overlay" id="cpOl">
-    <div class="cp-box" id="cpBox" style="position: fixed;">
-        <div class="sv" id="sv">
-            <div class="sv-w"></div>
-            <div class="sv-b"></div>
-            <div class="sv-th" id="svTh"></div>
-        </div>
-        <div class="bars">
-            <div class="btr" id="hueTr">
-                <div class="bin"><div class="bh"></div></div>
-                <div class="bth" id="hueTh"></div>
+    <div class="cp-box" id="cpBox">
+        <!-- Top Row: SV + Hue + Alpha Bars -->
+        <div class="cp-top-row">
+            <div class="sv" id="sv">
+                <div class="sv-w"></div>
+                <div class="sv-b"></div>
+                <div class="sv-th" id="svTh"></div>
             </div>
-            <div class="btr" id="aTr">
-                <div class="bin"><div class="bck"></div></div>
-                <div class="bag" id="aGr"></div>
-                <div class="bth" id="aTh"></div>
+            <div class="cp-bars">
+                <!-- Hue Bar -->
+                <div class="cp-bar" id="hueTr">
+                    <div class="cp-bar-inner cp-bar-hue"></div>
+                    <div class="cp-bar-thumb" id="hueTh"></div>
+                </div>
+                <!-- Alpha Bar -->
+                <div class="cp-bar" id="aTr">
+                    <div class="cp-bar-inner cp-bar-alpha"></div>
+                    <div class="cp-bar-alpha-grad" id="aGr"></div>
+                    <div class="cp-bar-thumb" id="aTh"></div>
+                </div>
             </div>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
+        
+        <!-- Bottom: Horizontal Alpha + Hex -->
+        <div style="display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 220px;">
             <div class="cp-alpha-horizontal" id="cpAlphaHorizontal">
-                <div class="cp-alpha-grad" id="cpAlphaGrad"></div>
-                <div class="cp-alpha-handle" id="cpAlphaHandle"></div>
+                <div class="cp-alpha-grad-h" id="cpAlphaGrad"></div>
+                <div class="cp-alpha-handle-h" id="cpAlphaHandle"></div>
             </div>
             <div class="cp-hex-container">
                 <input type="text" class="cp-hex-input" id="cpHexInput" value="00FFEB" maxlength="6">
@@ -394,8 +523,8 @@
     </div>
 </div>
 
-<!-- APP CONTAINER -->
-<div style="display:flex; width:100%; height:100%;">
+<!-- APP CONTAINER (HIDDEN UNTIL TOKEN VALIDATED) -->
+<div id="app-container" style="display:none; width:100%; height:100%; flex:1;">
   
   <!-- SIDEBAR -->
   <div class="sidebar">
@@ -418,7 +547,7 @@
         </div>
 
         <div class="nav-item expanded active" id="nav-visuals" onclick="handleNavClick('visuals')">
-            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             Visuals
             <svg class="nav-arrow" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
         </div>
@@ -545,7 +674,7 @@
 
         </div>
 
-        <!-- LIVE PREVIEW - TAMANHO 420px IGUAL CÓDIGO ORIGINAL -->
+        <!-- LIVE PREVIEW -->
         <div class="live-preview-container">
             <div class="lp-header">Preview</div>
             <div class="lp-canvas-wrap">
@@ -558,7 +687,7 @@
 
 <script>
 // ============================================
-// CURSOR CIRCULAR (IGUAL CÓDIGO ORIGINAL)
+// CURSOR CIRCULAR SEM BOLINHA
 // ============================================
 (function(){
     const cur = document.getElementById('custom-cursor');
@@ -648,25 +777,18 @@ let partnerId = null;
 let isGlobal = false;
 let bgImage = null;
 let isUpdatingLocally = false; 
-let lastSentState = ""; 
+let lastSentState = "";
 
 window.onload = async function(){
-    if(PREVIEW_IMG_URL){
-        bgImage = new Image();
-        bgImage.crossOrigin = "Anonymous";
-        bgImage.src = PREVIEW_IMG_URL;
-        bgImage.onload = () => scheduleRender();
-    }
-
     const token = new URLSearchParams(window.location.search).get('token');
-    if(!token){ 
-        console.warn("Demo mode");
-        setConn(true);
-        resizeCanvas(); 
-        scheduleRender(); 
-        return; 
+    
+    // SEM TOKEN: MOSTRAR APENAS LOADING SCREEN
+    if(!token){
+        // Permanecer na tela de loading indefinidamente
+        return;
     }
     
+    // COM TOKEN: VALIDAR E CARREGAR INTERFACE
     try{
         const {data, error} = await client.from('n3sk').select('*').eq('token', token).eq('is_active', true).single();
         
@@ -695,12 +817,27 @@ window.onload = async function(){
             }catch(e){ console.warn("IP check failed", e); }
         }
         
+        // ESCONDER LOADING, MOSTRAR APP
+        document.getElementById('loading-screen').classList.add('hidden');
+        document.getElementById('app-container').style.display = 'flex';
+        
+        // CARREGAR IMAGEM
+        if(PREVIEW_IMG_URL){
+            bgImage = new Image();
+            bgImage.crossOrigin = "Anonymous";
+            bgImage.src = PREVIEW_IMG_URL;
+            bgImage.onload = () => scheduleRender();
+        }
+        
         setConn(true);
         startSync();
         resizeCanvas();
         scheduleRender();
         
-    }catch(e){ console.error(e); }
+    }catch(e){ 
+        console.error(e);
+        alert("Erro ao validar token");
+    }
 };
 
 function setConn(c){
@@ -710,7 +847,7 @@ function setConn(c){
 }
 
 // ============================================
-// SYNC - CORRIGIDO PARA NÃO FLICAR
+// SYNC
 // ============================================
 async function startSync(){
     setInterval(async () => {
@@ -789,7 +926,6 @@ function applyState(s){
     
     if(s.values?.thickness) {
         document.getElementById('val-thickness').textContent = s.values.thickness;
-        document.querySelector('#content-visuals-players input[type=range]').value = s.values.thickness;
     }
     
     if(s.colors?.espcolor){
@@ -804,12 +940,13 @@ function applyState(s){
 }
 
 // ============================================
-// COLOR PICKER - IGUAL IMAGEM 3
+// COLOR PICKER - LAYOUT IGUAL IMAGEM 3
 // ============================================
 var cpTarget=null,cpH=0.47,cpS=1,cpV=1,cpA=1;
 var svTX=1,svTY=0,svCX=1,svCY=0;
 var hTY=0,hCY=0,aCY=0; 
 var animRun=false;
+
 var cpOl=document.getElementById('cpOl'), cpBox=document.getElementById('cpBox');
 var svEl=document.getElementById('sv'), svTh=document.getElementById('svTh');
 var hueTr=document.getElementById('hueTr'), hueTh=document.getElementById('hueTh');
@@ -838,10 +975,9 @@ function runAnim(){
   svCX=lerp(svCX,svTX,sp);svCY=lerp(svCY,svTY,sp);
   hCY=lerp(hCY,hTY,sp);
   svTh.style.left=(svCX*100)+'%';svTh.style.top=(svCY*100)+'%';
-  var hH=hueTr.getBoundingClientRect().height||152;
-  var aH=aTr.getBoundingClientRect().height||152;
+  var hH=hueTr.getBoundingClientRect().height||160;
   hueTh.style.top=(hCY*hH)+'px';
-  aTh.style.top=(aCY*aH)+'px';
+  aTh.style.top=(aCY*hH)+'px';
   if(Math.abs(svCX-svTX)>.0005||Math.abs(svCY-svTY)>.0005||Math.abs(hCY-hTY)>.0005)
     requestAnimationFrame(runAnim);
   else animRun=false;
@@ -861,7 +997,6 @@ function updateCP(){
   hueTh.style.background=hHex;
   aTh.style.background='rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+','+cpA+')';
   
-  // Update alpha horizontal gradient
   cpAlphaGrad.style.background='linear-gradient(to right,transparent,'+hHex+')';
   
   if(cpTarget){
@@ -875,7 +1010,7 @@ function updateCP(){
 
 function openCP(el){
   cpTarget=el;
-  var rect=el.getBoundingClientRect(),popW=420,popH=200;
+  var rect=el.getBoundingClientRect(),popW=280,popH=230;
   var left=rect.right+10,top=rect.top;
   if(left+popW>innerWidth)left=rect.left-popW-10;
   if(top+popH>innerHeight)top=innerHeight-popH-10;
@@ -893,13 +1028,11 @@ function openCP(el){
   svCX=cpS;svTX=cpS;svCY=1-cpV;svTY=1-cpV;hCY=cpH;hTY=cpH;aCY=1-cpA;
   updateCP();
   svTh.style.left=(svCX*100)+'%';svTh.style.top=(svCY*100)+'%';
-  var hH=hueTr.getBoundingClientRect().height||152;
-  var aH=aTr.getBoundingClientRect().height||152;
+  var hH=hueTr.getBoundingClientRect().height||160;
   hueTh.style.top=(hCY*hH)+'px';
-  aTh.style.top=(aCY*aH)+'px';
+  aTh.style.top=(aCY*hH)+'px';
   
-  // Alpha horizontal position
-  var alphaWidth = cpAlphaHorizontal.getBoundingClientRect().width || 190;
+  var alphaWidth = cpAlphaHorizontal.getBoundingClientRect().width || 220;
   cpAlphaHandle.style.left = (cpA * alphaWidth) + 'px';
   
   cpOl.classList.add('open');
@@ -940,7 +1073,7 @@ function doSV(e){var r=svEl.getBoundingClientRect();cpS=cl((e.clientX-r.left)/r.
 function doH(e){var r=hueTr.getBoundingClientRect();cpH=cl((e.clientY-r.top)/r.height,0,.9999);hTY=cpH;updateCP();startAnim();}
 function doA(e){
     var r=aTr.getBoundingClientRect();
-    var height = r.height || 152;
+    var height = r.height || 160;
     cpA = cl(1 - ((e.clientY - r.top) / height), 0, 1);
     aCY = 1 - cpA; 
     updateCP();
@@ -948,7 +1081,7 @@ function doA(e){
 }
 function doAlphaH(e){
     var r = cpAlphaHorizontal.getBoundingClientRect();
-    var width = r.width || 190;
+    var width = r.width || 220;
     cpA = cl((e.clientX - r.left) / width, 0, 1);
     cpAlphaHandle.style.left = (cpA * width) + 'px';
     updateCP();
@@ -985,7 +1118,7 @@ function showGlobalQr(){
 function closeGlobalQr(){ document.getElementById('qr-modal').classList.remove('active'); }
 
 // ============================================
-// PREVIEW CANVAS - SOMENTE IMAGEM, SEM DESENHOS ESP
+// PREVIEW CANVAS
 // ============================================
 var canvas = document.getElementById('previewCanvas');
 var ctx = canvas.getContext('2d', { alpha: false });
@@ -996,9 +1129,14 @@ function resizeCanvas() {
   var nw = rect.width, nh = rect.height - 35; 
   var dpr = window.devicePixelRatio || 1;
   if (canvasWidth !== nw || canvasHeight !== nh) { 
-      canvas.width = nw * dpr; canvas.height = nh * dpr; 
-      canvas.style.width = nw + 'px'; canvas.style.height = nh + 'px';
-      ctx.scale(dpr, dpr); canvasWidth = nw; canvasHeight = nh; scheduleRender(); 
+      canvas.width = nw * dpr; 
+      canvas.height = nh * dpr; 
+      canvas.style.width = nw + 'px'; 
+      canvas.style.height = nh + 'px';
+      ctx.scale(dpr, dpr); 
+      canvasWidth = nw; 
+      canvasHeight = nh; 
+      scheduleRender(); 
   }
 }
 window.addEventListener('resize', resizeCanvas);
@@ -1010,9 +1148,9 @@ function renderPreview() {
   
   ctx.save();
   ctx.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0);
-  ctx.fillStyle = '#050505'; ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+  ctx.fillStyle = '#050505'; 
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-  // SOMENTE DESENHA A IMAGEM DE FUNDO - SEM DESENHOS DE ESP
   if (bgImage && bgImage.complete && bgImage.naturalWidth > 0) {
       var s = Math.min(canvasWidth / bgImage.width, canvasHeight / bgImage.height);
       var w = bgImage.width * s, h = bgImage.height * s;
