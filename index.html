@@ -11,7 +11,7 @@
 
     <style>
         :root{ 
-            --primary: #00FFEB; /* CIANO - Cor original */
+            --primary: #00FFEB;
             --primary-dim: rgba(0, 255, 235, 0.08);
             --bg: #050505;
             --sidebar: #0a0a0a;
@@ -33,7 +33,7 @@
             font-size: 13px;
         }
 
-        /* --- CURSOR CIRCULAR (IGUAL CÓDIGO ORIGINAL) --- */
+        /* CURSOR CIRCULAR */
         #custom-cursor {
             position: fixed; top: 0; left: 0; width: 18px; height: 18px;
             border: 2px solid var(--primary);
@@ -47,12 +47,45 @@
             transform: translate(-50%, -50%) scale(0.65);
             border-color: #fff;
         }
-        .cursor-dot {
-            position: absolute; top: 7px; left: 7px; width: 4px; height: 4px;
-            background: var(--primary); border-radius: 50%;
+
+        /* LOADING SCREEN */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            gap: 20px;
+        }
+        .loading-ring {
+            width: 50px;
+            height: 50px;
+            border: 2px solid transparent;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite, pulse 2s ease-in-out infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; transform: scale(0.95); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+        .loading-text {
+            color: var(--primary);
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            animation: blink 2s ease-in-out infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
         }
 
-        /* --- SIDEBAR --- */
+        /* SIDEBAR */
         .sidebar {
             width: 240px; background: var(--sidebar); border-right: 1px solid var(--border);
             display: flex; flex-direction: column; flex-shrink: 0; z-index: 10;
@@ -110,17 +143,16 @@
             padding: 10px; background: #111; border-radius: 6px; border: 1.5px solid #333; margin-top: 10px;
         }
         .stat-dot { width: 10px; height: 10px; border-radius: 50%; background: #444; transition: all 0.3s; }
-        .stat-dot.on { background: #4ade80; box-shadow: 0 0 8px #4ade80; animation: pulse 2s infinite; }
+        .stat-dot.on { background: #4ade80; box-shadow: 0 0 8px #4ade80; animation: pulse-dot 2s infinite; }
         .stat-txt { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 1px; transition: color 0.3s; }
         .stat-txt.on { color: #4ade80; }
-
-        @keyframes pulse {
+        @keyframes pulse-dot {
             0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
             70% { box-shadow: 0 0 0 8px rgba(74, 222, 128, 0); }
             100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
         }
 
-        /* --- MAIN CONTENT --- */
+        /* MAIN CONTENT */
         .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
         .top-bar {
             height: 50px; border-bottom: 1px solid var(--border); display: flex; align-items: center;
@@ -130,10 +162,20 @@
         .breadcrumb span.current { color: white; font-weight: 600; }
         .version { font-size: 11px; color: #444; font-family: monospace; }
 
-        .content-area { flex: 1; display: flex; overflow: hidden; position: relative; }
+        .content-area { 
+            flex: 1; 
+            display: flex; 
+            overflow: hidden; 
+            position: relative; 
+        }
 
         .config-panel {
-            flex: 1; padding: 24px; overflow-y: auto; max-width: 600px;
+            flex: 1; 
+            padding: 24px; 
+            overflow-y: auto; 
+            max-width: 600px;
+            position: relative;
+            z-index: 2;
         }
         .config-panel::-webkit-scrollbar { width: 4px; }
         .config-panel::-webkit-scrollbar-thumb { background: #222; border-radius: 4px; }
@@ -169,7 +211,7 @@
         }
         .dropdown-btn:hover { border-color: #444; }
 
-        /* TOGGLE IGUAL CÓDIGO ORIGINAL */
+        /* TOGGLE */
         .tgl {
             width: 46px; height: 26px; background: #2a2a2a; border-radius: 99px; position: relative;
             border: 1.5px solid #444; transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
@@ -184,133 +226,267 @@
         }
         .tgl.on::after { left: 22px; }
 
-        /* LIVE PREVIEW - TAMANHO CORRETO (420px igual código original) */
+        /* LIVE PREVIEW - ALTURA COMPLETA, LARGURA FIXA NA DIREITA */
         .live-preview-container {
             position: absolute;
-            top: 60px;
-            right: 24px;
-            width: 420px; /* TAMANHO ORIGINAL */
-            height: calc(100% - 84px);
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 420px;
+            height: 100%;
             background: var(--card);
-            border: 1.5px solid var(--border);
-            border-radius: 10px;
+            border-left: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            z-index: 5;
+            z-index: 1;
         }
         .lp-header {
-            padding: 8px 14px; border-bottom: 1px solid var(--border); font-size: 10px;
-            color: #fff; font-weight: 700; letter-spacing: 2px; background: var(--border);
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            font-size: 10px;
+            color: var(--muted);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            background: #0a0a0a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
         }
-        .lp-canvas-wrap { flex: 1; position: relative; background: #050505; overflow: hidden; }
-        .lp-canvas-wrap canvas { width: 100%; height: 100%; display: block; object-fit: contain; }
+        .lp-canvas-wrap { 
+            flex: 1; 
+            position: relative; 
+            background: #050505; 
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .lp-canvas-wrap canvas { 
+            display: block; 
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
 
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* COLOR PICKER - IGUAL IMAGEM 3 */
+        /* COLOR PICKER */
         .cp-overlay {
-            display: none; position: fixed; inset: 0; z-index: 9000;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(2px);
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            z-index: 9000;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.2s ease;
         }
         .cp-overlay.open { display: flex; align-items: center; justify-content: center; }
         
         .cp-box {
-            position: fixed; background: #161616; border: 1.5px solid var(--border);
-            border-radius: 10px; padding: 12px; display: flex; gap: 10px;
-            align-items: flex-start; z-index: 901;
-            box-shadow: 0 16px 48px rgba(0,0,0,0.9);
-            user-select: none; touch-action: none;
+            position: relative;
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 16px;
+            width: 320px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            border: 1px solid #2a2a2a;
         }
         
-        /* Área de Saturação - Quadrada */
-        .sv {
-            width: 190px; height: 152px; border-radius: 5px; position: relative;
-            overflow: hidden; flex-shrink: 0; border: 1px solid #222;
-            background-color: #ff0000 !important;
+        .cp-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
         }
-        .sv-w { position: absolute; inset: 0; background: linear-gradient(to right, #fff, transparent); }
-        .sv-b { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, #000); }
-        .sv-th {
-            position: absolute; width: 13px; height: 13px; border-radius: 50%;
-            border: 2.5px solid #fff; transform: translate(-50%, -50%); pointer-events: none;
-            box-shadow: 0 0 0 1.5px rgba(0,0,0,0.7), 0 2px 5px rgba(0,0,0,0.8);
-            transition: left 0.05s linear, top 0.05s linear;
+        .cp-title-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        
-        /* Barras Verticais e Horizontal */
-        .bars { display: flex; gap: 8px; }
-        .btr {
-            position: relative; width: 14px; height: 152px; border-radius: 99px;
-            overflow: visible; flex-shrink: 0; border: 1px solid #222;
+        .cp-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--primary);
         }
-        .bin { position: absolute; inset: 0; border-radius: 99px; overflow: hidden; }
-        .bh {
-            width: 100%; height: 100%;
-            background: linear-gradient(to bottom, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
+        .cp-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
         }
-        .bck {
-            width: 100%; height: 100%;
-            background: repeating-conic-gradient(#555 0% 25%, #333 0% 50%) 0 0 / 8px 8px;
+        .cp-close {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
         }
-        .bag { position: absolute; inset: 0; border-radius: 99px; pointer-events: none; }
-        .bth {
-            position: absolute; left: 50%; transform: translate(-50%, -50%);
-            width: 17px; height: 17px; border-radius: 50%; background: #fff;
-            border: 2.5px solid #fff;
-            box-shadow: 0 0 0 1.5px rgba(0,0,0,0.6), 0 2px 5px rgba(0,0,0,0.7);
-            pointer-events: none; z-index: 10;
-            transition: top 0.05s linear, background 0.05s linear;
+        .cp-close:hover {
+            background: #2a2a2a;
+            color: #fff;
         }
         
-        /* Slider Alpha Horizontal embaixo */
-        .cp-alpha-horizontal {
-            width: 190px; height: 12px; border-radius: 6px; position: relative;
-            margin-top: 8px; cursor: pointer;
-            background-image: linear-gradient(45deg, #333 25%, transparent 25%), 
-                              linear-gradient(-45deg, #333 25%, transparent 25%), 
-                              linear-gradient(45deg, transparent 75%, #333 75%), 
-                              linear-gradient(-45deg, transparent 75%, #333 75%);
-            background-size: 8px 8px;
-            background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+        .cp-saturation {
+            width: 100%;
+            height: 240px;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 16px;
+            cursor: crosshair;
+            background: linear-gradient(to right, #fff, var(--primary));
         }
-        .cp-alpha-grad {
-            position: absolute; inset: 0; border-radius: 6px;
-            background: linear-gradient(to right, transparent, var(--primary));
+        .cp-sat-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent, #000);
+            pointer-events: none;
+        }
+        .cp-sat-handle {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border: 3px solid #fff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            pointer-events: none;
+            transition: transform 0.05s;
+        }
+        
+        .cp-hue-slider {
+            width: 24px;
+            height: 240px;
+            border-radius: 8px;
+            position: relative;
+            cursor: pointer;
+            background: linear-gradient(to bottom, 
+                #ff0000 0%, 
+                #ffff00 17%, 
+                #00ff00 33%, 
+                #00ffff 50%, 
+                #0000ff 67%, 
+                #ff00ff 83%, 
+                #ff0000 100%
+            );
+            float: right;
+            margin-left: 12px;
+        }
+        .cp-hue-handle {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 28px;
+            height: 10px;
+            background: #fff;
+            border: 2px solid #fff;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            transition: top 0.05s;
+        }
+        
+        .cp-sliders-container {
+            display: flex;
+            align-items: stretch;
+            margin-bottom: 16px;
+        }
+        
+        .cp-alpha-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .cp-alpha-slider {
+            width: 100%;
+            height: 24px;
+            border-radius: 8px;
+            position: relative;
+            cursor: pointer;
+            background-image: 
+                linear-gradient(45deg, #333 25%, transparent 25%), 
+                linear-gradient(-45deg, #333 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #333 75%), 
+                linear-gradient(-45deg, transparent 75%, #333 75%);
+            background-size: 10px 10px;
+            background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
+            overflow: hidden;
+        }
+        .cp-alpha-gradient {
+            position: absolute;
+            inset: 0;
+            border-radius: 8px;
         }
         .cp-alpha-handle {
-            position: absolute; top: 50%; transform: translate(-50%, -50%);
-            width: 16px; height: 16px; background: #fff; border-radius: 50%;
-            border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            background: #fff;
+            border: 3px solid #fff;
+            border-radius: 50%;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+            margin-left: -14px;
+            transition: left 0.05s;
         }
         
-        /* Campo HEX */
         .cp-hex-container {
-            display: flex; align-items: center; gap: 8px; margin-top: 10px;
-            background: #0a0a0a; padding: 8px; border-radius: 6px; border: 1px solid #222;
+            display: flex;
+            align-items: center;
+            background: #0a0a0a;
+            border-radius: 6px;
+            padding: 10px 12px;
+            border: 1px solid #2a2a2a;
+            clear: both;
         }
         .cp-hex-input {
-            flex: 1; background: transparent; border: none; color: #fff;
-            font-family: monospace; font-size: 12px; outline: none; text-transform: uppercase;
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            font-weight: 600;
+            outline: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         .cp-copy-btn {
-            color: #666; cursor: pointer; padding: 4px; transition: color 0.2s;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            margin-left: 8px;
         }
-        .cp-copy-btn:hover { color: var(--primary); }
+        .cp-copy-btn:hover {
+            background: #2a2a2a;
+            color: var(--primary);
+        }
 
-        /* SWATCH SVG */
         .sw-container {
             width: 36px; height: 24px; flex-shrink: 0; border-radius: 4px; overflow: hidden;
             border: 1.5px solid #555; position: relative; cursor: pointer; isolation: isolate; 
         }
-        .sw-svg { width: 100%; height: 100%; display: block; mix-blend-mode: normal !important; }
+        .sw-svg { width: 100%; height: 100%; display: block; }
 
         /* Modal QR */
         #qr-modal {
             position: fixed; inset: 0; z-index: 9999; display: none; align-items: center; justify-content: center;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+            background: rgba(0,0,0,0.9); backdrop-filter: blur(8px);
         }
         #qr-modal.active { display: flex; }
         .qr-modal-content {
@@ -337,44 +513,59 @@
             .nav-item { padding: 12px; border: none; font-size: 12px; }
             .submenu { display: none !important; }
             .content-area { flex-direction: column; }
-            .live-preview-container { position: relative; top: 0; right: 0; width: 100%; height: 50vh; margin: 10px; }
+            .live-preview-container { position: relative; top: 0; right: 0; width: 100%; height: 60vh; border-left: none; border-top: 1px solid var(--border); }
             .config-panel { max-width: 100%; }
         }
     </style>
 </head>
 <body>
 
-<!-- CUSTOM CURSOR CIRCULAR -->
-<div id="custom-cursor"><div class="cursor-dot"></div></div>
+<!-- LOADING SCREEN -->
+<div id="loading-screen">
+    <div class="loading-ring"></div>
+    <div class="loading-text">CONNECTING TO N3SK CORE...</div>
+</div>
 
-<!-- COLOR PICKER OVERLAY - IGUAL IMAGEM 3 -->
+<!-- CUSTOM CURSOR -->
+<div id="custom-cursor"></div>
+
+<!-- COLOR PICKER -->
 <div class="cp-overlay" id="cpOl">
-    <div class="cp-box" id="cpBox" style="position: fixed;">
-        <div class="sv" id="sv">
-            <div class="sv-w"></div>
-            <div class="sv-b"></div>
-            <div class="sv-th" id="svTh"></div>
-        </div>
-        <div class="bars">
-            <div class="btr" id="hueTr">
-                <div class="bin"><div class="bh"></div></div>
-                <div class="bth" id="hueTh"></div>
+    <div class="cp-box" id="cpBox">
+        <div class="cp-header">
+            <div class="cp-title-group">
+                <div class="cp-dot" id="cpDot"></div>
+                <div class="cp-title" id="cpTitle">Health bar (color)</div>
             </div>
-            <div class="btr" id="aTr">
-                <div class="bin"><div class="bck"></div></div>
-                <div class="bag" id="aGr"></div>
-                <div class="bth" id="aTh"></div>
+            <div class="cp-close" onclick="closeCP()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
             </div>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-            <div class="cp-alpha-horizontal" id="cpAlphaHorizontal">
-                <div class="cp-alpha-grad" id="cpAlphaGrad"></div>
+        
+        <div class="cp-sliders-container">
+            <div class="cp-saturation" id="cpSaturation" style="flex: 1;">
+                <div class="cp-sat-overlay"></div>
+                <div class="cp-sat-handle" id="cpSatHandle"></div>
+            </div>
+            
+            <div class="cp-hue-slider" id="cpHueSlider">
+                <div class="cp-hue-handle" id="cpHueHandle"></div>
+            </div>
+        </div>
+        
+        <div class="cp-alpha-container">
+            <div class="cp-alpha-slider" id="cpAlphaSlider">
+                <div class="cp-alpha-gradient" id="cpAlphaGradient"></div>
                 <div class="cp-alpha-handle" id="cpAlphaHandle"></div>
             </div>
+            
             <div class="cp-hex-container">
                 <input type="text" class="cp-hex-input" id="cpHexInput" value="00FFEB" maxlength="6">
                 <div class="cp-copy-btn" onclick="copyHex()" title="Copy">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                         <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                     </svg>
@@ -395,7 +586,7 @@
 </div>
 
 <!-- APP CONTAINER -->
-<div style="display:flex; width:100%; height:100%;">
+<div id="app-container" style="display:none; width:100%; height:100%; flex:1;">
   
   <!-- SIDEBAR -->
   <div class="sidebar">
@@ -486,7 +677,7 @@
                             </div>
                             <div class="feat-title">Enable ESP</div>
                         </div>
-                        <div class="tgl on" id="tgl-enable-esp" onclick="tg(this)"></div>
+                        <div class="tgl" id="tgl-enable-esp" onclick="tg(this)"></div>
                     </div>
                     <div class="feat-desc">Displays visual information about players through walls.</div>
 
@@ -510,15 +701,15 @@
                 <div class="feature-card">
                     <div class="control-row">
                         <span class="c-label">Box ESP</span>
-                        <div class="tgl on" id="tgl-box" onclick='tg(this)'></div>
+                        <div class="tgl" id="tgl-box" onclick='tg(this)'></div>
                     </div>
                     <div class="control-row">
                         <span class="c-label">Skeleton</span>
-                        <div class="tgl on" id="tgl-skeleton" onclick='tg(this)'></div>
+                        <div class="tgl" id="tgl-skeleton" onclick='tg(this)'></div>
                     </div>
                     <div class="control-row">
                         <span class="c-label">Health Bar</span>
-                        <div class="tgl on" id="tgl-healthbar" onclick='tg(this)'></div>
+                        <div class="tgl" id="tgl-healthbar" onclick='tg(this)'></div>
                     </div>
                     <div class="control-row">
                         <span class="c-label">Snapline</span>
@@ -526,12 +717,12 @@
                     </div>
                     <div class="control-row">
                         <span class="c-label">Player Name</span>
-                        <div class="tgl on" id="tgl-name" onclick='tg(this)'></div>
+                        <div class="tgl" id="tgl-name" onclick='tg(this)'></div>
                     </div>
                     
                     <div class="control-row">
                         <span class="c-label">ESP Color</span>
-                        <div class="sw-container" id="sw-espcolor" onclick='openCP(this)'>
+                        <div class="sw-container" id="sw-espcolor" onclick='openCP(this, "ESP Color")'>
                             <svg class="sw-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
                                 <rect width="100" height="100" fill="#00FFEB"/>
                             </svg>
@@ -545,9 +736,16 @@
 
         </div>
 
-        <!-- LIVE PREVIEW - TAMANHO 420px IGUAL CÓDIGO ORIGINAL -->
+        <!-- LIVE PREVIEW - ALTURA COMPLETA, LARGURA FIXA NA DIREITA -->
         <div class="live-preview-container">
-            <div class="lp-header">Preview</div>
+            <div class="lp-header">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+                Preview
+            </div>
             <div class="lp-canvas-wrap">
                 <canvas id="previewCanvas"></canvas>
             </div>
@@ -557,9 +755,7 @@
 </div>
 
 <script>
-// ============================================
-// CURSOR CIRCULAR (IGUAL CÓDIGO ORIGINAL)
-// ============================================
+// CURSOR
 (function(){
     const cur = document.getElementById('custom-cursor');
     if(!cur || window.innerWidth <= 900) return; 
@@ -578,9 +774,7 @@
     loop();
 })();
 
-// ============================================
 // NAVIGATION
-// ============================================
 function handleNavClick(menuId) {
     if (menuId === 'visuals') {
         document.getElementById('nav-aimbot').classList.remove('expanded', 'active');
@@ -635,9 +829,7 @@ function tg(el){
     sendState(); 
 }
 
-// ============================================
 // SUPABASE
-// ============================================
 const SUPA_URL = "https://gkzxuerurfedfwuxhimf.supabase.co";
 const SUPA_KEY = "sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6";
 const client = supabase.createClient(SUPA_URL, SUPA_KEY);
@@ -648,23 +840,13 @@ let partnerId = null;
 let isGlobal = false;
 let bgImage = null;
 let isUpdatingLocally = false; 
-let lastSentState = ""; 
+let lastSentState = "";
 
 window.onload = async function(){
-    if(PREVIEW_IMG_URL){
-        bgImage = new Image();
-        bgImage.crossOrigin = "Anonymous";
-        bgImage.src = PREVIEW_IMG_URL;
-        bgImage.onload = () => scheduleRender();
-    }
-
     const token = new URLSearchParams(window.location.search).get('token');
-    if(!token){ 
-        console.warn("Demo mode");
-        setConn(true);
-        resizeCanvas(); 
-        scheduleRender(); 
-        return; 
+    
+    if(!token){
+        return;
     }
     
     try{
@@ -695,12 +877,25 @@ window.onload = async function(){
             }catch(e){ console.warn("IP check failed", e); }
         }
         
+        document.getElementById('loading-screen').style.display = 'none';
+        document.getElementById('app-container').style.display = 'flex';
+        
+        if(PREVIEW_IMG_URL){
+            bgImage = new Image();
+            bgImage.crossOrigin = "Anonymous";
+            bgImage.src = PREVIEW_IMG_URL;
+            bgImage.onload = () => scheduleRender();
+        }
+        
         setConn(true);
         startSync();
         resizeCanvas();
         scheduleRender();
         
-    }catch(e){ console.error(e); }
+    }catch(e){ 
+        console.error(e);
+        alert("Erro ao validar token");
+    }
 };
 
 function setConn(c){
@@ -709,26 +904,32 @@ function setConn(c){
     else{d.classList.remove('on');t.classList.remove('on');t.textContent='OFFLINE';}
 }
 
-// ============================================
-// SYNC - CORRIGIDO PARA NÃO FLICAR
-// ============================================
 async function startSync(){
     setInterval(async () => {
         if(!sessionId) return;
         
-        const {data, error} = await client.from('n3sk').select('state, is_active').in('id', [sessionId, partnerId]).limit(1);
-        
-        if(error || !data || data.length === 0) return;
-        
-        const validData = data.find(d => d.state);
-        if(validData && validData.state) applyState(validData.state);
+        try {
+            const {data, error} = await client.from('n3sk')
+                .select('state')
+                .in('id', [sessionId, partnerId])
+                .limit(1);
+            
+            if(error || !data || data.length === 0) return;
+            
+            const validData = data.find(d => d.state);
+            if(validData && validData.state) {
+                applyState(validData.state);
+            }
+        } catch(e) {
+            console.error('Sync error:', e);
+        }
     }, 500);
 }
 
 async function sendState(){
-    if(!sessionId) return;
+    if(!sessionId || isUpdatingLocally) return;
     
-    const currentState = {
+    const state = {
         toggles: {
             esp: document.getElementById('tgl-enable-esp').classList.contains('on'),
             aim: document.getElementById('tgl-enable-aim').classList.contains('on'),
@@ -743,81 +944,77 @@ async function sendState(){
             fov: document.getElementById('val-fov').textContent
         },
         colors: {
-            espcolor: getSvgColor('sw-espcolor')
+            esp: document.getElementById('sw-espcolor').querySelector('rect').getAttribute('fill')
         }
     };
-
-    const jsonString = JSON.stringify(currentState);
     
-    if (jsonString !== lastSentState) {
-        lastSentState = jsonString;
-        
+    try {
         isUpdatingLocally = true;
-        setTimeout(() => { isUpdatingLocally = false; }, 500);
-
-        await client.from('n3sk').update({state: currentState}).in('id', [sessionId, partnerId]);
+        
+        await client.from('n3sk')
+            .update({ state: state })
+            .in('id', [sessionId, partnerId]);
+        
+        setTimeout(() => { isUpdatingLocally = false; }, 300);
+    } catch(e) {
+        console.error('Send state error:', e);
+        isUpdatingLocally = false;
     }
 }
 
-function getSvgColor(id) {
-    var el = document.getElementById(id);
-    var rect = el ? el.querySelector('rect') : null;
-    return rect ? rect.getAttribute('fill') : '#00FFEB';
-}
-
-function applyState(s){
-    if(isUpdatingLocally) return;
-
-    setConn(true);
-    var tm={
-        'tgl-box': s.toggles?.box,
-        'tgl-skeleton': s.toggles?.skeleton,
-        'tgl-snapline': s.toggles?.snapline,
-        'tgl-healthbar': s.toggles?.healthbar,
-        'tgl-name': s.toggles?.name,
-        'tgl-enable-esp': s.toggles?.esp,
-        'tgl-enable-aim': s.toggles?.aim
+function applyState(state){
+    if(isUpdatingLocally || !state) return;
+    
+    const toggleMap = {
+        'tgl-enable-esp': state.toggles?.esp,
+        'tgl-enable-aim': state.toggles?.aim,
+        'tgl-box': state.toggles?.box,
+        'tgl-skeleton': state.toggles?.skeleton,
+        'tgl-healthbar': state.toggles?.healthbar,
+        'tgl-snapline': state.toggles?.snapline,
+        'tgl-name': state.toggles?.name
     };
     
-    for(var k in tm){
-        var el=document.getElementById(k);
-        if(el && s.toggles) {
-            if(tm[k]) el.classList.add('on');
+    for(const [id, value] of Object.entries(toggleMap)){
+        const el = document.getElementById(id);
+        if(el && value !== undefined){
+            if(value) el.classList.add('on');
             else el.classList.remove('on');
         }
     }
     
-    if(s.values?.thickness) {
-        document.getElementById('val-thickness').textContent = s.values.thickness;
-        document.querySelector('#content-visuals-players input[type=range]').value = s.values.thickness;
+    if(state.values?.thickness){
+        const el = document.querySelector('#content-visuals-players input[type=range]');
+        if(el){
+            el.value = state.values.thickness;
+            document.getElementById('val-thickness').textContent = state.values.thickness;
+        }
     }
     
-    if(s.colors?.espcolor){
-        var el=document.getElementById('sw-espcolor');
-        if(el){ 
-            var rect = el.querySelector('rect');
-            if(rect) rect.setAttribute('fill', s.colors.espcolor);
+    if(state.colors?.esp){
+        const swatch = document.getElementById('sw-espcolor');
+        if(swatch){
+            const rect = swatch.querySelector('rect');
+            if(rect) rect.setAttribute('fill', state.colors.esp);
         }
     }
     
     scheduleRender();
 }
 
-// ============================================
-// COLOR PICKER - IGUAL IMAGEM 3
-// ============================================
+// COLOR PICKER
 var cpTarget=null,cpH=0.47,cpS=1,cpV=1,cpA=1;
-var svTX=1,svTY=0,svCX=1,svCY=0;
-var hTY=0,hCY=0,aCY=0; 
-var animRun=false;
 var cpOl=document.getElementById('cpOl'), cpBox=document.getElementById('cpBox');
-var svEl=document.getElementById('sv'), svTh=document.getElementById('svTh');
-var hueTr=document.getElementById('hueTr'), hueTh=document.getElementById('hueTh');
-var aTr=document.getElementById('aTr'), aGr=document.getElementById('aGr'), aTh=document.getElementById('aTh');
-var cpAlphaHorizontal=document.getElementById('cpAlphaHorizontal');
-var cpAlphaGrad=document.getElementById('cpAlphaGrad');
+var cpSaturation=document.getElementById('cpSaturation');
+var cpSatHandle=document.getElementById('cpSatHandle');
+var cpHueSlider=document.getElementById('cpHueSlider');
+var cpHueHandle=document.getElementById('cpHueHandle');
+var cpAlphaSlider=document.getElementById('cpAlphaSlider');
 var cpAlphaHandle=document.getElementById('cpAlphaHandle');
+var cpAlphaGradient=document.getElementById('cpAlphaGradient');
 var cpHexInput=document.getElementById('cpHexInput');
+var cpDot=document.getElementById('cpDot');
+var cpTitle=document.getElementById('cpTitle');
 
 function h2r(h,s,v){
   var r,g,b,i=Math.floor(h*6),f=h*6-i,p=v*(1-s),q=v*(1-f*s),t=v*(1-(1-f)*s);
@@ -831,41 +1028,20 @@ function hex2hsv(hex){
   if(d===0)h=0;else if(mx===r)h=((g-b)/d)%6;else if(mx===g)h=(b-r)/d+2;else h=(r-g)/d+4;
   return[h/6,s,v];
 }
-function lerp(a,b,t){return a+(b-a)*t}
-
-function runAnim(){
-  var sp=0.28;
-  svCX=lerp(svCX,svTX,sp);svCY=lerp(svCY,svTY,sp);
-  hCY=lerp(hCY,hTY,sp);
-  svTh.style.left=(svCX*100)+'%';svTh.style.top=(svCY*100)+'%';
-  var hH=hueTr.getBoundingClientRect().height||152;
-  var aH=aTr.getBoundingClientRect().height||152;
-  hueTh.style.top=(hCY*hH)+'px';
-  aTh.style.top=(aCY*aH)+'px';
-  if(Math.abs(svCX-svTX)>.0005||Math.abs(svCY-svTY)>.0005||Math.abs(hCY-hTY)>.0005)
-    requestAnimationFrame(runAnim);
-  else animRun=false;
-}
-function startAnim(){if(!animRun){animRun=true;requestAnimationFrame(runAnim);}}
 
 function updateCP(){
   var hRgb=h2r(cpH,1,1); 
   var hHex=r2h(hRgb[0],hRgb[1],hRgb[2]);
   
-  svEl.style.background=hHex;
+  cpSaturation.style.background='linear-gradient(to right,#fff,'+hHex+')';
   
   var rgb=h2r(cpH,cpS,cpV);
-  svTh.style.background=r2h(rgb[0],rgb[1],rgb[2]);
+  var hex=r2h(rgb[0],rgb[1],rgb[2]);
   
-  aGr.style.background='linear-gradient(to bottom,'+hHex+',transparent)';
-  hueTh.style.background=hHex;
-  aTh.style.background='rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+','+cpA+')';
-  
-  // Update alpha horizontal gradient
-  cpAlphaGrad.style.background='linear-gradient(to right,transparent,'+hHex+')';
+  cpAlphaGradient.style.background='linear-gradient(to right,transparent,'+hHex+')';
+  cpDot.style.background=hex;
   
   if(cpTarget){
-    var hex=r2h(rgb[0],rgb[1],rgb[2]);
     var rect = cpTarget.querySelector('rect');
     if(rect) rect.setAttribute('fill', hex);
     cpHexInput.value = hex.replace('#','').toUpperCase();
@@ -873,15 +1049,10 @@ function updateCP(){
   }
 }
 
-function openCP(el){
+function openCP(el, title){
   cpTarget=el;
-  var rect=el.getBoundingClientRect(),popW=420,popH=200;
-  var left=rect.right+10,top=rect.top;
-  if(left+popW>innerWidth)left=rect.left-popW-10;
-  if(top+popH>innerHeight)top=innerHeight-popH-10;
-  if(left<4)left=4;if(top<4)top=4;
-  cpBox.style.left=left+'px';cpBox.style.top=top+'px';
-
+  if(title) cpTitle.textContent = title;
+  
   var svgRect = el.querySelector('rect');
   var currentColor = svgRect ? svgRect.getAttribute('fill') : '#00FFEB';
 
@@ -889,18 +1060,18 @@ function openCP(el){
       var hsv=hex2hsv(currentColor);
       cpH=hsv[0];cpS=hsv[1];cpV=hsv[2];cpA=1;
   }
-
-  svCX=cpS;svTX=cpS;svCY=1-cpV;svTY=1-cpV;hCY=cpH;hTY=cpH;aCY=1-cpA;
-  updateCP();
-  svTh.style.left=(svCX*100)+'%';svTh.style.top=(svCY*100)+'%';
-  var hH=hueTr.getBoundingClientRect().height||152;
-  var aH=aTr.getBoundingClientRect().height||152;
-  hueTh.style.top=(hCY*hH)+'px';
-  aTh.style.top=(aCY*aH)+'px';
   
-  // Alpha horizontal position
-  var alphaWidth = cpAlphaHorizontal.getBoundingClientRect().width || 190;
-  cpAlphaHandle.style.left = (cpA * alphaWidth) + 'px';
+  updateCP();
+  
+  var satRect = cpSaturation.getBoundingClientRect();
+  cpSatHandle.style.left = (cpS * satRect.width) + 'px';
+  cpSatHandle.style.top = ((1-cpV) * satRect.height) + 'px';
+  
+  var hueRect = cpHueSlider.getBoundingClientRect();
+  cpHueHandle.style.top = (cpH * hueRect.height) + 'px';
+  
+  var alphaRect = cpAlphaSlider.getBoundingClientRect();
+  cpAlphaHandle.style.left = (cpA * alphaRect.width) + 'px';
   
   cpOl.classList.add('open');
 }
@@ -914,43 +1085,45 @@ cpOl.addEventListener('mousedown',function(e){
   if(e.target===cpOl){closeCP();}
 });
 
-var dSV=false,dH=false,dA=false,dAlphaH=false;
-function cl(v,a,b){return Math.max(a,Math.min(b,v))}
+var dSat=false,dHue=false,dAlpha=false;
 
-svEl.addEventListener('mousedown',function(e){e.preventDefault();dSV=true;doSV(e)});
-hueTr.addEventListener('mousedown',function(e){e.preventDefault();dH=true;doH(e)});
-aTr.addEventListener('mousedown',function(e){e.preventDefault();dA=true;doA(e)});
-cpAlphaHorizontal.addEventListener('mousedown',function(e){e.preventDefault();dAlphaH=true;doAlphaH(e)});
+cpSaturation.addEventListener('mousedown',function(e){e.preventDefault();dSat=true;updateSat(e)});
+cpHueSlider.addEventListener('mousedown',function(e){e.preventDefault();dHue=true;updateHue(e)});
+cpAlphaSlider.addEventListener('mousedown',function(e){e.preventDefault();dAlpha=true;updateAlpha(e)});
 
 document.addEventListener('mousemove',function(e){
-    if(dSV){ doSV(e); }
-    if(dH){ doH(e); }
-    if(dA){ doA(e); }
-    if(dAlphaH){ doAlphaH(e); }
+    if(dSat){ updateSat(e); }
+    if(dHue){ updateHue(e); }
+    if(dAlpha){ updateAlpha(e); }
 });
 
 document.addEventListener('mouseup',function(){ 
-    if(dSV||dH||dA||dAlphaH){
-        dSV=false; dH=false; dA=false; dAlphaH=false;
+    if(dSat||dHue||dAlpha){
+        dSat=false; dHue=false; dAlpha=false;
         sendState();
     }
 });
 
-function doSV(e){var r=svEl.getBoundingClientRect();cpS=cl((e.clientX-r.left)/r.width,0,1);cpV=cl(1-(e.clientY-r.top)/r.height,0,1);svTX=cpS;svTY=1-cpV;updateCP();startAnim();}
-function doH(e){var r=hueTr.getBoundingClientRect();cpH=cl((e.clientY-r.top)/r.height,0,.9999);hTY=cpH;updateCP();startAnim();}
-function doA(e){
-    var r=aTr.getBoundingClientRect();
-    var height = r.height || 152;
-    cpA = cl(1 - ((e.clientY - r.top) / height), 0, 1);
-    aCY = 1 - cpA; 
+function updateSat(e){
+    var r=cpSaturation.getBoundingClientRect();
+    cpS=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));
+    cpV=Math.max(0,Math.min(1,1-(e.clientY-r.top)/r.height));
+    cpSatHandle.style.left=(cpS*r.width)+'px';
+    cpSatHandle.style.top=((1-cpV)*r.height)+'px';
     updateCP();
-    startAnim();
 }
-function doAlphaH(e){
-    var r = cpAlphaHorizontal.getBoundingClientRect();
-    var width = r.width || 190;
-    cpA = cl((e.clientX - r.left) / width, 0, 1);
-    cpAlphaHandle.style.left = (cpA * width) + 'px';
+
+function updateHue(e){
+    var r=cpHueSlider.getBoundingClientRect();
+    cpH=Math.max(0,Math.min(1,(e.clientY-r.top)/r.height));
+    cpHueHandle.style.top=(cpH*r.height)+'px';
+    updateCP();
+}
+
+function updateAlpha(e){
+    var r=cpAlphaSlider.getBoundingClientRect();
+    cpA=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));
+    cpAlphaHandle.style.left=(cpA*r.width)+'px';
     updateCP();
 }
 
@@ -960,9 +1133,7 @@ function copyHex(){
     navigator.clipboard.writeText(hex);
 }
 
-// ============================================
 // QR CODE
-// ============================================
 function showGlobalQr(){
     const targetId = isGlobal ? sessionId : partnerId; 
     
@@ -984,21 +1155,24 @@ function showGlobalQr(){
 }
 function closeGlobalQr(){ document.getElementById('qr-modal').classList.remove('active'); }
 
-// ============================================
-// PREVIEW CANVAS - SOMENTE IMAGEM, SEM DESENHOS ESP
-// ============================================
+// PREVIEW CANVAS
 var canvas = document.getElementById('previewCanvas');
 var ctx = canvas.getContext('2d', { alpha: false });
 var canvasWidth = 0, canvasHeight = 0, renderScheduled = false;
 
 function resizeCanvas() {
   var rect = canvas.parentElement.getBoundingClientRect();
-  var nw = rect.width, nh = rect.height - 35; 
+  var nw = rect.width, nh = rect.height; 
   var dpr = window.devicePixelRatio || 1;
   if (canvasWidth !== nw || canvasHeight !== nh) { 
-      canvas.width = nw * dpr; canvas.height = nh * dpr; 
-      canvas.style.width = nw + 'px'; canvas.style.height = nh + 'px';
-      ctx.scale(dpr, dpr); canvasWidth = nw; canvasHeight = nh; scheduleRender(); 
+      canvas.width = nw * dpr; 
+      canvas.height = nh * dpr; 
+      canvas.style.width = nw + 'px'; 
+      canvas.style.height = nh + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      canvasWidth = nw; 
+      canvasHeight = nh; 
+      scheduleRender(); 
   }
 }
 window.addEventListener('resize', resizeCanvas);
@@ -1010,13 +1184,21 @@ function renderPreview() {
   
   ctx.save();
   ctx.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0);
-  ctx.fillStyle = '#050505'; ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+  ctx.fillStyle = '#050505'; 
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-  // SOMENTE DESENHA A IMAGEM DE FUNDO - SEM DESENHOS DE ESP
   if (bgImage && bgImage.complete && bgImage.naturalWidth > 0) {
-      var s = Math.min(canvasWidth / bgImage.width, canvasHeight / bgImage.height);
-      var w = bgImage.width * s, h = bgImage.height * s;
-      ctx.drawImage(bgImage, (canvasWidth - w)/2, (canvasHeight - h)/2, w, h);
+      var scaleX = canvasWidth / bgImage.width;
+      var scaleY = canvasHeight / bgImage.height;
+      var s = Math.min(scaleX, scaleY) * 0.9;
+      
+      var w = bgImage.width * s;
+      var h = bgImage.height * s;
+      
+      var x = (canvasWidth - w) / 2;
+      var y = (canvasHeight - h) / 2;
+      
+      ctx.drawImage(bgImage, x, y, w, h);
   }
 
   ctx.restore();
