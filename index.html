@@ -92,7 +92,7 @@
         /* Removido z-index interno para evitar bugs de renderização no mobile */
         .sv{width:190px;height:152px;border-radius:5px;position:relative;overflow:hidden;flex-shrink:0;border:1px solid #222; background: #ff0000;}
         .sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent)}
-        .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,#000)}
+        .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,rgba(0,0,0,0.3))}
         .sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,.7),0 2px 5px rgba(0,0,0,.8); transition: left 0.05s linear, top 0.05s linear;}
         
         .bars{display:flex;gap:8px}
@@ -393,7 +393,12 @@ function updateCP(){
   
   svEl.style.background=hHex;
   
-  var rgb=h2r(cpH,cpS,cpV);
+  // Aumentar brilho mínimo no celular para ficar visível
+  var isMobile = window.innerWidth <= 900;
+  var minV = isMobile ? 0.5 : 0; // No mobile, V mínimo é 0.5 para não ficar escuro
+  var displayV = Math.max(cpV, minV);
+  
+  var rgb=h2r(cpH,cpS,displayV);
   svTh.style.background=r2h(rgb[0],rgb[1],rgb[2]);
   
   aGr.style.background='linear-gradient(to bottom,'+hHex+',transparent)';
