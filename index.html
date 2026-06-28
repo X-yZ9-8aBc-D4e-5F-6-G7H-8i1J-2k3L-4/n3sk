@@ -48,7 +48,7 @@
             border-color: #fff;
         }
 
-        /* LOADING SCREEN - PULSANDO IGUAL IMAGEM 5 */
+        /* LOADING SCREEN */
         #loading-screen {
             position: fixed;
             inset: 0;
@@ -162,10 +162,20 @@
         .breadcrumb span.current { color: white; font-weight: 600; }
         .version { font-size: 11px; color: #444; font-family: monospace; }
 
-        .content-area { flex: 1; display: flex; overflow: hidden; position: relative; }
+        .content-area { 
+            flex: 1; 
+            display: flex; 
+            overflow: hidden; 
+            position: relative; 
+        }
 
         .config-panel {
-            flex: 1; padding: 24px; overflow-y: auto; max-width: 600px;
+            flex: 1; 
+            padding: 24px; 
+            overflow-y: auto; 
+            max-width: 600px;
+            position: relative;
+            z-index: 2;
         }
         .config-panel::-webkit-scrollbar { width: 4px; }
         .config-panel::-webkit-scrollbar-thumb { background: #222; border-radius: 4px; }
@@ -201,7 +211,7 @@
         }
         .dropdown-btn:hover { border-color: #444; }
 
-        /* TOGGLE - TODOS COMEÇAM DESLIGADOS */
+        /* TOGGLE */
         .tgl {
             width: 46px; height: 26px; background: #2a2a2a; border-radius: 99px; position: relative;
             border: 1.5px solid #444; transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
@@ -216,20 +226,21 @@
         }
         .tgl.on::after { left: 22px; }
 
-        /* LIVE PREVIEW - TAMANHO MAIOR E CENTRALIZADO */
+        /* LIVE PREVIEW - OCUPA TODA ALTURA E LARGURA DISPONÍVEL */
         .live-preview-container {
             position: absolute;
-            top: 60px;
-            right: 24px;
-            width: 420px;
-            height: 680px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            z-index: 5;
+            z-index: 1;
+            pointer-events: none;
         }
         .lp-header {
             padding: 10px 14px;
@@ -242,15 +253,17 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            pointer-events: auto;
         }
         .lp-canvas-wrap { 
             flex: 1; 
             position: relative; 
-            background: #050505; 
+            background: transparent; 
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
+            pointer-events: auto;
         }
         .lp-canvas-wrap canvas { 
             display: block; 
@@ -263,7 +276,7 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* COLOR PICKER - EXATAMENTE IGUAL IMAGEM 3 */
+        /* COLOR PICKER */
         .cp-overlay {
             display: none; 
             position: fixed; 
@@ -323,7 +336,6 @@
             color: #fff;
         }
         
-        /* Área de Saturação - Quadrado Grande */
         .cp-saturation {
             width: 100%;
             height: 240px;
@@ -352,7 +364,6 @@
             transition: transform 0.05s;
         }
         
-        /* Slider Hue - Vertical à direita */
         .cp-hue-slider {
             width: 24px;
             height: 240px;
@@ -384,14 +395,12 @@
             transition: top 0.05s;
         }
         
-        /* Container dos sliders */
         .cp-sliders-container {
             display: flex;
             align-items: stretch;
             margin-bottom: 16px;
         }
         
-        /* Slider Alpha - Horizontal embaixo */
         .cp-alpha-container {
             flex: 1;
             display: flex;
@@ -432,7 +441,6 @@
             transition: left 0.05s;
         }
         
-        /* Campo HEX */
         .cp-hex-container {
             display: flex;
             align-items: center;
@@ -471,7 +479,6 @@
             color: var(--primary);
         }
 
-        /* SWATCH SVG */
         .sw-container {
             width: 36px; height: 24px; flex-shrink: 0; border-radius: 4px; overflow: hidden;
             border: 1.5px solid #555; position: relative; cursor: pointer; isolation: isolate; 
@@ -515,7 +522,7 @@
 </head>
 <body>
 
-<!-- LOADING SCREEN - PULSANDO IGUAL IMAGEM 5 -->
+<!-- LOADING SCREEN -->
 <div id="loading-screen">
     <div class="loading-ring"></div>
     <div class="loading-text">CONNECTING TO N3SK CORE...</div>
@@ -524,7 +531,7 @@
 <!-- CUSTOM CURSOR -->
 <div id="custom-cursor"></div>
 
-<!-- COLOR PICKER - IGUAL IMAGEM 3 -->
+<!-- COLOR PICKER -->
 <div class="cp-overlay" id="cpOl">
     <div class="cp-box" id="cpBox">
         <div class="cp-header">
@@ -541,19 +548,16 @@
         </div>
         
         <div class="cp-sliders-container">
-            <!-- Área de Saturação Quadrada -->
             <div class="cp-saturation" id="cpSaturation" style="flex: 1;">
                 <div class="cp-sat-overlay"></div>
                 <div class="cp-sat-handle" id="cpSatHandle"></div>
             </div>
             
-            <!-- Hue Vertical -->
             <div class="cp-hue-slider" id="cpHueSlider">
                 <div class="cp-hue-handle" id="cpHueHandle"></div>
             </div>
         </div>
         
-        <!-- Alpha Horizontal e HEX -->
         <div class="cp-alpha-container">
             <div class="cp-alpha-slider" id="cpAlphaSlider">
                 <div class="cp-alpha-gradient" id="cpAlphaGradient"></div>
@@ -665,7 +669,7 @@
                 </div>
             </div>
 
-            <!-- VISUALS PLAYERS CONTENT - TODOS TOGGLES DESLIGADOS -->
+            <!-- VISUALS PLAYERS CONTENT -->
             <div id="content-visuals-players" class="tab-content active">
                 <div class="feature-card">
                     <div class="feat-head">
@@ -734,7 +738,7 @@
 
         </div>
 
-        <!-- LIVE PREVIEW -->
+        <!-- LIVE PREVIEW - AGORA OCUPA TODO O ESPAÇO -->
         <div class="live-preview-container">
             <div class="lp-header">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -843,12 +847,10 @@ let lastSentState = "";
 window.onload = async function(){
     const token = new URLSearchParams(window.location.search).get('token');
     
-    // SEM TOKEN: PERMANECER NA TELA DE LOADING PULSANDO
     if(!token){
-        return; // Permanece no loading screen
+        return;
     }
     
-    // COM TOKEN: VALIDAR E CARREGAR
     try{
         const {data, error} = await client.from('n3sk').select('*').eq('token', token).eq('is_active', true).single();
         
@@ -877,11 +879,9 @@ window.onload = async function(){
             }catch(e){ console.warn("IP check failed", e); }
         }
         
-        // ESCONDER LOADING, MOSTRAR APP
         document.getElementById('loading-screen').style.display = 'none';
         document.getElementById('app-container').style.display = 'flex';
         
-        // CARREGAR IMAGEM
         if(PREVIEW_IMG_URL){
             bgImage = new Image();
             bgImage.crossOrigin = "Anonymous";
@@ -906,7 +906,6 @@ function setConn(c){
     else{d.classList.remove('on');t.classList.remove('on');t.textContent='OFFLINE';}
 }
 
-// SYNC CORRIGIDO
 async function startSync(){
     setInterval(async () => {
         if(!sessionId) return;
@@ -954,7 +953,6 @@ async function sendState(){
     try {
         isUpdatingLocally = true;
         
-        // Envia para ambos os registros (main e global)
         await client.from('n3sk')
             .update({ state: state })
             .in('id', [sessionId, partnerId]);
@@ -969,7 +967,6 @@ async function sendState(){
 function applyState(state){
     if(isUpdatingLocally || !state) return;
     
-    // Aplica toggles
     const toggleMap = {
         'tgl-enable-esp': state.toggles?.esp,
         'tgl-enable-aim': state.toggles?.aim,
@@ -988,7 +985,6 @@ function applyState(state){
         }
     }
     
-    // Aplica valores
     if(state.values?.thickness){
         const el = document.querySelector('#content-visuals-players input[type=range]');
         if(el){
@@ -997,7 +993,6 @@ function applyState(state){
         }
     }
     
-    // Aplica cores
     if(state.colors?.esp){
         const swatch = document.getElementById('sw-espcolor');
         if(swatch){
@@ -1070,7 +1065,6 @@ function openCP(el, title){
   
   updateCP();
   
-  // Posiciona handles
   var satRect = cpSaturation.getBoundingClientRect();
   cpSatHandle.style.left = (cpS * satRect.width) + 'px';
   cpSatHandle.style.top = ((1-cpV) * satRect.height) + 'px';
@@ -1163,7 +1157,7 @@ function showGlobalQr(){
 }
 function closeGlobalQr(){ document.getElementById('qr-modal').classList.remove('active'); }
 
-// PREVIEW CANVAS
+// PREVIEW CANVAS - AGORA CENTRALIZADO
 var canvas = document.getElementById('previewCanvas');
 var ctx = canvas.getContext('2d', { alpha: false });
 var canvasWidth = 0, canvasHeight = 0, renderScheduled = false;
@@ -1173,9 +1167,14 @@ function resizeCanvas() {
   var nw = rect.width, nh = rect.height; 
   var dpr = window.devicePixelRatio || 1;
   if (canvasWidth !== nw || canvasHeight !== nh) { 
-      canvas.width = nw * dpr; canvas.height = nh * dpr; 
-      canvas.style.width = nw + 'px'; canvas.style.height = nh + 'px';
-      ctx.scale(dpr, dpr); canvasWidth = nw; canvasHeight = nh; scheduleRender(); 
+      canvas.width = nw * dpr; 
+      canvas.height = nh * dpr; 
+      canvas.style.width = nw + 'px'; 
+      canvas.style.height = nh + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      canvasWidth = nw; 
+      canvasHeight = nh; 
+      scheduleRender(); 
   }
 }
 window.addEventListener('resize', resizeCanvas);
@@ -1187,12 +1186,23 @@ function renderPreview() {
   
   ctx.save();
   ctx.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0);
-  ctx.fillStyle = '#050505'; ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+  ctx.fillStyle = '#050505'; 
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
   if (bgImage && bgImage.complete && bgImage.naturalWidth > 0) {
-      var s = Math.min(canvasWidth / bgImage.width, canvasHeight / bgImage.height);
-      var w = bgImage.width * s, h = bgImage.height * s;
-      ctx.drawImage(bgImage, (canvasWidth - w)/2, (canvasHeight - h)/2, w, h);
+      // Calcula escala para caber no canvas mantendo proporção
+      var scaleX = canvasWidth / bgImage.width;
+      var scaleY = canvasHeight / bgImage.height;
+      var s = Math.min(scaleX, scaleY) * 0.9; // 90% para dar margem
+      
+      var w = bgImage.width * s;
+      var h = bgImage.height * s;
+      
+      // Centraliza a imagem
+      var x = (canvasWidth - w) / 2;
+      var y = (canvasHeight - h) / 2;
+      
+      ctx.drawImage(bgImage, x, y, w, h);
   }
 
   ctx.restore();
