@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset='utf-8'>
     <meta name='viewport' content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no'>
     <meta name='color-scheme' content='light dark'>
-    <title>n3sk</title>
+    <title>n3sk Cloud Control</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <style>
@@ -21,7 +20,7 @@
         }
         *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 
-        /* CURSOR ORIGINAL */
+        /* CURSOR */
         html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;cursor:none}
         @media(hover:hover){ 
             body { cursor: none; }
@@ -73,26 +72,25 @@
         .preview-panel{width:420px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;flex-shrink:0}
         .preview-canvas{flex:1;background:#050505;width:100%;height:100%;display:block}
 
-        /* TOGGLE ORIGINAL */
+        /* TOGGLE */
         .tgl{width:46px;height:26px;background:#2a2a2a;border-radius:99px;position:relative;border:1.5px solid #444;transition:all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);user-select:none;flex-shrink:0}
         .tgl.on{background:var(--red);border-color:#ff6b6b;box-shadow:0 0 8px rgba(199,48,48,.4)}
         .tgl::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#ffffff;top:2px;left:2px;transition:all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);box-shadow:0 1px 4px rgba(0,0,0,.5)}
         .tgl.on::after{left:22px}
 
-        /* SWATCH SVG ORIGINAL */
+        /* SWATCH SVG */
         .sw-container {
             width: 36px; height: 24px; flex-shrink: 0; border-radius: 4px; overflow: hidden;
             border: 1.5px solid #555; position: relative; cursor: pointer; isolation: isolate; 
         }
         .sw-svg { width: 100%; height: 100%; display: block; mix-blend-mode: normal !important; }
 
-        /* COLOR PICKER OVERLAY ORIGINAL */
+        /* COLOR PICKER OVERLAY */
         .cp-ol{display:none;position:fixed;inset:0;z-index:9000} .cp-ol.open{display:block}
         .cp-box{position:fixed;background:#161616;border:1.5px solid var(--border);border-radius:10px;padding:12px;display:flex;gap:10px;align-items:flex-start;z-index:901;box-shadow:0 16px 48px rgba(0,0,0,.9);user-select:none;touch-action:none}
         .sv{width:190px;height:152px;border-radius:5px;position:relative;overflow:hidden;flex-shrink:0;border:1px solid #222}
         .sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent)}
         .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,#000)}
-        /* SMOOTH NAS BOLINHAS */
         .sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,.7),0 2px 5px rgba(0,0,0,.8); transition: left 0.05s linear, top 0.05s linear;}
         .bars{display:flex;gap:8px}
         .btr{position:relative;width:14px;height:152px;border-radius:99px;overflow:visible;flex-shrink:0;border:1px solid #222}
@@ -167,7 +165,7 @@
 <!-- LOGIN SCREEN -->
 <div id="login-screen">
     <div class="login-card">
-        <h1>N3SK <span></span></h1>
+        <h1>N3SK <span>CLOUD</span></h1>
         <p id="login-msg">Validando acesso...</p>
         <div class="loader" id="login-loader"></div>
     </div>
@@ -183,7 +181,7 @@
     </div>
 </div>
 
-<!-- COLOR PICKER OVERLAY ORIGINAL -->
+<!-- COLOR PICKER OVERLAY -->
 <div class='cp-ol' id='cpOl'>
   <div class='cp-box' id='cpBox'>
     <div class='sv' id='sv'><div class='sv-w'></div><div class='sv-b'></div><div class='sv-th' id='svTh'></div></div>
@@ -223,7 +221,6 @@
     <div class='panel'>
       <div class='ph'>ESP COLORS</div>
       <div class='pgrid'>
-        <!-- Usando SVG Inline igual ao original -->
         <div class='row'><span>Box color</span><div class='sw-container' id='sw-boxcolor' data-k='boxcolor' onclick='openCP(this)'><svg class='sw-svg' viewBox='0 0 100 100' preserveAspectRatio='none'><rect width='100' height='100' fill='#ffffff'/></svg></div></div>
         <div class='row'><span>Skeleton color</span><div class='sw-container' id='sw-skeletoncolor' data-k='skeletoncolor' onclick='openCP(this)'><svg class='sw-svg' viewBox='0 0 100 100' preserveAspectRatio='none'><rect width='100' height='100' fill='#ff0000'/></svg></div></div>
         <div class='row'><span>Snapline color</span><div class='sw-container' id='sw-snaplinecolor' data-k='snaplinecolor' onclick='openCP(this)'><svg class='sw-svg' viewBox='0 0 100 100' preserveAspectRatio='none'><rect width='100' height='100' fill='#00ff00'/></svg></div></div>
@@ -251,22 +248,19 @@ const PREVIEW_IMG_URL = 'https://media.discordapp.net/attachments/11843230479315
 let sessionId = null;
 let isGlobal = false;
 let bgImage = null;
-let isUpdatingLocally = false; // TRAVA PARA EVITAR BUG DE TOGGLE
+let isUpdatingLocally = false; 
 
 // ============================================
-// CURSOR (INICIA IMEDIATAMENTE)
+// CURSOR
 // ============================================
 (function(){
     const cur = document.getElementById('cur');
     if(!cur || window.innerWidth <= 900) return; 
-    
     let mx = window.innerWidth/2, my = window.innerHeight/2;
     let cx = mx, cy = my;
-    
     document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; }, {passive:true});
     document.addEventListener('mousedown', () => cur.classList.add('ck'));
     document.addEventListener('mouseup', () => cur.classList.remove('ck'));
-    
     function loop(){
         cx += (mx-cx)*0.13;
         cy += (my-cy)*0.13;
@@ -292,26 +286,39 @@ window.onload = async function(){
     if(!token){ showLoginError("Token não encontrado"); return; }
     
     try{
+        // Busca o token na tabela
         const {data, error} = await client.from('n3sk').select('*').eq('token', token).eq('is_active', true).single();
-        if(error || !data){ showLoginError("Token inválido ou expirado"); return; }
+        
+        if(error || !data){ 
+            showLoginError("Token inválido ou expirado"); 
+            return; 
+        }
         
         sessionId = data.id;
         isGlobal = data.is_global;
         
+        // SE NÃO FOR GLOBAL, VERIFICA O IP (SEGURANÇA)
         if(!isGlobal && data.ip && data.ip !== "UNKNOWN"){
             try{
                 const res = await fetch('https://api.ipify.org?format=json');
                 const ipData = await res.json();
-                if(ipData.ip !== data.ip){ showLoginError("Acesso negado - Dispositivo diferente"); return; }
+                if(ipData.ip !== data.ip){ 
+                    showLoginError("Acesso negado - Dispositivo diferente"); 
+                    return; 
+                }
             }catch(e){ console.warn("IP check failed", e); }
         }
         
+        // Sucesso no login
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app').style.display = 'block';
         setConn(true);
+        
+        // Inicia sincronização
         startSync();
         resizeCanvas();
         scheduleRender();
+        
     }catch(e){ showLoginError("Erro: "+e.message); }
 };
 
@@ -322,16 +329,16 @@ function showLoginError(msg){
 }
 
 // ============================================
-// TOGGLES (BLINDADO CONTRA BUG)
+// TOGGLES
 // ============================================
 function tg(el){
     el.classList.toggle('on'); 
     scheduleRender();
-    sendState(); // Envia imediatamente sem debounce
+    sendState(); 
 }
 
 // ============================================
-// COLOR PICKER ORIGINAL (TEMPO REAL + SMOOTH)
+// COLOR PICKER
 // ============================================
 var cpTarget=null,cpH=0,cpS=1,cpV=1,cpA=1;
 var svTX=1,svTY=0,svCX=1,svCY=0;
@@ -380,7 +387,6 @@ function updateCP(){
   aTh.style.background='rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+','+cpA+')';
   if(cpTarget){
     var hex=r2h(rgb[0],rgb[1],rgb[2]);
-    // Atualiza o atributo 'fill' do SVG igual ao original
     var rect = cpTarget.querySelector('rect');
     if(rect) rect.setAttribute('fill', hex);
     scheduleRender();
@@ -396,7 +402,6 @@ function openCP(el){
   if(left<4)left=4;if(top<4)top=4;
   cpBox.style.left=left+'px';cpBox.style.top=top+'px';
 
-  // Pega a cor atual do SVG
   var svgRect = el.querySelector('rect');
   var currentColor = svgRect ? svgRect.getAttribute('fill') : '#ff0000';
 
@@ -429,27 +434,14 @@ svEl.addEventListener('mousedown',function(e){e.preventDefault();dSV=true;doSV(e
 hueTr.addEventListener('mousedown',function(e){e.preventDefault();dH=true;doH(e)});
 aTr.addEventListener('mousedown',function(e){e.preventDefault();dA=true;doA(e)});
 
-// MODIFICAÇÃO 1: Mousemove enviando em tempo real
 document.addEventListener('mousemove',function(e){
-    if(dSV){
-        doSV(e);
-        sendState();
-    }
-    if(dH){
-        doH(e);
-        sendState();
-    }
-    if(dA){
-        doA(e);
-        sendState();
-    }
+    if(dSV){ doSV(e); sendState(); }
+    if(dH){ doH(e); sendState(); }
+    if(dA){ doA(e); sendState(); }
 });
 
-// MODIFICAÇÃO 2: Mouseup apenas parando o drag (sem enviar de novo)
 document.addEventListener('mouseup',function(){ 
-    dSV=false;
-    dH=false;
-    dA=false;
+    dSV=false; dH=false; dA=false;
 });
 
 function doSV(e){var r=svEl.getBoundingClientRect();cpS=cl((e.clientX-r.left)/r.width,0,1);cpV=cl(1-(e.clientY-r.top)/r.height,0,1);svTX=cpS;svTY=1-cpV;updateCP();startAnim();}
@@ -468,34 +460,25 @@ svEl.addEventListener('touchstart',function(e){e.preventDefault();dSV=true;doSV(
 hueTr.addEventListener('touchstart',function(e){e.preventDefault();dH=true;doH(tm(e))},{passive:false});
 aTr.addEventListener('touchstart',function(e){e.preventDefault();dA=true;doA(tm(e))},{passive:false});
 
-// MODIFICAÇÃO 3: Touchmove enviando em tempo real
 document.addEventListener('touchmove',function(e){
   if(dSV||dH||dA){
     e.preventDefault();
     var m=tm(e);
-    if(dSV){
-        doSV(m);
-        sendState();
-    }
-    if(dH){
-        doH(m);
-        sendState();
-    }
-    if(dA){
-        doA(m);
-        sendState();
-    }
+    if(dSV){ doSV(m); sendState(); }
+    if(dH){ doH(m); sendState(); }
+    if(dA){ doA(m); sendState(); }
   }
 },{passive:false});
 
 document.addEventListener('touchend',function(){ dSV=false;dH=false;dA=false; sendState(); });
 
 // ============================================
-// SYNC & STATE (ZERO DELAY + PROTEÇÃO)
+// SYNC & STATE
 // ============================================
 async function startSync(){
     setInterval(async () => {
         if(!sessionId) return;
+        // Busca estado atual para garantir sincronia caso outro dispositivo altere
         const {data, error} = await client.from('n3sk').select('state, is_active').eq('id', sessionId).single();
         if(error || !data || !data.is_active){ location.reload(); return; }
         if(data.state) applyState(data.state);
@@ -523,6 +506,8 @@ async function sendState(){
         },
         alphas: { boxalpha: cpA, skeletonalpha: 1, snaplinealpha: 1, healthbaralpha: 1 }
     };
+    
+    // Atualiza o registro atual (seja Main ou Global)
     await client.from('n3sk').update({state}).eq('id', sessionId);
 }
 
@@ -545,7 +530,6 @@ function applyState(s){
     for(var k in cm){
         var el=document.getElementById(cm[k]);
         if(el && s.colors && s.colors[k]){ 
-            // Atualiza o SVG com a cor recebida igual ao original
             var rect = el.querySelector('rect');
             if(rect) rect.setAttribute('fill', s.colors[k]);
         }
@@ -569,7 +553,10 @@ function setConn(c){
 // QR CODE
 // ============================================
 function showGlobalQr(){
+    // Tenta encontrar o ID global associado a esta sessão
+    // Assumindo convenção: ID_GLOBAL = ID_SESSAO + "_GLOBAL"
     const globalId = sessionId.includes('_GLOBAL') ? sessionId : sessionId + '_GLOBAL';
+    
     client.from('n3sk').select('token').eq('id', globalId).single()
     .then(({data, error}) => {
         if(data && data.token){
@@ -581,13 +568,15 @@ function showGlobalQr(){
                 colorDark: "#000000", colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.H
             });
+        } else {
+            alert("Erro ao gerar QR Global. Verifique se a sessão global foi criada.");
         }
     });
 }
 function closeGlobalQr(){ document.getElementById('qr-modal').classList.remove('active'); }
 
 // ============================================
-// PREVIEW CANVAS ORIGINAL
+// PREVIEW CANVAS
 // ============================================
 var canvas = document.getElementById('espCanvas');
 var ctx = canvas.getContext('2d', { alpha: false });
