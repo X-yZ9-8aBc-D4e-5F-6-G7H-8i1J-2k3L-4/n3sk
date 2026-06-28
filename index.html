@@ -1,22 +1,11 @@
-Entendi perfeitamente o problema. O que está acontecendo é um conflito de **Modo Escuro (Dark Mode)** do navegador no celular com o modo como as cores são renderizadas na tela (Canvas/SVG).
-
-Quando o celular está em modo escuro, ele tenta "escurecer" elementos que ele acha que são fundos claros, ou inverte cores para proteger a visão, o que deixa seu seletor de cores preto e o vermelho sangue parecendo marrom escuro. Além disso, a forma como o degradê preto era aplicado estava cobrindo a cor base.
-
-Aqui está o código corrigido. Fiz três alterações principais:
-1.  **Forçar o navegador a não alterar as cores** (`color-rendering` e `forced-colors`).
-2.  **Corrigir a lógica do degradê** para garantir que a cor base seja sempre vibrante antes de aplicar a sombra.
-3.  **Remover a animação da Healthbar** (deixar estática) conforme você pediu anteriormente.
-
-Substitua todo o seu código por este:
-
-```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset='utf-8'>
+    <!-- Força o layout mobile sem zoom -->
     <meta name='viewport' content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no'>
-    <!-- Adicionado para tentar forçar cores vivas no mobile -->
-    <meta name='color-scheme' content='only light'> 
+    <!-- TRUQUE 1: Força o navegador a achar que é Light Mode para não inverter cores -->
+    <meta name='color-scheme' content='light'> 
     <title>n3sk Cloud Control</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
@@ -31,12 +20,14 @@ Substitua todo o seu código por este:
             --muted:#888; 
         }
         
-        /* CORREÇÃO MOBILE: Força o navegador a renderizar as cores exatas */
+        /* TRUQUE 2: Impede o celular de alterar cores automaticamente */
         * {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
             color-rendering: optimizeQuality !important;
             forced-color-adjust: none !important;
+            /* Garante que o branco seja BRANCO puro e não cinza */
+            -webkit-text-fill-color: currentColor !important;
         }
 
         *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -109,7 +100,10 @@ Substitua todo o seu código por este:
         /* COLOR PICKER OVERLAY */
         .cp-ol{display:none;position:fixed;inset:0;z-index:9000} .cp-ol.open{display:block}
         .cp-box{position:fixed;background:#161616;border:1.5px solid var(--border);border-radius:10px;padding:12px;display:flex;gap:10px;align-items:flex-start;z-index:901;box-shadow:0 16px 48px rgba(0,0,0,.9);user-select:none;touch-action:none}
-        .sv{width:190px;height:152px;border-radius:5px;position:relative;overflow:hidden;flex-shrink:0;border:1px solid #222}
+        
+        /* TRUQUE 3: Container do seletor com fundo branco FORÇADO para evitar escurecimento */
+        .sv{width:190px;height:152px;border-radius:5px;position:relative;overflow:hidden;flex-shrink:0;border:1px solid #222; background-color: #ff0000 !important;}
+        
         .sv-w{position:absolute;inset:0;background:linear-gradient(to right,#fff,transparent)}
         .sv-b{position:absolute;inset:0;background:linear-gradient(to bottom,transparent,#000)}
         .sv-th{position:absolute;width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1.5px rgba(0,0,0,.7),0 2px 5px rgba(0,0,0,.8); transition: left 0.05s linear, top 0.05s linear;}
@@ -697,4 +691,3 @@ function renderPreview() {
 </script>
 </body>
 </html>
-```
