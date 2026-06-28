@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -240,7 +241,7 @@
 
 <script>
 // ============================================
-// CONFIGURAÇÃO SUPABASE & VARIÁVEIS GLOBAIS
+// CONFIGURAÇÃO SUPABASE
 // ============================================
 const SUPA_URL = "https://gkzxuerurfedfwuxhimf.supabase.co";
 const SUPA_KEY = "sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6";
@@ -250,34 +251,27 @@ const PREVIEW_IMG_URL = 'https://media.discordapp.net/attachments/11843230479315
 let sessionId = null;
 let isGlobal = false;
 let bgImage = null;
-let isUpdatingLocally = false;
-
-// ARMAZENAMENTO DE ALPHAS INDIVIDUAIS POR COR
-// Isso garante que o Box tenha o alpha dele, o Skeleton o dele, etc.
-let colorAlphas = {
-    'boxcolor': 1.0,
-    'skeletoncolor': 1.0,
-    'snaplinecolor': 1.0,
-    'healthbarcolor': 1.0
-};
-
-// Variável para saber QUAL cor estamos editando agora
-let currentEditingKey = null; 
+let isUpdatingLocally = false; // TRAVA PARA EVITAR BUG DE TOGGLE
 
 // ============================================
-// CURSOR
+// CURSOR (INICIA IMEDIATAMENTE)
 // ============================================
 (function(){
     const cur = document.getElementById('cur');
     if(!cur || window.innerWidth <= 900) return; 
+    
     let mx = window.innerWidth/2, my = window.innerHeight/2;
     let cx = mx, cy = my;
+    
     document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; }, {passive:true});
     document.addEventListener('mousedown', () => cur.classList.add('ck'));
     document.addEventListener('mouseup', () => cur.classList.remove('ck'));
+    
     function loop(){
-        cx += (mx-cx)*0.13; cy += (my-cy)*0.13;
-        cur.style.left = cx+'px'; cur.style.top = cy+'px';
+        cx += (mx-cx)*0.13;
+        cy += (my-cy)*0.13;
+        cur.style.left = cx+'px';
+        cur.style.top = cy+'px';
         requestAnimationFrame(loop);
     }
     loop();
@@ -304,7 +298,6 @@ window.onload = async function(){
         sessionId = data.id;
         isGlobal = data.is_global;
         
-        // Verificação de IP simples
         if(!isGlobal && data.ip && data.ip !== "UNKNOWN"){
             try{
                 const res = await fetch('https://api.ipify.org?format=json');
@@ -329,28 +322,26 @@ function showLoginError(msg){
 }
 
 // ============================================
-// TOGGLES
+// TOGGLES (BLINDADO CONTRA BUG)
 // ============================================
 function tg(el){
     el.classList.toggle('on'); 
     scheduleRender();
-    sendState(); 
+    sendState(); // Envia imediatamente sem debounce
 }
 
 // ============================================
-// COLOR PICKER LOGIC (CORRIGIDO PARA SEPARAR CORES)
+// COLOR PICKER ORIGINAL (TEMPO REAL + SMOOTH)
 // ============================================
-var cpTarget=null, cpH=0, cpS=1, cpV=1, cpA=1;
-var svTX=1, svTY=0, svCX=1, svCY=0;
-var hTY=0, hCY=0, aCY=0; 
+var cpTarget=null,cpH=0,cpS=1,cpV=1,cpA=1;
+var svTX=1,svTY=0,svCX=1,svCY=0;
+var hTY=0,hCY=0,aCY=0; 
 var animRun=false;
-
 var cpOl=document.getElementById('cpOl'), cpBox=document.getElementById('cpBox');
 var svEl=document.getElementById('sv'), svTh=document.getElementById('svTh');
 var hueTr=document.getElementById('hueTr'), hueTh=document.getElementById('hueTh');
 var aTr=document.getElementById('aTr'), aGr=document.getElementById('aGr'), aTh=document.getElementById('aTh');
 
-// Funções Auxiliares de Cor
 function h2r(h,s,v){
   var r,g,b,i=Math.floor(h*6),f=h*6-i,p=v*(1-s),q=v*(1-f*s),t=v*(1-(1-f)*s);
   switch(i%6){case 0:r=v;g=t;b=p;break;case 1:r=q;g=v;b=p;break;case 2:r=p;g=v;b=t;break;case 3:r=p;g=q;b=v;break;case 4:r=t;g=p;b=v;break;case 5:r=v;g=p;b=q;break;}
@@ -365,176 +356,142 @@ function hex2hsv(hex){
 }
 function lerp(a,b,t){return a+(b-a)*t}
 
-// Animação Suave das Bolinhas
 function runAnim(){
   var sp=0.28;
-  svCX=lerp(svCX,svTX,sp); svCY=lerp(svCY,svTY,sp);
+  svCX=lerp(svCX,svTX,sp);svCY=lerp(svCY,svTY,sp);
   hCY=lerp(hCY,hTY,sp);
-  
-  svTh.style.left=(svCX*100)+'%'; svTh.style.top=(svCY*100)+'%';
-  
+  svTh.style.left=(svCX*100)+'%';svTh.style.top=(svCY*100)+'%';
   var hH=hueTr.getBoundingClientRect().height||152;
   var aH=aTr.getBoundingClientRect().height||152;
-  
   hueTh.style.top=(hCY*hH)+'px';
   aTh.style.top=(aCY*aH)+'px';
-  
-  if(Math.abs(svCX-svTX)>.0005 || Math.abs(svCY-svTY)>.0005 || Math.abs(hCY-hTY)>.0005)
+  if(Math.abs(svCX-svTX)>.0005||Math.abs(svCY-svTY)>.0005||Math.abs(hCY-hTY)>.0005)
     requestAnimationFrame(runAnim);
   else animRun=false;
 }
 function startAnim(){if(!animRun){animRun=true;requestAnimationFrame(runAnim);}}
 
-// Atualiza Visual do Picker e do Swatch na Tela
 function updateCP(){
-  var rgb=h2r(cpH,cpS,cpV);
-  var hRgb=h2r(cpH,1,1);
-  var hHex=r2h(hRgb[0],hRgb[1],hRgb[2]);
-  
+  var rgb=h2r(cpH,cpS,cpV),hRgb=h2r(cpH,1,1),hHex=r2h(hRgb[0],hRgb[1],hRgb[2]);
   svEl.style.background=hHex;
   svTh.style.background=r2h(rgb[0],rgb[1],rgb[2]);
   aGr.style.background='linear-gradient(to bottom,'+hHex+',transparent)';
   hueTh.style.background=hHex;
   aTh.style.background='rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+','+cpA+')';
-  
-  // ATUALIZA O SWATCH NA TELA IMEDIATAMENTE
   if(cpTarget){
     var hex=r2h(rgb[0],rgb[1],rgb[2]);
+    // Atualiza o atributo 'fill' do SVG igual ao original
     var rect = cpTarget.querySelector('rect');
     if(rect) rect.setAttribute('fill', hex);
-    
-    // Aplica transparência visual no swatch também (opcional, mas bom pra feedback)
-    cpTarget.style.opacity = 0.5 + (cpA * 0.5); 
-    
-    scheduleRender(); // Atualiza Preview Canvas
+    scheduleRender();
   }
 }
 
-// ABRIR COLOR PICKER
 function openCP(el){
-  cpTarget = el;
-  
-  // Identifica qual chave estamos editando (ex: 'boxcolor')
-  currentEditingKey = el.getAttribute('data-k'); 
-  
-  var rect=el.getBoundingClientRect(), popW=240, popH=190;
-  var left=rect.right+10, top=rect.top;
-  if(left+popW>innerWidth) left=rect.left-popW-10;
-  if(top+popH>innerHeight) top=innerHeight-popH-10;
-  if(left<4) left=4; if(top<4) top=4;
-  
-  cpBox.style.left=left+'px'; cpBox.style.top=top+'px';
+  cpTarget=el;
+  var rect=el.getBoundingClientRect(),popW=240,popH=190;
+  var left=rect.right+10,top=rect.top;
+  if(left+popW>innerWidth)left=rect.left-popW-10;
+  if(top+popH>innerHeight)top=innerHeight-popH-10;
+  if(left<4)left=4;if(top<4)top=4;
+  cpBox.style.left=left+'px';cpBox.style.top=top+'px';
 
   // Pega a cor atual do SVG
   var svgRect = el.querySelector('rect');
   var currentColor = svgRect ? svgRect.getAttribute('fill') : '#ff0000';
-  
-  // Pega o Alpha SALVO especificamente para esta cor
-  var savedAlpha = colorAlphas[currentEditingKey] || 1.0;
 
   if(currentColor){
       var hsv=hex2hsv(currentColor);
-      cpH=hsv[0]; cpS=hsv[1]; cpV=hsv[2];
+      cpH=hsv[0];cpS=hsv[1];cpV=hsv[2];cpA=1;
   }
-  cpA = savedAlpha; // Carrega o alpha correto
 
-  // Configura posições iniciais
-  svCX=cpS; svTX=cpS; svCY=1-cpV; svTY=1-cpV;
-  hCY=cpH; hTY=cpH; 
-  aCY=1-cpA;
-  
+  svCX=cpS;svTX=cpS;svCY=1-cpV;svTY=1-cpV;hCY=cpH;hTY=cpH;aCY=1-cpA;
   updateCP();
-  
-  // Força posição inicial sem animação para não pular
-  svTh.style.left=(svCX*100)+'%'; svTh.style.top=(svCY*100)+'%';
+  svTh.style.left=(svCX*100)+'%';svTh.style.top=(svCY*100)+'%';
   var hH=hueTr.getBoundingClientRect().height||152;
   var aH=aTr.getBoundingClientRect().height||152;
   hueTh.style.top=(hCY*hH)+'px';
   aTh.style.top=(aCY*aH)+'px';
-  
   cpOl.classList.add('open');
 }
 
-// Fechar ao clicar fora
-cpOl.addEventListener('mousedown', function(e){
-  if(e.target===cpOl){ cpOl.classList.remove('open'); sendState(); }
+cpOl.addEventListener('mousedown',function(e){
+  if(e.target===cpOl){cpOl.classList.remove('open');sendState();}
 });
-cpOl.addEventListener('touchstart', function(e){
-  if(e.target===cpOl){ cpOl.classList.remove('open'); sendState(); }
+cpOl.addEventListener('touchstart',function(e){
+  if(e.target===cpOl){cpOl.classList.remove('open');sendState();}
 },{passive:true});
 
-// Lógica de Drag (Arrastar)
-var dSV=false, dH=false, dA=false;
+var dSV=false,dH=false,dA=false;
 function cl(v,a,b){return Math.max(a,Math.min(b,v))}
 
-svEl.addEventListener('mousedown', function(e){ e.preventDefault(); dSV=true; doSV(e); });
-hueTr.addEventListener('mousedown', function(e){ e.preventDefault(); dH=true; doH(e); });
-aTr.addEventListener('mousedown', function(e){ e.preventDefault(); dA=true; doA(e); });
+svEl.addEventListener('mousedown',function(e){e.preventDefault();dSV=true;doSV(e)});
+hueTr.addEventListener('mousedown',function(e){e.preventDefault();dH=true;doH(e)});
+aTr.addEventListener('mousedown',function(e){e.preventDefault();dA=true;doA(e)});
 
-// MOUSE MOVE (REAL-TIME UPDATE)
-document.addEventListener('mousemove', function(e){
-    if(dSV){ doSV(e); sendState(); } // Envia estado a cada movimento
-    if(dH){ doH(e); sendState(); }
-    if(dA){ doA(e); sendState(); }
+// MODIFICAÇÃO 1: Mousemove enviando em tempo real
+document.addEventListener('mousemove',function(e){
+    if(dSV){
+        doSV(e);
+        sendState();
+    }
+    if(dH){
+        doH(e);
+        sendState();
+    }
+    if(dA){
+        doA(e);
+        sendState();
+    }
 });
 
-document.addEventListener('mouseup', function(){ 
-    dSV=false; dH=false; dA=false; 
-    // Garante que o último estado seja salvo ao soltar
-    if(cpOl.classList.contains('open')) sendState();
+// MODIFICAÇÃO 2: Mouseup apenas parando o drag (sem enviar de novo)
+document.addEventListener('mouseup',function(){ 
+    dSV=false;
+    dH=false;
+    dA=false;
 });
 
-function doSV(e){
-    var r=svEl.getBoundingClientRect();
-    cpS=cl((e.clientX-r.left)/r.width, 0, 1);
-    cpV=cl(1-(e.clientY-r.top)/r.height, 0, 1);
-    svTX=cpS; svTY=1-cpV;
-    updateCP(); startAnim();
-}
-function doH(e){
-    var r=hueTr.getBoundingClientRect();
-    cpH=cl((e.clientY-r.top)/r.height, 0, .9999);
-    hTY=cpH;
-    updateCP(); startAnim();
-}
+function doSV(e){var r=svEl.getBoundingClientRect();cpS=cl((e.clientX-r.left)/r.width,0,1);cpV=cl(1-(e.clientY-r.top)/r.height,0,1);svTX=cpS;svTY=1-cpV;updateCP();startAnim();}
+function doH(e){var r=hueTr.getBoundingClientRect();cpH=cl((e.clientY-r.top)/r.height,0,.9999);hTY=cpH;updateCP();startAnim();}
 function doA(e){
     var r=aTr.getBoundingClientRect();
     var height = r.height || 152;
     cpA = cl(1 - ((e.clientY - r.top) / height), 0, 1);
-    
-    // SALVA O ALPHA NA VARIÁVEL ESPECÍFICA DA COR ATUAL
-    if(currentEditingKey) {
-        colorAlphas[currentEditingKey] = cpA;
-    }
-    
     aCY = 1 - cpA; 
-    updateCP(); startAnim();
+    updateCP();
+    startAnim();
 }
 
-// TOUCH EVENTS (Mobile Real-time)
-function tm(e){return{clientX:e.touches[0].clientX, clientY:e.touches[0].clientY}}
-svEl.addEventListener('touchstart', function(e){ e.preventDefault(); dSV=true; doSV(tm(e)); }, {passive:false});
-hueTr.addEventListener('touchstart', function(e){ e.preventDefault(); dH=true; doH(tm(e)); }, {passive:false});
-aTr.addEventListener('touchstart', function(e){ e.preventDefault(); dA=true; doA(tm(e)); }, {passive:false});
+function tm(e){return{clientX:e.touches[0].clientX,clientY:e.touches[0].clientY}}
+svEl.addEventListener('touchstart',function(e){e.preventDefault();dSV=true;doSV(tm(e))},{passive:false});
+hueTr.addEventListener('touchstart',function(e){e.preventDefault();dH=true;doH(tm(e))},{passive:false});
+aTr.addEventListener('touchstart',function(e){e.preventDefault();dA=true;doA(tm(e))},{passive:false});
 
-document.addEventListener('touchmove', function(e){
+// MODIFICAÇÃO 3: Touchmove enviando em tempo real
+document.addEventListener('touchmove',function(e){
   if(dSV||dH||dA){
     e.preventDefault();
     var m=tm(e);
-    if(dSV){ doSV(m); sendState(); }
-    if(dH){ doH(m); sendState(); }
-    if(dA){ doA(m); sendState(); }
+    if(dSV){
+        doSV(m);
+        sendState();
+    }
+    if(dH){
+        doH(m);
+        sendState();
+    }
+    if(dA){
+        doA(m);
+        sendState();
+    }
   }
 },{passive:false});
 
-document.addEventListener('touchend', function(){ 
-    dSV=false; dH=false; dA=false; 
-    sendState(); 
-});
-
+document.addEventListener('touchend',function(){ dSV=false;dH=false;dA=false; sendState(); });
 
 // ============================================
-// SYNC & STATE (ENVIO E RECEBIMENTO)
+// SYNC & STATE (ZERO DELAY + PROTEÇÃO)
 // ============================================
 async function startSync(){
     setInterval(async () => {
@@ -564,16 +521,8 @@ async function sendState(){
             snaplinecolor: getSvgColor('sw-snaplinecolor'),
             healthbarcolor: getSvgColor('sw-healthbarcolor')
         },
-        // ENVIA OS ALPHAS INDIVIDUAIS
-        alphas: { 
-            boxalpha: colorAlphas['boxcolor'], 
-            skeletonalpha: colorAlphas['skeletoncolor'], 
-            snaplinealpha: colorAlphas['snaplinecolor'], 
-            healthbaralpha: colorAlphas['healthbarcolor'] 
-        }
+        alphas: { boxalpha: cpA, skeletonalpha: 1, snaplinealpha: 1, healthbaralpha: 1 }
     };
-    
-    // Usa upsert para garantir atualização rápida
     await client.from('n3sk').update({state}).eq('id', sessionId);
 }
 
@@ -587,39 +536,33 @@ function applyState(s){
     if(isUpdatingLocally) return;
 
     setConn(true);
-    
-    // Aplica Toggles
-    var tm={box:'tgl-box', skeleton:'tgl-skeleton', snapline:'tgl-snapline', healthbar:'tgl-healthbar'};
+    var tm={box:'tgl-box',skeleton:'tgl-skeleton',snapline:'tgl-snapline',healthbar:'tgl-healthbar'};
     for(var k in tm){
         var el=document.getElementById(tm[k]);
         if(el && s.toggles) el.classList.toggle('on', !!s.toggles[k]);
     }
-    
-    // Aplica Cores
-    var cm={boxcolor:'sw-boxcolor', skeletoncolor:'sw-skeletoncolor', snaplinecolor:'sw-snaplinecolor', healthbarcolor:'sw-healthbarcolor'};
+    var cm={boxcolor:'sw-boxcolor',skeletoncolor:'sw-skeletoncolor',snaplinecolor:'sw-snaplinecolor',healthbarcolor:'sw-healthbarcolor'};
     for(var k in cm){
         var el=document.getElementById(cm[k]);
         if(el && s.colors && s.colors[k]){ 
+            // Atualiza o SVG com a cor recebida igual ao original
             var rect = el.querySelector('rect');
             if(rect) rect.setAttribute('fill', s.colors[k]);
         }
     }
-    
-    // Aplica Alphas Individuais
     if(s.alphas) {
-        if(s.alphas.boxalpha !== undefined) colorAlphas['boxcolor'] = s.alphas.boxalpha;
-        if(s.alphas.skeletonalpha !== undefined) colorAlphas['skeletoncolor'] = s.alphas.skeletonalpha;
-        if(s.alphas.snaplinealpha !== undefined) colorAlphas['snaplinecolor'] = s.alphas.snaplinealpha;
-        if(s.alphas.healthbaralpha !== undefined) colorAlphas['healthbarcolor'] = s.alphas.healthbaralpha;
+        if(s.alphas.boxalpha !== undefined) cpA = s.alphas.boxalpha;
+        aCY = 1 - cpA;
+        var aH=aTr.getBoundingClientRect().height||152;
+        if(aTh) aTh.style.top=(aCY*aH)+'px';
     }
-    
     scheduleRender();
 }
 
 function setConn(c){
-    var d=document.getElementById('dot'), t=document.getElementById('txt');
-    if(c){ d.classList.add('on'); t.classList.add('on'); t.textContent='CONECTADO'; }
-    else{ d.classList.remove('on'); t.classList.remove('on'); t.textContent='OFFLINE'; }
+    var d=document.getElementById('dot'),t=document.getElementById('txt');
+    if(c){d.classList.add('on');t.classList.add('on');t.textContent='CONECTADO';}
+    else{d.classList.remove('on');t.classList.remove('on');t.textContent='OFFLINE';}
 }
 
 // ============================================
@@ -644,7 +587,7 @@ function showGlobalQr(){
 function closeGlobalQr(){ document.getElementById('qr-modal').classList.remove('active'); }
 
 // ============================================
-// PREVIEW CANVAS (USA AS CORES CERTAS)
+// PREVIEW CANVAS ORIGINAL
 // ============================================
 var canvas = document.getElementById('espCanvas');
 var ctx = canvas.getContext('2d', { alpha: false });
@@ -669,28 +612,21 @@ function scheduleRender() { if (!renderScheduled) { renderScheduled = true; requ
 function renderPreview() {
   renderScheduled = false;
   if (!canvasWidth || !canvasHeight) return;
-  
   ctx.save();
   ctx.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0);
   ctx.fillStyle = '#050505'; ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-  // Background Image
   if (bgImage && bgImage.complete && bgImage.naturalWidth > 0) {
       var s = Math.min(canvasWidth / bgImage.width, canvasHeight / bgImage.height);
       var w = bgImage.width * s, h = bgImage.height * s;
       ctx.drawImage(bgImage, (canvasWidth - w)/2, (canvasHeight - h)/2, w, h);
   }
 
-  // Pega estados
   var isBox = document.getElementById('tgl-box').classList.contains('on');
   var isHp = document.getElementById('tgl-healthbar').classList.contains('on');
 
-  // Pega cores e alphas ESPECÍFICOS
   var bC = getSvgColor('sw-boxcolor');
-  var bA = colorAlphas['boxcolor'] || 1.0;
-  
   var hC = getSvgColor('sw-healthbarcolor');
-  var hA = colorAlphas['healthbarcolor'] || 1.0;
 
   var bH = canvasHeight * 0.75, bW = bH * 0.45;
   var bX = (canvasWidth - bW) / 2, bY = (canvasHeight - bH) / 2 + 20;
@@ -698,13 +634,9 @@ function renderPreview() {
   targetBoxOpacity = isBox ? 1 : 0;
   boxOpacity = lerp(boxOpacity, targetBoxOpacity, 0.05);
 
-  // Desenha BOX com a cor e alpha corretos
   if (boxOpacity > 0.01) {
-    ctx.globalAlpha = boxOpacity * bA; // Aplica alpha do box
-    ctx.strokeStyle = bC; 
-    ctx.lineWidth = 2; 
-    var l = bW * 0.25;
-    
+    ctx.globalAlpha = boxOpacity;
+    ctx.strokeStyle = bC; ctx.lineWidth = 2; var l = bW * 0.25;
     ctx.beginPath(); ctx.moveTo(bX, bY + l); ctx.lineTo(bX, bY); ctx.lineTo(bX + l, bY); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(bX + bW - l, bY); ctx.lineTo(bX + bW, bY); ctx.lineTo(bX + bW, bY + l); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(bX, bY + bH - l); ctx.lineTo(bX, bY + bH); ctx.lineTo(bX + l, bY + bH); ctx.stroke();
@@ -712,24 +644,18 @@ function renderPreview() {
     ctx.globalAlpha = 1.0;
   }
 
-  // Desenha HEALTHBAR com a cor e alpha corretos
   if (isHp) {
     var bw = 6, bx = bX - 12; 
     hpAnimTime += 0.05; 
     var pulse = 0.5 + 0.5 * Math.sin(hpAnimTime * 2 * Math.PI * 0.3);
     var currentHpHeight = bH * pulse;
-    
     ctx.fillStyle = 'rgba(15,15,15,0.8)'; ctx.fillRect(bx, bY, bw, bH);
-    
-    ctx.globalAlpha = hA; // Aplica alpha da healthbar
-    ctx.fillStyle = hC; 
-    ctx.fillRect(bx, bY + (bH - currentHpHeight), bw, currentHpHeight);
-    ctx.globalAlpha = 1.0;
+    ctx.fillStyle = hC; ctx.fillRect(bx, bY + (bH - currentHpHeight), bw, currentHpHeight);
   }
-  
   ctx.restore();
   if (Math.abs(boxOpacity - targetBoxOpacity) > 0.01 || isHp) scheduleRender();
 }
 </script>
 </body>
 </html>
+```
