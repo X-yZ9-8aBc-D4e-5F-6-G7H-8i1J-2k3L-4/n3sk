@@ -386,8 +386,8 @@ function runAnim(){
 function startAnim(){if(!animRun){animRun=true;requestAnimationFrame(runAnim);}}
 
 function updateCP(){
-  // Correção para mobile: Garante que a cor base seja sempre vibrante (S=1, V=1)
-  // antes de aplicar os gradientes de branco/preto por cima.
+  // CORREÇÃO AQUI: Usamos Saturação 1 e Valor 1 para o fundo (hRgb)
+  // Isso garante que o quadrado nunca fique preto/escuro demais no mobile
   var hRgb=h2r(cpH,1,1); 
   var hHex=r2h(hRgb[0],hRgb[1],hRgb[2]);
   
