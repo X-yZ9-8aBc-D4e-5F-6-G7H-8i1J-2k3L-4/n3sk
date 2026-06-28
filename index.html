@@ -1690,7 +1690,7 @@ function openCP(el, title){
   
   var satRect = cpSaturation.getBoundingClientRect();
   cpSatHandle.style.left = (cpS * satRect.width) + 'px';
-  cpSatHandle.style.top = ((1-cpV) satRect.height) + 'px';
+  cpSatHandle.style.top = ((1-cpV) * satRect.height) + 'px';
   
   var hueRect = cpHueSlider.getBoundingClientRect();
   cpHueHandle.style.top = (cpH * hueRect.height) + 'px';
