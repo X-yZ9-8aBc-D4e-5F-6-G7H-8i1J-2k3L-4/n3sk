@@ -3,903 +3,439 @@
 <head>
     <meta charset='utf-8'>
     <meta name='viewport' content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no'>
-    <meta name='color-scheme' content='light'>
-    <title>n3sk Cloud Control</title>
+    <title>n3sk Cloud Control - Refactored</title>
+    
+    <!-- Supabase & QRCode -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    
+    <!-- Fonte Moderna -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        :root {
-            --black: #0a0a0a;
-            --dark: #141414;
-            --darker: #1a1a1a;
-            --border: #2a2a2a;
-            --cyan: #00d4d4;
-            --text: #e0e0e0;
-            --text-muted: #888;
-            --red: #c73030;
+        :root{ 
+            --primary: #00FFEB; /* Verde Ciano da Color Picker */
+            --primary-dim: rgba(0, 255, 235, 0.1);
+            --bg: #0a0a0a;
+            --panel: #111111;
+            --border: #222222;
+            --text: #ffffff;
+            --muted: #666666;
+            --danger: #ff4444;
         }
 
-        * {
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-            -webkit-text-fill-color: currentColor !important;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        html, body {
-            width: 100%;
-            height: 100%;
-            background: var(--black);
-            color: var(--text);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-            font-size: 14px;
-            cursor: none;
-            overflow: hidden;
-        }
-
-        @media(hover:hover) {
-            #cursor { position: fixed; width: 16px; height: 16px; border: 2px solid var(--red); border-radius: 50%; pointer-events: none; z-index: 99999; transform: translate(-50%,-50%); opacity: 0.8; transition: transform 0.1s ease; }
-            #cursor.click { transform: translate(-50%,-50%) scale(0.6); box-shadow: 0 0 12px rgba(199,48,48,0.6); }
-        }
-        @media(hover:none) { #cursor { display: none !important; } }
-
-        /* ===== LAYOUT ===== */
-        .wrapper { display: flex; width: 100%; height: 100%; }
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; outline:none; }
         
-        /* ===== SIDEBAR ===== */
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Layout Principal */
+        .app-container {
+            width: 95%;
+            max-width: 1200px;
+            height: 90vh;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            display: flex;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        /* --- SIDEBAR --- */
         .sidebar {
-            width: 280px;
-            background: linear-gradient(180deg, var(--dark) 0%, #0f0f0f 100%);
+            width: 260px;
+            background: #0f0f0f;
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            padding: 20px 0;
+            flex-shrink: 0;
         }
 
-        .sidebar-logo {
-            padding: 24px 20px;
-            border-bottom: 1px solid var(--border);
-            text-align: center;
+        .brand {
+            padding: 0 24px 24px;
+            font-size: 20px;
             font-weight: 800;
-            font-size: 18px;
-            letter-spacing: 2px;
-            color: var(--cyan);
+            letter-spacing: 1px;
+            color: white;
             text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 10px;
         }
+        .brand span { color: var(--primary); }
 
-        .sidebar-nav {
-            flex: 1;
-            overflow-y: auto;
-            padding: 12px 0;
+        .menu-group { margin-bottom: 20px; }
+        .menu-label {
+            padding: 0 24px;
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
         }
-
-        .sidebar-nav::-webkit-scrollbar { width: 5px; }
-        .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
-        .sidebar-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
 
         .nav-item {
-            padding: 14px 20px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            color: var(--text-muted);
+            padding: 12px 24px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            border-left: 3px solid transparent;
-            position: relative;
-            font-size: 13px;
+            transition: all 0.2s;
+            color: #aaa;
+            font-size: 14px;
             font-weight: 500;
+            position: relative;
         }
-
-        .nav-item:hover {
-            background: rgba(0, 212, 212, 0.08);
-            color: var(--text);
-        }
-
+        .nav-item:hover { color: white; background: rgba(255,255,255,0.02); }
         .nav-item.active {
-            border-left-color: var(--cyan);
-            color: var(--cyan);
-            background: rgba(0, 212, 212, 0.1);
+            color: var(--primary);
+            background: var(--primary-dim);
+            border-right: 2px solid var(--primary);
         }
+        .nav-icon { width: 18px; height: 18px; margin-right: 12px; fill: currentColor; opacity: 0.8; }
 
-        .nav-item-icon {
-            width: 18px;
-            height: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-
-        .nav-item.has-submenu::after {
-            content: '▶';
-            font-size: 10px;
-            margin-left: auto;
-            transition: transform 0.3s ease;
-        }
-
-        .nav-item.has-submenu.open::after {
-            transform: rotate(90deg);
-        }
-
-        .nav-submenu {
-            display: none;
-            background: rgba(0, 0, 0, 0.3);
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
+        /* Submenu Accordion */
+        .submenu {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease;
+            background: #0a0a0a;
         }
-
-        .nav-submenu.open {
-            display: block;
-            max-height: 500px;
-        }
-
-        .nav-submenu-item {
-            padding: 10px 20px 10px 50px;
-            color: var(--text-muted);
+        .submenu.open { max-height: 300px; }
+        .sub-item {
+            padding: 10px 24px 10px 54px;
+            font-size: 13px;
+            color: #888;
             cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 12px;
-            border-left: 2px solid transparent;
+            transition: 0.2s;
         }
+        .sub-item:hover { color: white; }
+        .sub-item.active { color: var(--primary); font-weight: 600; }
 
-        .nav-submenu-item:hover {
-            color: var(--cyan);
-            background: rgba(0, 212, 212, 0.05);
-        }
-
-        .nav-submenu-item.active {
-            color: var(--cyan);
-            border-left-color: var(--cyan);
-            background: rgba(0, 212, 212, 0.1);
-        }
-
-        .sidebar-profile {
-            padding: 16px 20px;
+        /* Profile Box na Sidebar */
+        .profile-box {
+            margin-top: auto;
+            padding: 20px 24px;
             border-top: 1px solid var(--border);
             display: flex;
             align-items: center;
             gap: 12px;
-            background: rgba(0, 0, 0, 0.3);
         }
-
-        .sidebar-profile-avatar {
-            width: 48px;
-            height: 48px;
+        .avatar {
+            width: 40px; height: 40px;
             border-radius: 50%;
-            border: 2px solid var(--cyan);
-            object-fit: cover;
-            flex-shrink: 0;
+            background: #222;
+            border: 2px solid var(--primary);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; color: var(--primary);
         }
+        .user-info h4 { font-size: 13px; color: white; margin-bottom: 2px; }
+        .user-info p { font-size: 10px; color: var(--muted); }
+        .status-dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; box-shadow: 0 0 8px #4ade80; }
 
-        .sidebar-profile-info {
+        /* --- MAIN CONTENT --- */
+        .main-content {
             flex: 1;
-            min-width: 0;
-        }
-
-        .sidebar-profile-name {
-            font-weight: 700;
-            font-size: 13px;
-        }
-
-        .sidebar-profile-status {
-            font-size: 11px;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .status-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: #444;
-        }
-
-        .status-dot.active {
-            background: var(--cyan);
-            box-shadow: 0 0 6px var(--cyan);
-        }
-
-        /* ===== CENTER PANEL ===== */
-        .center-panel {
-            flex: 1;
-            background: var(--black);
-            border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
 
-        .center-header {
-            padding: 20px;
+        .top-bar {
+            height: 60px;
             border-bottom: 1px solid var(--border);
-        }
-
-        .center-title {
-            font-size: 24px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            color: #fff;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-        }
-
-        .center-tabs {
             display: flex;
-            gap: 16px;
-            border-bottom: 1px solid var(--border);
-            margin: -20px -20px 0 -20px;
-            padding: 0 20px;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
         }
+        .breadcrumb { font-size: 14px; color: var(--muted); }
+        .breadcrumb span { color: white; font-weight: 600; }
+        .version { font-size: 12px; color: var(--muted); font-family: monospace; }
 
-        .center-tab {
-            padding: 14px 0;
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            transition: all 0.2s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .center-tab:hover {
-            color: var(--text);
-        }
-
-        .center-tab.active {
-            color: var(--cyan);
-            border-bottom-color: var(--cyan);
-        }
-
-        .center-content {
+        .content-area {
             flex: 1;
+            display: flex;
+            padding: 30px;
+            gap: 30px;
             overflow-y: auto;
-            padding: 20px;
         }
 
-        .center-content::-webkit-scrollbar { width: 6px; }
-        .center-content::-webkit-scrollbar-track { background: transparent; }
-        .center-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
-
-        .feature-section {
-            margin-bottom: 28px;
-        }
-
-        .feature-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .feature-warning {
-            width: 18px;
-            height: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(199, 48, 48, 0.2);
-            border: 1px solid var(--red);
-            border-radius: 50%;
-            color: var(--red);
-            font-size: 12px;
-            font-weight: bold;
-            flex-shrink: 0;
-        }
-
-        .feature-description {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-bottom: 14px;
-            line-height: 1.5;
-        }
-
-        .feature-control {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 12px 0;
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .feature-label {
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text);
+        /* Config Panel (Esquerda) */
+        .config-panel {
             flex: 1;
-        }
-
-        /* ===== TOGGLE ===== */
-        .toggle {
-            width: 44px;
-            height: 24px;
-            background: var(--darker);
-            border: 1.5px solid var(--border);
-            border-radius: 99px;
-            position: relative;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            flex-shrink: 0;
-        }
-
-        .toggle.on {
-            background: var(--cyan);
-            border-color: var(--cyan);
-        }
-
-        .toggle::after {
-            content: '';
-            position: absolute;
-            width: 18px;
-            height: 18px;
-            background: white;
-            border-radius: 50%;
-            top: 2px;
-            left: 2px;
-            transition: left 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .toggle.on::after {
-            left: 22px;
-        }
-
-        /* ===== CHECKBOX ===== */
-        .checkbox {
-            width: 20px;
-            height: 20px;
-            border: 1.5px solid var(--cyan);
-            border-radius: 4px;
-            background: transparent;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            flex-shrink: 0;
-        }
-
-        .checkbox.checked {
-            background: var(--cyan);
-        }
-
-        .checkbox.checked::after {
-            content: '✓';
-            color: var(--black);
-            font-weight: bold;
-            font-size: 12px;
-        }
-
-        /* ===== SLIDER ===== */
-        .slider-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .slider {
-            flex: 1;
-            height: 4px;
-            background: var(--darker);
-            border-radius: 99px;
-            outline: none;
-            -webkit-appearance: none;
-            cursor: pointer;
-        }
-
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 14px;
-            height: 14px;
-            background: var(--cyan);
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 0 6px rgba(0, 212, 212, 0.5);
-        }
-
-        .slider::-moz-range-thumb {
-            width: 14px;
-            height: 14px;
-            background: var(--cyan);
-            border-radius: 50%;
-            cursor: pointer;
-            border: none;
-            box-shadow: 0 0 6px rgba(0, 212, 212, 0.5);
-        }
-
-        .slider-value {
-            min-width: 35px;
-            text-align: right;
-            font-size: 12px;
-            color: var(--cyan);
-            font-weight: 600;
-        }
-
-        /* ===== SELECT ===== */
-        .select {
-            padding: 8px 12px;
-            background: var(--darker);
-            border: 1.5px solid var(--border);
-            border-radius: 6px;
-            color: var(--text);
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            min-width: 120px;
-        }
-
-        .select:hover {
-            border-color: var(--cyan);
-        }
-
-        .select:focus {
-            outline: none;
-            border-color: var(--cyan);
-            box-shadow: 0 0 8px rgba(0, 212, 212, 0.2);
-        }
-
-        /* ===== COLOR SWATCH ===== */
-        .color-swatch {
-            width: 36px;
-            height: 24px;
-            border-radius: 4px;
-            border: 1.5px solid var(--border);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            background: #fff;
-            flex-shrink: 0;
-        }
-
-        .color-swatch:hover {
-            border-color: var(--cyan);
-            box-shadow: 0 0 8px rgba(0, 212, 212, 0.3);
-        }
-
-        /* ===== RIGHT PANEL ===== */
-        .right-panel {
-            width: 360px;
-            background: var(--dark);
-            border-left: 1px solid var(--border);
+            max-width: 500px;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            gap: 20px;
         }
 
-        .right-header {
-            padding: 20px;
-            border-bottom: 1px solid var(--border);
-            text-align: center;
-        }
-
-        .right-title {
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            color: var(--cyan);
-            text-transform: uppercase;
-        }
-
-        .right-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .right-content::-webkit-scrollbar { width: 5px; }
-        .right-content::-webkit-scrollbar-track { background: transparent; }
-        .right-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
-
-        .preview-image {
-            max-width: 280px;
-            max-height: 400px;
-            margin-bottom: 20px;
-            border-radius: 8px;
+        .card {
+            background: #161616;
             border: 1px solid var(--border);
-        }
-
-        .preview-stats {
-            width: 100%;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-
-        .stat-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .stat-label {
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .stat-item {
-            padding: 10px;
-            background: var(--darker);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 12px;
-            color: var(--text);
-            border-left: 3px solid var(--cyan);
-        }
-
-        /* ===== QR BUTTON ===== */
-        .btn-qr {
-            width: 100%;
-            padding: 12px;
-            margin-top: 12px;
-            background: transparent;
-            border: 1.5px solid var(--cyan);
-            color: var(--cyan);
-            font-weight: 700;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            transition: all 0.3s ease;
-        }
-
-        .btn-qr:hover {
-            background: var(--cyan);
-            color: var(--black);
-            box-shadow: 0 0 12px rgba(0, 212, 212, 0.4);
-        }
-
-        /* ===== LOGIN ===== */
-        #login-screen {
-            position: fixed;
-            inset: 0;
-            z-index: 99999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: radial-gradient(circle, #1a0505 0%, #000 100%);
-        }
-
-        .login-card {
-            background: rgba(20, 20, 20, 0.9);
-            backdrop-filter: blur(16px);
-            padding: 60px 50px;
-            border-radius: 16px;
-            border: 1px solid rgba(0, 212, 212, 0.2);
-            text-align: center;
-            max-width: 360px;
-            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.7);
-            animation: floatUp 0.8s ease;
-        }
-
-        .login-card h1 {
-            font-size: 36px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            margin-bottom: 16px;
-        }
-
-        .login-card h1 span {
-            color: var(--cyan);
-            text-shadow: 0 0 20px rgba(0, 212, 212, 0.4);
-        }
-
-        .login-card p {
-            color: var(--text-muted);
-            margin-bottom: 24px;
-            font-size: 14px;
-        }
-
-        .loader {
-            width: 40px;
-            height: 40px;
-            margin: 0 auto;
-            border: 4px solid var(--border);
-            border-top: 4px solid var(--cyan);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        /* ===== QR MODAL ===== */
-        #qr-modal {
-            position: fixed;
-            inset: 0;
-            z-index: 99998;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(12px);
-        }
-
-        #qr-modal.active {
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .qr-modal-content {
-            background: var(--dark);
-            padding: 40px;
-            border-radius: 14px;
-            border: 1.5px solid var(--cyan);
-            text-align: center;
-            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.8);
-            animation: floatUp 0.4s ease;
-        }
-
-        .qr-modal-content h2 {
-            margin-bottom: 12px;
-            color: var(--cyan);
-            letter-spacing: 2px;
-            font-size: 20px;
-        }
-
-        .qr-modal-content p {
-            color: var(--text-muted);
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-
-        #qrcode-global {
-            padding: 20px;
-            background: white;
             border-radius: 12px;
-            margin-bottom: 20px;
-            display: inline-block;
+            padding: 20px;
         }
 
-        .qr-btn {
-            background: var(--cyan);
-            color: var(--black);
-            border: none;
-            padding: 12px 32px;
-            border-radius: 6px;
-            font-weight: 700;
-            cursor: pointer;
-            font-size: 12px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            transition: all 0.3s ease;
+        .feature-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .feature-icon {
+            width: 32px; height: 32px;
+            background: rgba(255, 165, 0, 0.1);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: orange;
+        }
+        .feature-title { font-size: 16px; font-weight: 600; color: white; }
+        .feature-desc { font-size: 12px; color: var(--muted); line-height: 1.5; margin-bottom: 20px; }
+
+        /* Controles */
+        .control-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #222;
+        }
+        .control-row:last-child { border-bottom: none; }
+        .control-label { font-size: 13px; color: #ddd; }
+        
+        /* Slider Customizado */
+        .slider-container { display: flex; align-items: center; gap: 10px; width: 60%; }
+        .slider-val { font-size: 12px; color: var(--muted); width: 30px; text-align: right; }
+        input[type=range] {
+            -webkit-appearance: none; width: 100%; height: 4px; background: #333; border-radius: 2px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 14px; height: 14px; background: var(--primary); border-radius: 50%; cursor: pointer;
+            box-shadow: 0 0 10px var(--primary);
         }
 
-        .qr-btn:hover {
-            box-shadow: 0 0 16px rgba(0, 212, 212, 0.4);
-            transform: scale(1.05);
+        /* Dropdown Fake */
+        .dropdown {
+            background: #222; padding: 6px 12px; border-radius: 6px; font-size: 12px; color: white;
+            display: flex; align-items: center; gap: 8px; cursor: pointer; border: 1px solid #333;
         }
 
-        /* ===== ANIMATIONS ===== */
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes floatUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        /* Toggle Switch Moderno */
+        .toggle {
+            width: 40px; height: 22px; background: #333; border-radius: 20px; position: relative; cursor: pointer; transition: 0.3s;
+        }
+        .toggle::after {
+            content:''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; background: white; border-radius: 50%; transition: 0.3s;
+        }
+        .toggle.on { background: var(--primary); }
+        .toggle.on::after { left: 20px; background: #000; }
+
+        /* --- PREVIEW PANEL (Direita) --- */
+        .preview-panel {
+            flex: 1;
+            background: #0f0f0f;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-width: 350px;
+        }
+        .preview-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+            color: var(--muted);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .preview-canvas-container {
+            flex: 1;
+            position: relative;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
+        }
+        canvas { width: 100%; height: 100%; display: block; }
+
+        /* Labels flutuantes no preview */
+        .overlay-label {
+            position: absolute; font-size: 10px; color: #fff; font-weight: 600; pointer-events: none;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+        .label-left { left: 20px; text-align: right; width: 60px; }
+        .label-right { right: 20px; text-align: left; width: 60px; }
+        .label-top { top: 20px; left: 50%; transform: translateX(-50%); }
+        .label-bottom { bottom: 20px; left: 50%; transform: translateX(-50%); }
+
+        /* Login Overlay */
+        #login-overlay {
+            position: fixed; inset: 0; background: #000; z-index: 9999;
+            display: flex; align-items: center; justify-content: center; flex-direction: column;
+        }
+        .loader { width: 40px; height: 40px; border: 3px solid #333; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Responsividade básica */
+        @media(max-width: 900px){
+            .app-container { flex-direction: column; height: 100vh; width: 100%; border-radius: 0; border: none; }
+            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border); padding: 10px; flex-direction: row; align-items: center; overflow-x: auto; }
+            .brand { padding: 0 10px; border: none; margin: 0; }
+            .menu-group, .profile-box { display: none; } /* Simplificado para mobile */
+            .content-area { flex-direction: column; }
+            .preview-panel { min-height: 300px; }
+        }
     </style>
 </head>
 <body>
 
-<div id="cursor"></div>
-
-<!-- LOGIN -->
-<div id="login-screen">
-    <div class="login-card">
-        <h1>N3SK <span>CLOUD</span></h1>
-        <p id="login-msg">Validando acesso...</p>
-        <div class="loader"></div>
-    </div>
+<!-- LOGIN FAKE (Simulação) -->
+<div id="login-overlay">
+    <div class="loader"></div>
+    <p style="margin-top: 20px; color: #666; font-size: 12px;">INITIALIZING N3SK CORE...</p>
 </div>
 
-<!-- QR MODAL -->
-<div id="qr-modal">
-    <div class="qr-modal-content">
-        <h2>ACESSO GLOBAL</h2>
-        <p>Escaneie para acessar de qualquer dispositivo</p>
-        <div id="qrcode-global"></div>
-        <button class="qr-btn" onclick="closeQR()">FECHAR</button>
-    </div>
-</div>
-
-<!-- APP -->
-<div id="app" style="display: none;">
-    <div class="wrapper">
-        <!-- SIDEBAR -->
-        <div class="sidebar">
-            <div class="sidebar-logo">N3SK</div>
-            
-            <div class="sidebar-nav">
-                <div class="nav-item has-submenu" onclick="toggleSubmenu(this)">
-                    <div class="nav-item-icon">⚡</div>
-                    <span>Visuals</span>
-                </div>
-                <div class="nav-submenu">
-                    <div class="nav-submenu-item active">Players</div>
-                </div>
-
-                <div class="nav-item">
-                    <div class="nav-item-icon">🎯</div>
-                    <span>AimBot</span>
-                </div>
-
-                <div class="nav-item">
-                    <div class="nav-item-icon">🎨</div>
-                    <span>Configs</span>
-                </div>
-
-                <div class="nav-item">
-                    <div class="nav-item-icon">⚙️</div>
-                    <span>Settings</span>
-                </div>
-            </div>
-
-            <div class="sidebar-profile">
-                <img src="https://i.pinimg.com/474x/ff/c1/a5/ffc1a5f503e31b814ff8953ec6f50c7c.jpg" class="sidebar-profile-avatar" alt="n3sk">
-                <div class="sidebar-profile-info">
-                    <div class="sidebar-profile-name">n3sk</div>
-                    <div class="sidebar-profile-status">
-                        <div class="status-dot active"></div>
-                        <span>CONECTADO</span>
-                    </div>
-                </div>
+<div class="app-container">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="brand">n3sk<span>.xyz</span></div>
+        
+        <div class="menu-group">
+            <div class="menu-label">Combat</div>
+            <div class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+                AimBot
             </div>
         </div>
 
-        <!-- CENTER PANEL -->
-        <div class="center-panel">
-            <div class="center-header">
-                <div class="center-title">Visuals</div>
-                <div class="center-tabs">
-                    <button class="center-tab active">Players</button>
-                </div>
+        <div class="menu-group">
+            <div class="menu-label">Visuals</div>
+            <div class="nav-item active" onclick="toggleSubmenu(this)">
+                <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                Visuals
+                <svg style="width:12px;height:12px;margin-left:auto;fill:currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
             </div>
-
-            <div class="center-content">
-                <!-- ENABLE ESP -->
-                <div class="feature-section">
-                    <div class="feature-title">
-                        <div class="feature-warning">⚠</div>
-                        Enable ESP
-                    </div>
-                    <div class="feature-description">Displays visual information about players and objects through walls and obstacles. Shows enemy positions, health bars, distance, and names in real-time to give tactical advantage.</div>
-                    <div class="feature-control">
-                        <span class="feature-label">Ativar</span>
-                        <div class="toggle on" id="espToggle" onclick="toggleESP(this)"></div>
-                    </div>
-                </div>
-
-                <!-- BOX THICKNESS -->
-                <div class="feature-section">
-                    <div class="feature-title">Box Thickness</div>
-                    <div class="feature-control">
-                        <span class="feature-label">Espessura</span>
-                        <div class="slider-wrapper">
-                            <input type="range" min="0.5" max="3" step="0.1" value="1" class="slider" id="thicknessSlider" oninput="updateThickness(this.value)">
-                            <span class="slider-value" id="thicknessValue">1.0</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- BOX TYPE -->
-                <div class="feature-section">
-                    <div class="feature-title">Box Type</div>
-                    <div class="feature-control">
-                        <span class="feature-label">Tipo</span>
-                        <select class="select" id="boxType" onchange="sendState()">
-                            <option value="corner">Corner</option>
-                            <option value="filled">Filled</option>
-                            <option value="2d">2D Box</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- BOX COLOR -->
-                <div class="feature-section">
-                    <div class="feature-title">Box Color</div>
-                    <div class="feature-control">
-                        <span class="feature-label">Cor Box</span>
-                        <div class="color-swatch" id="boxColorSwatch" onclick="openColorPicker(this, 'boxcolor')" style="background: #ffffff;"></div>
-                    </div>
-                </div>
-
-                <!-- DRAW BOX -->
-                <div class="feature-section">
-                    <div class="feature-title">Draw Box</div>
-                    <div class="feature-control">
-                        <span class="feature-label">Renderizar</span>
-                        <div class="toggle on" id="drawBoxToggle" onclick="toggleFeature(this)"></div>
-                    </div>
-                </div>
-
-                <!-- HEALTH BAR -->
-                <div class="feature-section">
-                    <div class="feature-title">Health Bar</div>
-                    <div class="feature-control">
-                        <span class="feature-label"></span>
-                        <div style="display: flex; gap: 12px;">
-                            <div class="checkbox checked" onclick="toggleCheckbox(this)"></div>
-                            <div class="toggle on" id="healthToggle" onclick="toggleFeature(this)"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ARMOR BAR -->
-                <div class="feature-section">
-                    <div class="feature-title">Armor Bar</div>
-                    <div class="feature-control">
-                        <span class="feature-label"></span>
-                        <div style="display: flex; gap: 12px;">
-                            <div class="checkbox checked" onclick="toggleCheckbox(this)"></div>
-                            <div class="toggle on" onclick="toggleFeature(this)"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SKELETON -->
-                <div class="feature-section">
-                    <div class="feature-title">Draw Skeleton</div>
-                    <div class="feature-control">
-                        <span class="feature-label">Renderizar</span>
-                        <div class="toggle on" id="skeletonToggle" onclick="toggleFeature(this)"></div>
-                    </div>
-                </div>
-
-                <!-- SNAPLINE -->
-                <div class="feature-section">
-                    <div class="feature-title">Draw Snapline</div>
-                    <div class="feature-control">
-                        <span class="feature-label">Renderizar</span>
-                        <div class="toggle" id="snaplineToggle" onclick="toggleFeature(this)"></div>
-                    </div>
-                </div>
-
-                <!-- QR BUTTON -->
-                <button class="btn-qr" onclick="showQR()">📱 GERAR QR GLOBAL</button>
+            <!-- Submenu Expansível -->
+            <div class="submenu open">
+                <div class="sub-item active">Players</div>
+                <div class="sub-item">Weapons</div>
+                <div class="sub-item">World</div>
+                <div class="sub-item">NPCs</div>
             </div>
         </div>
 
-        <!-- RIGHT PANEL -->
-        <div class="right-panel">
-            <div class="right-header">
-                <div class="right-title">Interactive ESP Preview</div>
+        <div class="menu-group">
+            <div class="menu-label">System</div>
+            <div class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L3.16 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.04.64.09.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                Settings
             </div>
-            
-            <div class="right-content">
-                <canvas id="previewCanvas" style="width: 100%; max-width: 300px; background: #050505; border-radius: 8px; border: 1px solid var(--border);"></canvas>
+        </div>
+
+        <div class="profile-box">
+            <div class="avatar">N3</div>
+            <div class="user-info">
+                <h4>Past Owl</h4>
+                <p>Fuck any Anti-cheat</p>
+            </div>
+            <div class="status-dot"></div>
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="main-content">
+        <div class="top-bar">
+            <div class="breadcrumb">Visuals <span style="margin:0 8px">•</span> Players</div>
+            <div class="version">Release 0.43.7</div>
+        </div>
+
+        <div class="content-area">
+            <!-- PAINEL DE CONFIGURAÇÃO -->
+            <div class="config-panel">
                 
-                <div class="preview-stats">
-                    <div class="stat-group">
-                        <div class="stat-label">Equipamento</div>
-                        <div class="stat-item">Helmet</div>
-                        <div class="stat-item">Scope</div>
-                        <div class="stat-item">HP</div>
+                <!-- Card Principal ESP -->
+                <div class="card">
+                    <div class="feature-header">
+                        <div class="feature-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </div>
+                        <div class="feature-title">Enable ESP</div>
+                        <div class="toggle on" id="tgl-enable-esp" onclick="toggleSwitch(this); updatePreview();"></div>
                     </div>
-                    <div class="stat-group">
-                        <div class="stat-label">Inventário</div>
-                        <div class="stat-item">Bomb</div>
-                        <div class="stat-item">Stamina</div>
-                        <div class="stat-item">Crouch</div>
+                    <div class="feature-desc">
+                        Displays visual information about players and objects through walls and obstacles. Shows enemy positions, health bars, distance, and names in real-time to give tactical advantage.
                     </div>
+
+                    <!-- Controles de Box -->
+                    <div class="control-row">
+                        <span class="control-label">Box thickness</span>
+                        <div class="slider-container">
+                            <span class="slider-val" id="val-thickness">1.0</span>
+                            <input type="range" min="0.1" max="5" step="0.1" value="1.0" oninput="document.getElementById('val-thickness').innerText = this.value; updatePreview()">
+                        </div>
+                    </div>
+
+                    <div class="control-row">
+                        <span class="control-label">Filled box</span>
+                        <div class="dropdown">
+                            Transparency
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M7 10l5 5 5-5z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Features Extras -->
+                <div class="card">
+                    <div class="control-row">
+                        <span class="control-label">Health Bar</span>
+                        <div class="toggle on" id="tgl-health" onclick="toggleSwitch(this); updatePreview()"></div>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-label">Armor bar</span>
+                        <div class="toggle on" id="tgl-armor" onclick="toggleSwitch(this); updatePreview()"></div>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-label">Weapon display</span>
+                        <div class="toggle on" id="tgl-weapon" onclick="toggleSwitch(this); updatePreview()"></div>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-label">Player name</span>
+                        <div class="toggle on" id="tgl-name" onclick="toggleSwitch(this); updatePreview()"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- PAINEL DE PREVIEW -->
+            <div class="preview-panel">
+                <div class="preview-header">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+                    Interactive ESP Preview
+                </div>
+                <div class="preview-canvas-container">
+                    <canvas id="previewCanvas"></canvas>
+                    
+                    <!-- Labels Estáticos -->
+                    <div class="overlay-label label-top" id="lbl-name">Nickname</div>
+                    <div class="overlay-label label-bottom" id="lbl-weapon">Weapons</div>
+                    
+                    <div class="overlay-label label-left" style="top: 25%">Helmet</div>
+                    <div class="overlay-label label-left" style="top: 35%">Scope</div>
+                    <div class="overlay-label label-left" style="top: 45%">HP</div>
+                    <div class="overlay-label label-left" style="top: 55%">Bomb</div>
+
+                    <div class="overlay-label label-right" style="top: 25%">Stamina</div>
+                    <div class="overlay-label label-right" style="top: 35%">Crouch</div>
+                    <div class="overlay-label label-right" style="top: 45%">Grenade</div>
+                    <div class="overlay-label label-right" style="top: 55%">Ammo</div>
+                    <div class="overlay-label label-right" style="top: 65%">Flash</div>
                 </div>
             </div>
         </div>
@@ -907,254 +443,151 @@
 </div>
 
 <script>
-// CONFIG
-const SUPA_URL = "https://gkzxuerurfedfwuxhimf.supabase.co";
-const SUPA_KEY = "sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6";
-const client = supabase.createClient(SUPA_URL, SUPA_KEY);
-const PREVIEW_IMG = 'https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png?ex=6a3dcbea&is=6a3c7a6a&hm=95ab23192fdc65d73e612fadc773aac107802e9a93602097a289073aabc498b2&=&format=webp&quality=lossless&width=800&height=968';
-
-let sessionId = null, partnerId = null, isGlobal = false, bgImage = null;
-let isUpdating = false, lastState = "";
-
-// CURSOR
-(function(){
-    const cursor = document.getElementById('cursor');
-    if(!cursor || window.innerWidth <= 900) return;
-    let mx = innerWidth/2, my = innerHeight/2, cx = mx, cy = my;
-    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; }, {passive:true});
-    document.addEventListener('mousedown', () => cursor.classList.add('click'));
-    document.addEventListener('mouseup', () => cursor.classList.remove('click'));
-    (function loop(){
-        cx += (mx-cx)*0.15;
-        cy += (my-cy)*0.15;
-        cursor.style.left = cx+'px';
-        cursor.style.top = cy+'px';
-        requestAnimationFrame(loop);
-    })();
-})();
-
-// MENU
-function toggleSubmenu(el){
-    el.classList.toggle('open');
-    el.nextElementSibling?.classList.toggle('open');
-}
-
-function toggleCheckbox(el){
-    el.classList.toggle('checked');
-}
-
-// AUTH
-window.onload = async function(){
-    bgImage = new Image();
-    bgImage.crossOrigin = "anonymous";
-    bgImage.src = PREVIEW_IMG;
-    bgImage.onload = () => scheduleRender();
-
-    const token = new URLSearchParams(location.search).get('token');
-    if(!token){ showError("Token não encontrado"); return; }
+    // --- LÓGICA DE UI ---
     
-    try {
-        const {data, error} = await client.from('n3sk').select('*').eq('token', token).eq('is_active', true).single();
-        if(error || !data){ showError("Token inválido"); return; }
-        
-        sessionId = data.id;
-        isGlobal = data.is_global;
-        partnerId = isGlobal ? sessionId.replace('_GLOBAL', '') : sessionId + '_GLOBAL';
+    // Remove tela de login após 1.5s
+    setTimeout(() => {
+        document.getElementById('login-overlay').style.opacity = '0';
+        setTimeout(() => document.getElementById('login-overlay').remove(), 500);
+    }, 1500);
 
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('app').style.display = 'block';
-        
-        startSync();
-        resizeCanvas();
-        scheduleRender();
-    } catch(e) { showError("Erro: " + e.message); }
-};
+    // Toggle Submenu
+    function toggleSubmenu(el) {
+        el.classList.toggle('active');
+        const submenu = el.nextElementSibling;
+        if(submenu) submenu.classList.toggle('open');
+    }
 
-function showError(msg){
-    document.getElementById('login-msg').textContent = msg;
-    document.querySelector('.loader').style.display = 'none';
-}
+    // Toggle Switch Genérico
+    function toggleSwitch(el) {
+        el.classList.toggle('on');
+    }
 
-// TOGGLE
-function toggleESP(el){
-    el.classList.toggle('on');
-    scheduleRender();
-    sendState();
-}
-
-function toggleFeature(el){
-    el.classList.toggle('on');
-    scheduleRender();
-    sendState();
-}
-
-function updateThickness(v){
-    document.getElementById('thicknessValue').textContent = parseFloat(v).toFixed(1);
-    sendState();
-}
-
-// STATE
-async function sendState(){
-    if(!sessionId) return;
+    // --- CANVAS PREVIEW LOGIC ---
+    const canvas = document.getElementById('previewCanvas');
+    const ctx = canvas.getContext('2d');
     
-    const state = {
-        toggles: {
-            esp: document.getElementById('espToggle').classList.contains('on'),
-            box: document.getElementById('drawBoxToggle').classList.contains('on'),
-            health: document.getElementById('healthToggle').classList.contains('on'),
-            skeleton: document.getElementById('skeletonToggle').classList.contains('on'),
-            snapline: document.getElementById('snaplineToggle').classList.contains('on')
-        },
-        settings: {
-            thickness: parseFloat(document.getElementById('thicknessSlider').value),
-            boxType: document.getElementById('boxType').value,
-            boxColor: document.getElementById('boxColorSwatch').style.background
+    function resizeCanvas() {
+        const container = canvas.parentElement;
+        canvas.width = container.clientWidth;
+        canvas.height = container.clientHeight;
+        drawPreview();
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    function drawPreview() {
+        const w = canvas.width;
+        const h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        const espEnabled = document.getElementById('tgl-enable-esp').classList.contains('on');
+        if (!espEnabled) return;
+
+        const showHealth = document.getElementById('tgl-health').classList.contains('on');
+        const showName = document.getElementById('tgl-name').classList.contains('on');
+        const showWeapon = document.getElementById('tgl-weapon').classList.contains('on');
+        const thickness = parseFloat(document.getElementById('val-thickness').value);
+
+        // Posição do boneco
+        const cx = w / 2;
+        const cy = h / 2 + 40;
+        const scale = Math.min(w, h) / 400;
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.scale(scale, scale);
+
+        // Cores
+        const primaryColor = '#00FFEB';
+        const skeletonColor = '#00FFEB';
+        const boxColor = '#00FFEB';
+        const healthColor = '#00FFEB';
+
+        // 1. Desenhar Skeleton (Boneco)
+        ctx.strokeStyle = skeletonColor;
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.globalAlpha = 0.3; // Mais transparente
+
+        // Cabeça
+        ctx.beginPath(); ctx.arc(0, -120, 15, 0, Math.PI*2); ctx.stroke();
+        // Corpo
+        ctx.beginPath(); ctx.moveTo(0, -105); ctx.lineTo(0, 20); ctx.stroke();
+        // Braços
+        ctx.beginPath(); ctx.moveTo(0, -90); ctx.lineTo(-40, -60); ctx.moveTo(0, -90); ctx.lineTo(40, -60); ctx.stroke();
+        // Pernas
+        ctx.beginPath(); ctx.moveTo(0, 20); ctx.lineTo(-30, 100); ctx.moveTo(0, 20); ctx.lineTo(30, 100); ctx.stroke();
+        
+        // Joints (Pontos)
+        ctx.fillStyle = skeletonColor;
+        [[0,-120], [0,-90], [-40,-60], [40,-60], [0,20], [-30,100], [30,100]].forEach(p => {
+            ctx.beginPath(); ctx.arc(p[0], p[1], 3, 0, Math.PI*2); ctx.fill();
+        });
+
+        ctx.globalAlpha = 1.0;
+
+        // 2. Desenhar Box (Caixa)
+        const boxW = 100;
+        const boxH = 240;
+        const boxX = -boxW/2;
+        const boxY = -140;
+
+        ctx.strokeStyle = boxColor;
+        ctx.lineWidth = thickness * 1.5;
+        
+        // Cantos da caixa (estilo crooked arm)
+        const l = 20; // tamanho do canto
+        ctx.beginPath();
+        // Top Left
+        ctx.moveTo(boxX, boxY + l); ctx.lineTo(boxX, boxY); ctx.lineTo(boxX + l, boxY);
+        // Top Right
+        ctx.moveTo(boxX + boxW - l, boxY); ctx.lineTo(boxX + boxW, boxY); ctx.lineTo(boxX + boxW, boxY + l);
+        // Bottom Left
+        ctx.moveTo(boxX, boxY + boxH - l); ctx.lineTo(boxX, boxY + boxH); ctx.lineTo(boxX + l, boxY + boxH);
+        // Bottom Right
+        ctx.moveTo(boxX + boxW - l, boxY + boxH); ctx.lineTo(boxX + boxW, boxY + boxH); ctx.lineTo(boxX + boxW, boxY + boxH - l);
+        ctx.stroke();
+
+        // 3. Health Bar (Barra lateral esquerda)
+        if (showHealth) {
+            const hpW = 6;
+            const hpH = boxH;
+            const hpX = boxX - 12;
+            
+            // Fundo
+            ctx.fillStyle = '#222';
+            ctx.fillRect(hpX, boxY, hpW, hpH);
+            
+            // Vida (Full por enquanto)
+            ctx.fillStyle = healthColor;
+            ctx.shadowColor = healthColor;
+            ctx.shadowBlur = 5;
+            ctx.fillRect(hpX, boxY, hpW, hpH);
+            ctx.shadowBlur = 0;
         }
-    };
+
+        // 4. Barra Azul Direita (Stamina/Mana fake)
+        const stW = 6;
+        const stH = boxH;
+        const stX = boxX + boxW + 6;
+        ctx.fillStyle = '#2a5eff'; // Azul
+        ctx.fillRect(stX, boxY, stW, stH);
+
+        ctx.restore();
+
+        // Atualizar visibilidade dos labels HTML
+        document.getElementById('lbl-name').style.display = showName ? 'block' : 'none';
+        document.getElementById('lbl-weapon').style.display = showWeapon ? 'block' : 'none';
+    }
+
+    // Inicializar
+    setTimeout(resizeCanvas, 100);
     
-    const json = JSON.stringify(state);
-    if(json !== lastState){
-        lastState = json;
-        isUpdating = true;
-        setTimeout(() => { isUpdating = false; }, 400);
-        await client.from('n3sk').update({state}).in('id', [sessionId, partnerId]);
-    }
-}
-
-async function startSync(){
-    setInterval(async () => {
-        if(!sessionId) return;
-        const {data} = await client.from('n3sk').select('state').in('id', [sessionId, partnerId]).limit(1);
-        if(data?.[0]?.state && !isUpdating) applyState(data[0].state);
-    }, 400);
-}
-
-function applyState(s){
-    if(s.toggles){
-        if(s.toggles.esp !== undefined) document.getElementById('espToggle').classList.toggle('on', !!s.toggles.esp);
-        if(s.toggles.box !== undefined) document.getElementById('drawBoxToggle').classList.toggle('on', !!s.toggles.box);
-        if(s.toggles.health !== undefined) document.getElementById('healthToggle').classList.toggle('on', !!s.toggles.health);
-        if(s.toggles.skeleton !== undefined) document.getElementById('skeletonToggle').classList.toggle('on', !!s.toggles.skeleton);
-        if(s.toggles.snapline !== undefined) document.getElementById('snaplineToggle').classList.toggle('on', !!s.toggles.snapline);
-    }
-    if(s.settings){
-        if(s.settings.thickness) { document.getElementById('thicknessSlider').value = s.settings.thickness; document.getElementById('thicknessValue').textContent = s.settings.thickness.toFixed(1); }
-        if(s.settings.boxType) document.getElementById('boxType').value = s.settings.boxType;
-        if(s.settings.boxColor) document.getElementById('boxColorSwatch').style.background = s.settings.boxColor;
-    }
-    scheduleRender();
-}
-
-// QR
-function showQR(){
-    const id = isGlobal ? sessionId : partnerId;
-    client.from('n3sk').select('token').eq('id', id).single().then(({data}) => {
-        if(data?.token){
-            document.getElementById('qr-modal').classList.add('active');
-            document.getElementById('qrcode-global').innerHTML = '';
-            new QRCode(document.getElementById('qrcode-global'), {
-                text: `https://n3sk.xyz/?token=${data.token}`,
-                width: 200, height: 200,
-                colorDark: "#000", colorLight: "#fff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-        }
-    });
-}
-
-function closeQR(){
-    document.getElementById('qr-modal').classList.remove('active');
-}
-
-// CANVAS
-const canvas = document.getElementById('previewCanvas');
-const ctx = canvas.getContext('2d', {alpha: false});
-let renderScheduled = false;
-
-function resizeCanvas(){
-    canvas.width = 300;
-    canvas.height = 400;
-}
-
-function scheduleRender(){
-    if(!renderScheduled){
-        renderScheduled = true;
-        requestAnimationFrame(renderCanvas);
-    }
-}
-
-function renderCanvas(){
-    renderScheduled = false;
-    ctx.fillStyle = '#050505';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    if(bgImage?.complete){
-        const scale = Math.min(canvas.width / bgImage.width, canvas.height / bgImage.height);
-        const w = bgImage.width * scale, h = bgImage.height * scale;
-        ctx.drawImage(bgImage, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+    // Função chamada pelos toggles
+    function updatePreview() {
+        drawPreview();
     }
 
-    const isBox = document.getElementById('drawBoxToggle').classList.contains('on');
-    if(isBox){
-        const thickness = parseFloat(document.getElementById('thicknessSlider').value);
-        ctx.strokeStyle = document.getElementById('boxColorSwatch').style.background;
-        ctx.lineWidth = thickness;
-        const bW = canvas.width * 0.4;
-        const bH = canvas.height * 0.6;
-        const bX = (canvas.width - bW) / 2;
-        const bY = (canvas.height - bH) / 2;
-        const corner = bW * 0.15;
-        
-        ctx.beginPath();
-        ctx.moveTo(bX, bY + corner);
-        ctx.lineTo(bX, bY);
-        ctx.lineTo(bX + corner, bY);
-        ctx.stroke();
-        
-        ctx.beginPath();
-        ctx.moveTo(bX + bW - corner, bY);
-        ctx.lineTo(bX + bW, bY);
-        ctx.lineTo(bX + bW, bY + corner);
-        ctx.stroke();
-        
-        ctx.beginPath();
-        ctx.moveTo(bX, bY + bH - corner);
-        ctx.lineTo(bX, bY + bH);
-        ctx.lineTo(bX + corner, bY + bH);
-        ctx.stroke();
-        
-        ctx.beginPath();
-        ctx.moveTo(bX + bW - corner, bY + bH);
-        ctx.lineTo(bX + bW, bY + bH);
-        ctx.lineTo(bX + bW, bY + bH - corner);
-        ctx.stroke();
-    }
-
-    const isHealth = document.getElementById('healthToggle').classList.contains('on');
-    if(isHealth){
-        const bW = canvas.width * 0.4;
-        const bH = canvas.height * 0.6;
-        const bX = (canvas.width - bW) / 2;
-        const bY = (canvas.height - bH) / 2;
-        const barW = 6;
-        const barX = bX - 12;
-        
-        ctx.fillStyle = 'rgba(20, 20, 20, 0.8)';
-        ctx.fillRect(barX, bY, barW, bH);
-        ctx.fillStyle = '#00ff00';
-        ctx.fillRect(barX, bY, barW, bH);
-    }
-
-    if(Math.abs(canvas.width) > 0) scheduleRender();
-}
-
-resizeCanvas();
-scheduleRender();
-
-function openColorPicker(el, key){
-    // Placeholder - pode adicionar color picker depois
-    alert('Color picker em desenvolvimento');
-}
 </script>
 </body>
 </html>
