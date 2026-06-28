@@ -386,12 +386,22 @@ function runAnim(){
 function startAnim(){if(!animRun){animRun=true;requestAnimationFrame(runAnim);}}
 
 function updateCP(){
-  var rgb=h2r(cpH,cpS,cpV),hRgb=h2r(cpH,1,1),hHex=r2h(hRgb[0],hRgb[1],hRgb[2]);
+  // Correção para mobile: Garante que a cor base seja sempre vibrante (S=1, V=1)
+  // antes de aplicar os gradientes de branco/preto por cima.
+  var hRgb=h2r(cpH,1,1); 
+  var hHex=r2h(hRgb[0],hRgb[1],hRgb[2]);
+  
+  // Aplica a cor pura como fundo
   svEl.style.background=hHex;
+  
+  // Calcula a cor atual do ponto selecionado apenas para o thumb e alpha
+  var rgb=h2r(cpH,cpS,cpV);
   svTh.style.background=r2h(rgb[0],rgb[1],rgb[2]);
+  
   aGr.style.background='linear-gradient(to bottom,'+hHex+',transparent)';
   hueTh.style.background=hHex;
   aTh.style.background='rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+','+cpA+')';
+  
   if(cpTarget){
     var hex=r2h(rgb[0],rgb[1],rgb[2]);
     var rect = cpTarget.querySelector('rect');
@@ -599,7 +609,7 @@ function closeGlobalQr(){ document.getElementById('qr-modal').classList.remove('
 var canvas = document.getElementById('espCanvas');
 var ctx = canvas.getContext('2d', { alpha: false });
 var canvasWidth = 0, canvasHeight = 0, renderScheduled = false;
-var hpAnimTime = 0;
+// Removido hpAnimTime pois a health será estática
 var boxOpacity = 0;
 var targetBoxOpacity = 0;
 
@@ -653,14 +663,15 @@ function renderPreview() {
 
   if (isHp) {
     var bw = 6, bx = bX - 12; 
-    hpAnimTime += 0.05; 
-    var pulse = 0.5 + 0.5 * Math.sin(hpAnimTime * 2 * Math.PI * 0.3);
-    var currentHpHeight = bH * pulse;
+    // Health estática (sem animação de pulso)
+    var currentHpHeight = bH; // Fixo em 100% da altura
+    
     ctx.fillStyle = 'rgba(15,15,15,0.8)'; ctx.fillRect(bx, bY, bw, bH);
     ctx.fillStyle = hC; ctx.fillRect(bx, bY + (bH - currentHpHeight), bw, currentHpHeight);
   }
   ctx.restore();
-  if (Math.abs(boxOpacity - targetBoxOpacity) > 0.01 || isHp) scheduleRender();
+  // Remove a verificação de isHp do agendamento recursivo para parar a animação constante
+  if (Math.abs(boxOpacity - targetBoxOpacity) > 0.01) scheduleRender();
 }
 </script>
 </body>
