@@ -10,23 +10,18 @@
     <style>
         :root {
             --black: #0a0a0a;
-            --dark: #111111;
+            --dark: #141414;
             --darker: #1a1a1a;
             --border: #2a2a2a;
             --cyan: #00d4d4;
-            --cyan-dark: #009999;
-            --red: #c73030;
-            --red-bright: #ff6b6b;
             --text: #e0e0e0;
-            --text-muted: #888888;
-            --text-light: #aaaaaa;
+            --text-muted: #888;
+            --red: #c73030;
         }
 
         * {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
-            color-rendering: optimizeQuality !important;
-            forced-color-adjust: none !important;
             -webkit-text-fill-color: currentColor !important;
         }
 
@@ -38,101 +33,166 @@
         }
 
         html, body {
+            width: 100%;
             height: 100%;
             background: var(--black);
             color: var(--text);
-            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            font-size: 14px;
             cursor: none;
             overflow: hidden;
         }
 
         @media(hover:hover) {
-            body { cursor: none; }
-            #cursor-dot {
-                position: fixed;
-                width: 18px;
-                height: 18px;
-                border: 2px solid var(--red);
-                border-radius: 50%;
-                pointer-events: none;
-                z-index: 99999;
-                transform: translate(-50%, -50%);
-                transition: transform .12s ease, border-color .15s ease;
-                opacity: 0.9;
-            }
-            #cursor-dot.click {
-                transform: translate(-50%, -50%) scale(0.6);
-                border-color: var(--red-bright);
-                box-shadow: 0 0 12px rgba(199, 48, 48, 0.6);
-            }
+            #cursor { position: fixed; width: 16px; height: 16px; border: 2px solid var(--red); border-radius: 50%; pointer-events: none; z-index: 99999; transform: translate(-50%,-50%); opacity: 0.8; transition: transform 0.1s ease; }
+            #cursor.click { transform: translate(-50%,-50%) scale(0.6); box-shadow: 0 0 12px rgba(199,48,48,0.6); }
         }
+        @media(hover:none) { #cursor { display: none !important; } }
 
-        @media(hover:none), (max-width: 900px) {
-            * { cursor: auto !important; }
-            #cursor-dot { display: none !important; }
-        }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0, 212, 212, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(0, 212, 212, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 212, 212, 0); } }
-        @keyframes floatUp { from { opacity: 0; transform: translateY(40px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* ===== LAYOUT PRINCIPAL ===== */
-        .container {
-            display: flex;
-            height: 100%;
-            gap: 12px;
-            padding: 12px;
-            animation: fadeIn 0.6s ease;
-        }
-
+        /* ===== LAYOUT ===== */
+        .wrapper { display: flex; width: 100%; height: 100%; }
+        
         /* ===== SIDEBAR ===== */
         .sidebar {
             width: 280px;
-            background: var(--dark);
-            border: 1px solid var(--border);
-            border-radius: 12px;
+            background: linear-gradient(180deg, var(--dark) 0%, #0f0f0f 100%);
+            border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
         }
 
-        .profile-section {
-            padding: 20px;
+        .sidebar-logo {
+            padding: 24px 20px;
             border-bottom: 1px solid var(--border);
+            text-align: center;
+            font-weight: 800;
+            font-size: 18px;
+            letter-spacing: 2px;
+            color: var(--cyan);
+            text-transform: uppercase;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 0;
+        }
+
+        .sidebar-nav::-webkit-scrollbar { width: 5px; }
+        .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+        .sidebar-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+        .nav-item {
+            padding: 14px 20px;
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            position: relative;
+            font-size: 13px;
+            font-weight: 500;
         }
 
-        .profile-avatar {
-            width: 56px;
-            height: 56px;
-            border-radius: 10px;
+        .nav-item:hover {
+            background: rgba(0, 212, 212, 0.08);
+            color: var(--text);
+        }
+
+        .nav-item.active {
+            border-left-color: var(--cyan);
+            color: var(--cyan);
+            background: rgba(0, 212, 212, 0.1);
+        }
+
+        .nav-item-icon {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .nav-item.has-submenu::after {
+            content: '▶';
+            font-size: 10px;
+            margin-left: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-item.has-submenu.open::after {
+            transform: rotate(90deg);
+        }
+
+        .nav-submenu {
+            display: none;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .nav-submenu.open {
+            display: block;
+            max-height: 500px;
+        }
+
+        .nav-submenu-item {
+            padding: 10px 20px 10px 50px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 12px;
+            border-left: 2px solid transparent;
+        }
+
+        .nav-submenu-item:hover {
+            color: var(--cyan);
+            background: rgba(0, 212, 212, 0.05);
+        }
+
+        .nav-submenu-item.active {
+            color: var(--cyan);
+            border-left-color: var(--cyan);
+            background: rgba(0, 212, 212, 0.1);
+        }
+
+        .sidebar-profile {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar-profile-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
             border: 2px solid var(--cyan);
             object-fit: cover;
-            box-shadow: 0 0 12px rgba(0, 212, 212, 0.3);
+            flex-shrink: 0;
         }
 
-        .profile-info {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
+        .sidebar-profile-info {
             flex: 1;
             min-width: 0;
         }
 
-        .profile-name {
-            font-size: 16px;
+        .sidebar-profile-name {
             font-weight: 700;
-            color: #fff;
-            letter-spacing: 0.5px;
+            font-size: 13px;
         }
 
-        .profile-status {
-            font-size: 12px;
+        .sidebar-profile-status {
+            font-size: 11px;
             color: var(--text-muted);
             display: flex;
             align-items: center;
@@ -140,303 +200,273 @@
         }
 
         .status-dot {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             background: #444;
-            transition: all 0.3s ease;
         }
 
         .status-dot.active {
             background: var(--cyan);
-            box-shadow: 0 0 8px var(--cyan);
-            animation: pulse 2s infinite;
+            box-shadow: 0 0 6px var(--cyan);
         }
 
-        /* ===== TABS ===== */
-        .tabs-container {
+        /* ===== CENTER PANEL ===== */
+        .center-panel {
+            flex: 1;
+            background: var(--black);
+            border-right: 1px solid var(--border);
             display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .center-header {
+            padding: 20px;
             border-bottom: 1px solid var(--border);
         }
 
-        .tab-btn {
-            flex: 1;
-            padding: 14px;
+        .center-title {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #fff;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .center-tabs {
+            display: flex;
+            gap: 16px;
+            border-bottom: 1px solid var(--border);
+            margin: -20px -20px 0 -20px;
+            padding: 0 20px;
+        }
+
+        .center-tab {
+            padding: 14px 0;
             background: transparent;
             border: none;
             color: var(--text-muted);
             font-size: 13px;
             font-weight: 600;
-            letter-spacing: 1px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            position: relative;
             border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .tab-btn:hover {
+        .center-tab:hover {
             color: var(--text);
         }
 
-        .tab-btn.active {
+        .center-tab.active {
             color: var(--cyan);
             border-bottom-color: var(--cyan);
         }
 
-        .tab-btn.active::before {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--cyan);
-            box-shadow: 0 -4px 12px rgba(0, 212, 212, 0.4);
-        }
-
-        /* ===== TAB CONTENT ===== */
-        .tabs-content {
+        .center-content {
             flex: 1;
             overflow-y: auto;
-            padding: 0;
+            padding: 20px;
         }
 
-        .tab-pane {
-            display: none;
-            animation: slideIn 0.4s ease;
+        .center-content::-webkit-scrollbar { width: 6px; }
+        .center-content::-webkit-scrollbar-track { background: transparent; }
+        .center-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+        .feature-section {
+            margin-bottom: 28px;
         }
 
-        .tab-pane.active {
-            display: block;
-        }
-
-        .tabs-content::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .tabs-content::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .tabs-content::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 99px;
-        }
-
-        .tabs-content::-webkit-scrollbar-thumb:hover {
-            background: var(--text-muted);
-        }
-
-        /* ===== SECTIONS ===== */
-        .section {
-            border-bottom: 1px solid var(--border);
-        }
-
-        .section-header {
-            padding: 14px 16px;
-            background: rgba(0, 212, 212, 0.05);
-            border-bottom: 1px solid var(--border);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: all 0.3s ease;
-            user-select: none;
-        }
-
-        .section-header:hover {
-            background: rgba(0, 212, 212, 0.08);
-        }
-
-        .section-header.collapsed {
-            background: transparent;
-        }
-
-        .section-title {
-            font-size: 12px;
+        .feature-title {
+            font-size: 16px;
             font-weight: 700;
-            letter-spacing: 1.5px;
-            color: var(--cyan);
-            text-transform: uppercase;
-        }
-
-        .section-arrow {
-            font-size: 10px;
-            color: var(--cyan);
-            transition: transform 0.3s ease;
-            transform: rotate(0deg);
-        }
-
-        .section.collapsed .section-arrow {
-            transform: rotate(-90deg);
-        }
-
-        .section-content {
-            display: block;
-            max-height: 1000px;
-            overflow: hidden;
-            transition: max-height 0.3s ease, opacity 0.3s ease;
-            opacity: 1;
-        }
-
-        .section.collapsed .section-content {
-            max-height: 0;
-            opacity: 0;
-        }
-
-        /* ===== OPTIONS ===== */
-        .option {
-            padding: 12px 16px;
-            border-bottom: 1px solid rgba(0, 212, 212, 0.1);
+            color: #fff;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            transition: background 0.2s ease;
+            gap: 10px;
         }
 
-        .option:last-child {
-            border-bottom: none;
+        .feature-warning {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(199, 48, 48, 0.2);
+            border: 1px solid var(--red);
+            border-radius: 50%;
+            color: var(--red);
+            font-size: 12px;
+            font-weight: bold;
+            flex-shrink: 0;
         }
 
-        .option:hover {
-            background: rgba(0, 212, 212, 0.02);
+        .feature-description {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+            line-height: 1.5;
         }
 
-        .option-label {
+        .feature-control {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .feature-label {
             font-size: 13px;
             font-weight: 500;
             color: var(--text);
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            flex: 1;
         }
 
-        .option-control {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* ===== TOGGLE SWITCH ===== */
+        /* ===== TOGGLE ===== */
         .toggle {
-            width: 48px;
-            height: 26px;
-            background: var(--border);
+            width: 44px;
+            height: 24px;
+            background: var(--darker);
+            border: 1.5px solid var(--border);
             border-radius: 99px;
             position: relative;
-            border: 1.5px solid var(--border);
-            transition: all 0.35s cubic-bezier(0.4, 0.0, 0.2, 1);
             cursor: pointer;
-            user-select: none;
+            transition: all 0.3s ease;
             flex-shrink: 0;
         }
 
         .toggle.on {
             background: var(--cyan);
             border-color: var(--cyan);
-            box-shadow: 0 0 12px rgba(0, 212, 212, 0.4);
         }
 
         .toggle::after {
             content: '';
             position: absolute;
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
+            background: white;
             border-radius: 50%;
-            background: #ffffff;
             top: 2px;
             left: 2px;
-            transition: all 0.35s cubic-bezier(0.4, 0.0, 0.2, 1);
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+            transition: left 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .toggle.on::after {
-            left: 24px;
+            left: 22px;
         }
 
-        /* ===== SELECT INPUT ===== */
-        .select-input {
+        /* ===== CHECKBOX ===== */
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 1.5px solid var(--cyan);
+            border-radius: 4px;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .checkbox.checked {
+            background: var(--cyan);
+        }
+
+        .checkbox.checked::after {
+            content: '✓';
+            color: var(--black);
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        /* ===== SLIDER ===== */
+        .slider-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .slider {
+            flex: 1;
+            height: 4px;
+            background: var(--darker);
+            border-radius: 99px;
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            background: var(--cyan);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 6px rgba(0, 212, 212, 0.5);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            background: var(--cyan);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 6px rgba(0, 212, 212, 0.5);
+        }
+
+        .slider-value {
+            min-width: 35px;
+            text-align: right;
+            font-size: 12px;
+            color: var(--cyan);
+            font-weight: 600;
+        }
+
+        /* ===== SELECT ===== */
+        .select {
             padding: 8px 12px;
             background: var(--darker);
             border: 1.5px solid var(--border);
             border-radius: 6px;
             color: var(--text);
             font-size: 12px;
-            font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
-            min-width: 100px;
+            min-width: 120px;
         }
 
-        .select-input:hover {
+        .select:hover {
             border-color: var(--cyan);
         }
 
-        .select-input:focus {
+        .select:focus {
             outline: none;
             border-color: var(--cyan);
             box-shadow: 0 0 8px rgba(0, 212, 212, 0.2);
         }
 
-        /* ===== SLIDER INPUT ===== */
-        .slider-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .slider-input {
-            flex: 1;
-            height: 5px;
-            background: var(--border);
-            border-radius: 99px;
-            outline: none;
-            -webkit-appearance: none;
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
-
-        .slider-input::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: var(--cyan);
-            cursor: pointer;
-            border: 2px solid var(--dark);
-            box-shadow: 0 0 8px rgba(0, 212, 212, 0.4);
-        }
-
-        .slider-input::-moz-range-thumb {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: var(--cyan);
-            cursor: pointer;
-            border: 2px solid var(--dark);
-            box-shadow: 0 0 8px rgba(0, 212, 212, 0.4);
-        }
-
-        .slider-value {
-            font-size: 12px;
-            color: var(--cyan);
-            font-weight: 600;
-            min-width: 30px;
-            text-align: right;
-        }
-
         /* ===== COLOR SWATCH ===== */
         .color-swatch {
-            width: 40px;
-            height: 28px;
-            border-radius: 6px;
+            width: 36px;
+            height: 24px;
+            border-radius: 4px;
             border: 1.5px solid var(--border);
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
+            background: #fff;
+            flex-shrink: 0;
         }
 
         .color-swatch:hover {
@@ -444,218 +474,107 @@
             box-shadow: 0 0 8px rgba(0, 212, 212, 0.3);
         }
 
-        .color-swatch svg {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-
-        /* ===== COLOR PICKER ===== */
-        .color-picker-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 9000;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(8px);
-            animation: fadeIn 0.3s ease;
-        }
-
-        .color-picker-overlay.open {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .color-picker-box {
-            position: relative;
+        /* ===== RIGHT PANEL ===== */
+        .right-panel {
+            width: 360px;
             background: var(--dark);
-            border: 1.5px solid var(--cyan);
-            border-radius: 14px;
-            padding: 24px;
+            border-left: 1px solid var(--border);
             display: flex;
-            gap: 16px;
-            align-items: flex-start;
-            z-index: 901;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
-            user-select: none;
-            touch-action: none;
-            animation: floatUp 0.4s ease;
+            flex-direction: column;
+            overflow: hidden;
         }
 
-        .color-picker-close {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            width: 28px;
-            height: 28px;
-            background: transparent;
-            border: none;
+        .right-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .right-title {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
             color: var(--cyan);
-            font-size: 20px;
-            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .right-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s ease;
         }
 
-        .color-picker-close:hover {
-            color: var(--red);
-        }
+        .right-content::-webkit-scrollbar { width: 5px; }
+        .right-content::-webkit-scrollbar-track { background: transparent; }
+        .right-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
 
-        .saturation-value {
-            width: 200px;
-            height: 160px;
+        .preview-image {
+            max-width: 280px;
+            max-height: 400px;
+            margin-bottom: 20px;
             border-radius: 8px;
-            position: relative;
-            overflow: hidden;
-            flex-shrink: 0;
-            border: 1px solid var(--border);
-            background-color: #ff0000 !important;
-        }
-
-        .sv-white {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to right, #fff, transparent);
-        }
-
-        .sv-black {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to bottom, transparent, #000);
-        }
-
-        .sv-thumb {
-            position: absolute;
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            border: 3px solid #fff;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            box-shadow: 0 0 0 1.5px rgba(0, 0, 0, 0.8), 0 2px 6px rgba(0, 0, 0, 0.6);
-            transition: left 0.05s linear, top 0.05s linear;
-        }
-
-        .bars-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .bar-row {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .bar {
-            position: relative;
-            width: 16px;
-            height: 160px;
-            border-radius: 99px;
-            overflow: visible;
-            flex-shrink: 0;
             border: 1px solid var(--border);
         }
 
-        .bar-inner {
-            position: absolute;
-            inset: 0;
-            border-radius: 99px;
-            overflow: hidden;
-        }
-
-        .bar-hue {
+        .preview-stats {
             width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom,
-                #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
         }
 
-        .bar-alpha-grid {
-            width: 100%;
-            height: 100%;
-            background: repeating-conic-gradient(#555 0% 25%, #333 0% 50%) 0 0/8px 8px;
-        }
-
-        .bar-thumb {
-            position: absolute;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 19px;
-            height: 19px;
-            border-radius: 50%;
-            background: #fff;
-            border: 2.5px solid #fff;
-            box-shadow: 0 0 0 1.5px rgba(0, 0, 0, 0.6), 0 2px 6px rgba(0, 0, 0, 0.7);
-            pointer-events: none;
-            z-index: 10;
-            transition: top 0.05s linear;
-        }
-
-        .color-info {
+        .stat-group {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
         }
 
-        .color-info-label {
+        .stat-label {
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 700;
             letter-spacing: 1px;
             color: var(--text-muted);
             text-transform: uppercase;
         }
 
-        .color-info-value {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--cyan);
-            font-family: 'Courier New', monospace;
-            letter-spacing: 1px;
-        }
-
-        /* ===== PREVIEW PANEL ===== */
-        .preview-panel {
-            flex: 1;
-            background: var(--dark);
+        .stat-item {
+            padding: 10px;
+            background: var(--darker);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-        }
-
-        .preview-header {
-            padding: 14px 16px;
-            background: rgba(0, 212, 212, 0.05);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .preview-title {
+            border-radius: 6px;
             font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            color: var(--cyan);
-            text-transform: uppercase;
+            color: var(--text);
+            border-left: 3px solid var(--cyan);
         }
 
-        .preview-canvas {
-            flex: 1;
-            background: #050505;
-            display: block;
+        /* ===== QR BUTTON ===== */
+        .btn-qr {
             width: 100%;
-            height: 100%;
+            padding: 12px;
+            margin-top: 12px;
+            background: transparent;
+            border: 1.5px solid var(--cyan);
+            color: var(--cyan);
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
         }
 
-        /* ===== LOGIN SCREEN ===== */
+        .btn-qr:hover {
+            background: var(--cyan);
+            color: var(--black);
+            box-shadow: 0 0 12px rgba(0, 212, 212, 0.4);
+        }
+
+        /* ===== LOGIN ===== */
         #login-screen {
             position: fixed;
             inset: 0;
@@ -663,30 +582,26 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: radial-gradient(circle at center, #1a0505 0%, #000000 100%);
-            font-family: 'Inter', 'Segoe UI', sans-serif;
-            color: white;
+            background: radial-gradient(circle, #1a0505 0%, #000 100%);
         }
 
         .login-card {
             background: rgba(20, 20, 20, 0.9);
             backdrop-filter: blur(16px);
             padding: 60px 50px;
-            border-radius: 20px;
+            border-radius: 16px;
             border: 1px solid rgba(0, 212, 212, 0.2);
-            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.7);
             text-align: center;
             max-width: 360px;
-            width: 100%;
-            animation: floatUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.7);
+            animation: floatUp 0.8s ease;
         }
 
         .login-card h1 {
             font-size: 36px;
-            margin: 0 0 16px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
             font-weight: 800;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
         }
 
         .login-card h1 span {
@@ -695,14 +610,9 @@
         }
 
         .login-card p {
-            color: var(--text-light);
-            font-size: 14px;
+            color: var(--text-muted);
             margin-bottom: 24px;
-            letter-spacing: 0.5px;
-        }
-
-        .login-card.error {
-            border-color: var(--red);
+            font-size: 14px;
         }
 
         .loader {
@@ -735,121 +645,69 @@
         .qr-modal-content {
             background: var(--dark);
             padding: 40px;
-            border-radius: 16px;
+            border-radius: 14px;
             border: 1.5px solid var(--cyan);
             text-align: center;
-            color: white;
             box-shadow: 0 25px 80px rgba(0, 0, 0, 0.8);
-            max-width: 400px;
-            width: 100%;
             animation: floatUp 0.4s ease;
         }
 
         .qr-modal-content h2 {
-            margin: 0 0 12px;
+            margin-bottom: 12px;
             color: var(--cyan);
             letter-spacing: 2px;
             font-size: 20px;
-            text-transform: uppercase;
         }
 
         .qr-modal-content p {
-            color: var(--text-light);
+            color: var(--text-muted);
+            margin-bottom: 20px;
             font-size: 14px;
-            margin-bottom: 24px;
-            letter-spacing: 0.5px;
         }
 
         #qrcode-global {
-            display: inline-block;
             padding: 20px;
             background: white;
-            border-radius: 14px;
-            margin-bottom: 24px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: inline-block;
         }
 
-        #qrcode-global img,
-        #qrcode-global canvas {
-            display: block;
-            margin: 0 auto;
-        }
-
-        .qr-close-btn {
+        .qr-btn {
             background: var(--cyan);
             color: var(--black);
             border: none;
-            padding: 12px 36px;
-            border-radius: 8px;
+            padding: 12px 32px;
+            border-radius: 6px;
             font-weight: 700;
             cursor: pointer;
+            font-size: 12px;
             letter-spacing: 1px;
-            font-size: 13px;
             text-transform: uppercase;
             transition: all 0.3s ease;
         }
 
-        .qr-close-btn:hover {
-            background: var(--cyan-dark);
+        .qr-btn:hover {
             box-shadow: 0 0 16px rgba(0, 212, 212, 0.4);
             transform: scale(1.05);
         }
 
-        /* ===== BUTTONS ===== */
-        .btn-global-qr {
-            width: 100%;
-            padding: 12px;
-            background: transparent;
-            border: 1.5px solid var(--cyan);
-            color: var(--cyan);
-            font-weight: 700;
-            letter-spacing: 1px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 12px;
-            text-transform: uppercase;
-            margin-top: 12px;
-        }
-
-        .btn-global-qr:hover {
-            background: var(--cyan);
-            color: var(--black);
-            box-shadow: 0 0 16px rgba(0, 212, 212, 0.4);
-            transform: translateY(-2px);
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media(max-width: 1200px) {
-            .container {
-                flex-direction: column;
-                gap: 8px;
-            }
-
-            .sidebar {
-                width: 100%;
-                max-height: 40vh;
-                min-height: auto;
-            }
-
-            .preview-panel {
-                height: 50vh;
-                min-height: 400px;
-            }
-        }
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes floatUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<!-- CURSOR -->
-<div id="cursor-dot"></div>
+<div id="cursor"></div>
 
-<!-- LOGIN SCREEN -->
+<!-- LOGIN -->
 <div id="login-screen">
     <div class="login-card">
         <h1>N3SK <span>CLOUD</span></h1>
         <p id="login-msg">Validando acesso...</p>
-        <div class="loader" id="login-loader"></div>
+        <div class="loader"></div>
     </div>
 </div>
 
@@ -859,788 +717,444 @@
         <h2>ACESSO GLOBAL</h2>
         <p>Escaneie para acessar de qualquer dispositivo</p>
         <div id="qrcode-global"></div>
-        <button class="qr-close-btn" onclick="closeGlobalQr()">FECHAR</button>
+        <button class="qr-btn" onclick="closeQR()">FECHAR</button>
     </div>
 </div>
 
-<!-- COLOR PICKER OVERLAY -->
-<div class="color-picker-overlay" id="cpOverlay">
-    <div class="color-picker-box" id="cpBox">
-        <button class="color-picker-close" onclick="closeColorPicker()">✕</button>
-        <div class="saturation-value" id="sv">
-            <div class="sv-white"></div>
-            <div class="sv-black"></div>
-            <div class="sv-thumb" id="svTh"></div>
-        </div>
-        <div class="bars-container">
-            <div class="bar-row">
-                <div class="bar" id="hueTr">
-                    <div class="bar-inner">
-                        <div class="bar-hue"></div>
-                    </div>
-                    <div class="bar-thumb" id="hueTh"></div>
-                </div>
-            </div>
-            <div class="bar-row">
-                <div class="bar" id="aTr">
-                    <div class="bar-inner">
-                        <div class="bar-alpha-grid"></div>
-                    </div>
-                    <div class="bar-thumb" id="aTh"></div>
-                </div>
-            </div>
-        </div>
-        <div class="color-info">
-            <div class="color-info-label">Cor</div>
-            <div class="color-info-value" id="colorHex">#FF0000</div>
-        </div>
-    </div>
-</div>
-
-<!-- APP CONTAINER -->
+<!-- APP -->
 <div id="app" style="display: none;">
-    <div class="container">
+    <div class="wrapper">
         <!-- SIDEBAR -->
         <div class="sidebar">
-            <!-- PROFILE SECTION -->
-            <div class="profile-section">
-                <img src="https://i.pinimg.com/474x/ff/c1/a5/ffc1a5f503e31b814ff8953ec6f50c7c.jpg" class="profile-avatar" alt="Profile" onerror="this.src='https://via.placeholder.com/100/00d4d4/000000?text=N3SK'">
-                <div class="profile-info">
-                    <div class="profile-name">n3sk</div>
-                    <div class="profile-status">
-                        <div class="status-dot active" id="statusDot"></div>
-                        <span id="statusText">CONECTADO</span>
-                    </div>
+            <div class="sidebar-logo">N3SK</div>
+            
+            <div class="sidebar-nav">
+                <div class="nav-item has-submenu" onclick="toggleSubmenu(this)">
+                    <div class="nav-item-icon">⚡</div>
+                    <span>Visuals</span>
+                </div>
+                <div class="nav-submenu">
+                    <div class="nav-submenu-item active">Players</div>
+                </div>
+
+                <div class="nav-item">
+                    <div class="nav-item-icon">🎯</div>
+                    <span>AimBot</span>
+                </div>
+
+                <div class="nav-item">
+                    <div class="nav-item-icon">🎨</div>
+                    <span>Configs</span>
+                </div>
+
+                <div class="nav-item">
+                    <div class="nav-item-icon">⚙️</div>
+                    <span>Settings</span>
                 </div>
             </div>
 
-            <!-- TAGLINE -->
-            <div style="padding: 0 20px; text-align: center; font-size: 11px; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 8px;">
-                FUCK ANY ANTI-CHEAT
-            </div>
-
-            <!-- TABS -->
-            <div class="tabs-container">
-                <button class="tab-btn active" data-tab="visuals">Visuals</button>
-                <button class="tab-btn" data-tab="aimbot">AimBot</button>
-            </div>
-
-            <!-- TABS CONTENT -->
-            <div class="tabs-content">
-                <!-- VISUALS TAB -->
-                <div class="tab-pane active" id="visuals-tab">
-                    <!-- ENABLE ESP SECTION -->
-                    <div class="section">
-                        <div class="section-header">
-                            <span class="section-title">Enable ESP</span>
-                            <span class="section-arrow">▶</span>
-                        </div>
-                        <div class="section-content">
-                            <div class="option">
-                                <span class="option-label">Ativar ESP</span>
-                                <div class="option-control">
-                                    <div class="toggle on" id="espEnabled" onclick="toggleEsp(this)"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- BOX SETTINGS SECTION -->
-                    <div class="section">
-                        <div class="section-header">
-                            <span class="section-title">Configurações Box</span>
-                            <span class="section-arrow">▶</span>
-                        </div>
-                        <div class="section-content">
-                            <div class="option">
-                                <span class="option-label">Tipo de Box</span>
-                                <div class="option-control">
-                                    <select class="select-input" id="boxType" onchange="updateBoxType(this.value)">
-                                        <option value="corner">Corner</option>
-                                        <option value="filled">Filled</option>
-                                        <option value="2d">2D Box</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="option">
-                                <span class="option-label">Espessura</span>
-                                <div class="option-control">
-                                    <div class="slider-group">
-                                        <input type="range" min="0.5" max="3" step="0.1" value="2" class="slider-input" id="boxThickness" oninput="updateThickness(this.value)">
-                                        <span class="slider-value" id="thicknessValue">2.0</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="option">
-                                <span class="option-label">Cor Box</span>
-                                <div class="option-control">
-                                    <div class="color-swatch" id="sw-boxcolor" onclick="openColorPicker(this)" data-color-key="boxcolor">
-                                        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
-                                            <rect width="100" height="100" fill="#ffffff"/>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="option">
-                                <span class="option-label">Draw Box</span>
-                                <div class="option-control">
-                                    <div class="toggle on" id="tgl-box" data-k="box" onclick="toggleFeature(this)"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- SKELETON SECTION -->
-                    <div class="section">
-                        <div class="section-header">
-                            <span class="section-title">Skeleton</span>
-                            <span class="section-arrow">▶</span>
-                        </div>
-                        <div class="section-content">
-                            <div class="option">
-                                <span class="option-label">Draw Skeleton</span>
-                                <div class="option-control">
-                                    <div class="toggle on" id="tgl-skeleton" data-k="skeleton" onclick="toggleFeature(this)"></div>
-                                </div>
-                            </div>
-                            <div class="option">
-                                <span class="option-label">Cor Skeleton</span>
-                                <div class="option-control">
-                                    <div class="color-swatch" id="sw-skeletoncolor" onclick="openColorPicker(this)" data-color-key="skeletoncolor">
-                                        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
-                                            <rect width="100" height="100" fill="#ff0000"/>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- SNAPLINE SECTION -->
-                    <div class="section">
-                        <div class="section-header">
-                            <span class="section-title">Snapline</span>
-                            <span class="section-arrow">▶</span>
-                        </div>
-                        <div class="section-content">
-                            <div class="option">
-                                <span class="option-label">Draw Snapline</span>
-                                <div class="option-control">
-                                    <div class="toggle" id="tgl-snapline" data-k="snapline" onclick="toggleFeature(this)"></div>
-                                </div>
-                            </div>
-                            <div class="option">
-                                <span class="option-label">Cor Snapline</span>
-                                <div class="option-control">
-                                    <div class="color-swatch" id="sw-snaplinecolor" onclick="openColorPicker(this)" data-color-key="snaplinecolor">
-                                        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
-                                            <rect width="100" height="100" fill="#00ff00"/>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- HEALTH BAR SECTION -->
-                    <div class="section">
-                        <div class="section-header">
-                            <span class="section-title">Health Bar</span>
-                            <span class="section-arrow">▶</span>
-                        </div>
-                        <div class="section-content">
-                            <div class="option">
-                                <span class="option-label">Draw Health Bar</span>
-                                <div class="option-control">
-                                    <div class="toggle on" id="tgl-healthbar" data-k="healthbar" onclick="toggleFeature(this)"></div>
-                                </div>
-                            </div>
-                            <div class="option">
-                                <span class="option-label">Cor Health Bar</span>
-                                <div class="option-control">
-                                    <div class="color-swatch" id="sw-healthbarcolor" onclick="openColorPicker(this)" data-color-key="healthbarcolor">
-                                        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
-                                            <rect width="100" height="100" fill="#00ff00"/>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- QR CODE BUTTON -->
-                    <button id="btnGlobalQr" class="btn-global-qr" onclick="showGlobalQr()">
-                        📱 GERAR QR GLOBAL
-                    </button>
-                </div>
-
-                <!-- AIMBOT TAB (PLACEHOLDER) -->
-                <div class="tab-pane" id="aimbot-tab">
-                    <div class="option" style="padding: 24px 16px; text-align: center; color: var(--text-muted);">
-                        <span>AimBot em desenvolvimento...</span>
+            <div class="sidebar-profile">
+                <img src="https://i.pinimg.com/474x/ff/c1/a5/ffc1a5f503e31b814ff8953ec6f50c7c.jpg" class="sidebar-profile-avatar" alt="n3sk">
+                <div class="sidebar-profile-info">
+                    <div class="sidebar-profile-name">n3sk</div>
+                    <div class="sidebar-profile-status">
+                        <div class="status-dot active"></div>
+                        <span>CONECTADO</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- PREVIEW PANEL -->
-        <div class="preview-panel">
-            <div class="preview-header">
-                <span class="preview-title">PREVIEW ESP</span>
+        <!-- CENTER PANEL -->
+        <div class="center-panel">
+            <div class="center-header">
+                <div class="center-title">Visuals</div>
+                <div class="center-tabs">
+                    <button class="center-tab active">Players</button>
+                </div>
             </div>
-            <canvas id="espCanvas" class="preview-canvas"></canvas>
+
+            <div class="center-content">
+                <!-- ENABLE ESP -->
+                <div class="feature-section">
+                    <div class="feature-title">
+                        <div class="feature-warning">⚠</div>
+                        Enable ESP
+                    </div>
+                    <div class="feature-description">Displays visual information about players and objects through walls and obstacles. Shows enemy positions, health bars, distance, and names in real-time to give tactical advantage.</div>
+                    <div class="feature-control">
+                        <span class="feature-label">Ativar</span>
+                        <div class="toggle on" id="espToggle" onclick="toggleESP(this)"></div>
+                    </div>
+                </div>
+
+                <!-- BOX THICKNESS -->
+                <div class="feature-section">
+                    <div class="feature-title">Box Thickness</div>
+                    <div class="feature-control">
+                        <span class="feature-label">Espessura</span>
+                        <div class="slider-wrapper">
+                            <input type="range" min="0.5" max="3" step="0.1" value="1" class="slider" id="thicknessSlider" oninput="updateThickness(this.value)">
+                            <span class="slider-value" id="thicknessValue">1.0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BOX TYPE -->
+                <div class="feature-section">
+                    <div class="feature-title">Box Type</div>
+                    <div class="feature-control">
+                        <span class="feature-label">Tipo</span>
+                        <select class="select" id="boxType" onchange="sendState()">
+                            <option value="corner">Corner</option>
+                            <option value="filled">Filled</option>
+                            <option value="2d">2D Box</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- BOX COLOR -->
+                <div class="feature-section">
+                    <div class="feature-title">Box Color</div>
+                    <div class="feature-control">
+                        <span class="feature-label">Cor Box</span>
+                        <div class="color-swatch" id="boxColorSwatch" onclick="openColorPicker(this, 'boxcolor')" style="background: #ffffff;"></div>
+                    </div>
+                </div>
+
+                <!-- DRAW BOX -->
+                <div class="feature-section">
+                    <div class="feature-title">Draw Box</div>
+                    <div class="feature-control">
+                        <span class="feature-label">Renderizar</span>
+                        <div class="toggle on" id="drawBoxToggle" onclick="toggleFeature(this)"></div>
+                    </div>
+                </div>
+
+                <!-- HEALTH BAR -->
+                <div class="feature-section">
+                    <div class="feature-title">Health Bar</div>
+                    <div class="feature-control">
+                        <span class="feature-label"></span>
+                        <div style="display: flex; gap: 12px;">
+                            <div class="checkbox checked" onclick="toggleCheckbox(this)"></div>
+                            <div class="toggle on" id="healthToggle" onclick="toggleFeature(this)"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ARMOR BAR -->
+                <div class="feature-section">
+                    <div class="feature-title">Armor Bar</div>
+                    <div class="feature-control">
+                        <span class="feature-label"></span>
+                        <div style="display: flex; gap: 12px;">
+                            <div class="checkbox checked" onclick="toggleCheckbox(this)"></div>
+                            <div class="toggle on" onclick="toggleFeature(this)"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SKELETON -->
+                <div class="feature-section">
+                    <div class="feature-title">Draw Skeleton</div>
+                    <div class="feature-control">
+                        <span class="feature-label">Renderizar</span>
+                        <div class="toggle on" id="skeletonToggle" onclick="toggleFeature(this)"></div>
+                    </div>
+                </div>
+
+                <!-- SNAPLINE -->
+                <div class="feature-section">
+                    <div class="feature-title">Draw Snapline</div>
+                    <div class="feature-control">
+                        <span class="feature-label">Renderizar</span>
+                        <div class="toggle" id="snaplineToggle" onclick="toggleFeature(this)"></div>
+                    </div>
+                </div>
+
+                <!-- QR BUTTON -->
+                <button class="btn-qr" onclick="showQR()">📱 GERAR QR GLOBAL</button>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="right-panel">
+            <div class="right-header">
+                <div class="right-title">Interactive ESP Preview</div>
+            </div>
+            
+            <div class="right-content">
+                <canvas id="previewCanvas" style="width: 100%; max-width: 300px; background: #050505; border-radius: 8px; border: 1px solid var(--border);"></canvas>
+                
+                <div class="preview-stats">
+                    <div class="stat-group">
+                        <div class="stat-label">Equipamento</div>
+                        <div class="stat-item">Helmet</div>
+                        <div class="stat-item">Scope</div>
+                        <div class="stat-item">HP</div>
+                    </div>
+                    <div class="stat-group">
+                        <div class="stat-label">Inventário</div>
+                        <div class="stat-item">Bomb</div>
+                        <div class="stat-item">Stamina</div>
+                        <div class="stat-item">Crouch</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-// ============================================
-// CONFIGURAÇÃO SUPABASE
-// ============================================
+// CONFIG
 const SUPA_URL = "https://gkzxuerurfedfwuxhimf.supabase.co";
 const SUPA_KEY = "sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6";
 const client = supabase.createClient(SUPA_URL, SUPA_KEY);
-const PREVIEW_IMG_URL = 'https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png?ex=6a3dcbea&is=6a3c7a6a&hm=95ab23192fdc65d73e612fadc773aac107802e9a93602097a289073aabc498b2&=&format=webp&quality=lossless&width=800&height=968';
+const PREVIEW_IMG = 'https://media.discordapp.net/attachments/1184323047931531294/1519504042357817424/Screenshot_111.png?ex=6a3dcbea&is=6a3c7a6a&hm=95ab23192fdc65d73e612fadc773aac107802e9a93602097a289073aabc498b2&=&format=webp&quality=lossless&width=800&height=968';
 
-let sessionId = null;
-let partnerId = null;
-let isGlobal = false;
-let bgImage = null;
-let isUpdatingLocally = false;
-let lastSentState = "";
+let sessionId = null, partnerId = null, isGlobal = false, bgImage = null;
+let isUpdating = false, lastState = "";
 
-// ============================================
 // CURSOR
-// ============================================
 (function(){
-    const dot = document.getElementById('cursor-dot');
-    if(!dot || window.innerWidth <= 900) return;
-    let mx = window.innerWidth/2, my = window.innerHeight/2;
-    let cx = mx, cy = my;
+    const cursor = document.getElementById('cursor');
+    if(!cursor || window.innerWidth <= 900) return;
+    let mx = innerWidth/2, my = innerHeight/2, cx = mx, cy = my;
     document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; }, {passive:true});
-    document.addEventListener('mousedown', () => dot.classList.add('click'));
-    document.addEventListener('mouseup', () => dot.classList.remove('click'));
-    function loop(){
-        cx += (mx-cx)*0.13;
-        cy += (my-cy)*0.13;
-        dot.style.left = cx+'px';
-        dot.style.top = cy+'px';
+    document.addEventListener('mousedown', () => cursor.classList.add('click'));
+    document.addEventListener('mouseup', () => cursor.classList.remove('click'));
+    (function loop(){
+        cx += (mx-cx)*0.15;
+        cy += (my-cy)*0.15;
+        cursor.style.left = cx+'px';
+        cursor.style.top = cy+'px';
         requestAnimationFrame(loop);
-    }
-    loop();
+    })();
 })();
 
-// ============================================
-// TABS FUNCTIONALITY
-// ============================================
-document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', function(){
-        const tabName = this.dataset.tab;
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-        this.classList.add('active');
-        document.getElementById(tabName + '-tab').classList.add('active');
-    });
-});
+// MENU
+function toggleSubmenu(el){
+    el.classList.toggle('open');
+    el.nextElementSibling?.classList.toggle('open');
+}
 
-// ============================================
-// SECTIONS COLLAPSE/EXPAND
-// ============================================
-document.querySelectorAll('.section-header').forEach(header => {
-    header.addEventListener('click', function(){
-        this.parentElement.classList.toggle('collapsed');
-    });
-});
+function toggleCheckbox(el){
+    el.classList.toggle('checked');
+}
 
-// ============================================
-// INICIALIZAÇÃO
-// ============================================
+// AUTH
 window.onload = async function(){
-    if(PREVIEW_IMG_URL){
-        bgImage = new Image();
-        bgImage.crossOrigin = "Anonymous";
-        bgImage.src = PREVIEW_IMG_URL;
-        bgImage.onload = () => scheduleRender();
-    }
+    bgImage = new Image();
+    bgImage.crossOrigin = "anonymous";
+    bgImage.src = PREVIEW_IMG;
+    bgImage.onload = () => scheduleRender();
 
-    const token = new URLSearchParams(window.location.search).get('token');
-    if(!token){ showLoginError("Token não encontrado"); return; }
+    const token = new URLSearchParams(location.search).get('token');
+    if(!token){ showError("Token não encontrado"); return; }
     
-    try{
+    try {
         const {data, error} = await client.from('n3sk').select('*').eq('token', token).eq('is_active', true).single();
-        
-        if(error || !data){ 
-            showLoginError("Token inválido ou expirado"); 
-            return; 
-        }
+        if(error || !data){ showError("Token inválido"); return; }
         
         sessionId = data.id;
         isGlobal = data.is_global;
         partnerId = isGlobal ? sessionId.replace('_GLOBAL', '') : sessionId + '_GLOBAL';
 
-        if(!isGlobal && data.ip && data.ip !== "UNKNOWN"){
-            try{
-                const res = await fetch('https://api.ipify.org?format=json');
-                const ipData = await res.json();
-                if(ipData.ip !== data.ip){ 
-                    showLoginError("Acesso negado - Dispositivo diferente"); 
-                    return; 
-                }
-            }catch(e){ console.warn("IP check failed", e); }
-        }
-        
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app').style.display = 'block';
-        setConnStatus(true);
         
         startSync();
         resizeCanvas();
         scheduleRender();
-        
-    }catch(e){ showLoginError("Erro: "+e.message); }
+    } catch(e) { showError("Erro: " + e.message); }
 };
 
-function showLoginError(msg){
+function showError(msg){
     document.getElementById('login-msg').textContent = msg;
-    document.getElementById('login-loader').style.display = 'none';
-    document.querySelector('.login-card').style.borderColor = 'var(--red)';
+    document.querySelector('.loader').style.display = 'none';
 }
 
-function setConnStatus(connected){
-    const dot = document.getElementById('statusDot');
-    const text = document.getElementById('statusText');
-    if(connected){
-        dot.classList.add('active');
-        text.textContent = 'CONECTADO';
-    } else {
-        dot.classList.remove('active');
-        text.textContent = 'OFFLINE';
-    }
+// TOGGLE
+function toggleESP(el){
+    el.classList.toggle('on');
+    scheduleRender();
+    sendState();
 }
 
-// ============================================
-// FEATURES TOGGLE
-// ============================================
 function toggleFeature(el){
     el.classList.toggle('on');
     scheduleRender();
     sendState();
 }
 
-function toggleEsp(el){
-    el.classList.toggle('on');
-    scheduleRender();
+function updateThickness(v){
+    document.getElementById('thicknessValue').textContent = parseFloat(v).toFixed(1);
     sendState();
 }
 
-// ============================================
-// COLOR PICKER
-// ============================================
-let cpTarget = null, cpH = 0, cpS = 1, cpV = 1, cpA = 1;
-let svTX = 1, svTY = 0, svCX = 1, svCY = 0;
-let hTY = 0, hCY = 0, aCY = 0;
-let animRunning = false;
-
-const cpOverlay = document.getElementById('cpOverlay');
-const cpBox = document.getElementById('cpBox');
-const svEl = document.getElementById('sv');
-const svTh = document.getElementById('svTh');
-const hueTr = document.getElementById('hueTr');
-const hueTh = document.getElementById('hueTh');
-const aTr = document.getElementById('aTr');
-const aTh = document.getElementById('aTh');
-
-function h2r(h, s, v){
-    let r, g, b, i = Math.floor(h * 6), f = h * 6 - i, p = v * (1 - s), q = v * (1 - f * s), t = v * (1 - (1 - f) * s);
-    switch(i % 6){
-        case 0: r = v; g = t; b = p; break;
-        case 1: r = q; g = v; b = p; break;
-        case 2: r = p; g = v; b = t; break;
-        case 3: r = p; g = q; b = v; break;
-        case 4: r = t; g = p; b = v; break;
-        case 5: r = v; g = p; b = q; break;
-    }
-    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
-}
-
-function r2h(r, g, b){
-    return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
-}
-
-function hex2hsv(hex){
-    const r = parseInt(hex.slice(1, 3), 16) / 255;
-    const g = parseInt(hex.slice(3, 5), 16) / 255;
-    const b = parseInt(hex.slice(5, 7), 16) / 255;
-    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
-    let h, s = mx === 0 ? 0 : d / mx, v = mx;
-    if(d === 0) h = 0;
-    else if(mx === r) h = ((g - b) / d) % 6;
-    else if(mx === g) h = (b - r) / d + 2;
-    else h = (r - g) / d + 4;
-    return [h / 6, s, v];
-}
-
-function lerp(a, b, t){ return a + (b - a) * t; }
-
-function runAnim(){
-    const sp = 0.28;
-    svCX = lerp(svCX, svTX, sp);
-    svCY = lerp(svCY, svTY, sp);
-    hCY = lerp(hCY, hTY, sp);
-    svTh.style.left = (svCX * 100) + '%';
-    svTh.style.top = (svCY * 100) + '%';
-    const hH = hueTr.getBoundingClientRect().height || 160;
-    const aH = aTr.getBoundingClientRect().height || 160;
-    hueTh.style.top = (hCY * hH) + 'px';
-    aTh.style.top = (aCY * aH) + 'px';
-    if(Math.abs(svCX - svTX) > 0.0005 || Math.abs(svCY - svTY) > 0.0005 || Math.abs(hCY - hTY) > 0.0005)
-        requestAnimationFrame(runAnim);
-    else animRunning = false;
-}
-
-function startAnim(){
-    if(!animRunning){
-        animRunning = true;
-        requestAnimationFrame(runAnim);
-    }
-}
-
-function updateColorPicker(){
-    const hRgb = h2r(cpH, 1, 1);
-    const hHex = r2h(hRgb[0], hRgb[1], hRgb[2]);
-    svEl.style.background = hHex;
-    
-    const rgb = h2r(cpH, cpS, cpV);
-    svTh.style.background = r2h(rgb[0], rgb[1], rgb[2]);
-    
-    hueTh.style.background = hHex;
-    aTh.style.background = 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',' + cpA + ')';
-    
-    const hex = r2h(rgb[0], rgb[1], rgb[2]);
-    document.getElementById('colorHex').textContent = hex.toUpperCase();
-    
-    if(cpTarget){
-        const rect = cpTarget.querySelector('rect');
-        if(rect) rect.setAttribute('fill', hex);
-        scheduleRender();
-    }
-}
-
-function openColorPicker(el){
-    cpTarget = el;
-    const rect = el.getBoundingClientRect();
-    const popW = 280, popH = 200;
-    let left = rect.right + 20, top = rect.top;
-    if(left + popW > innerWidth) left = rect.left - popW - 20;
-    if(top + popH > innerHeight) top = innerHeight - popH - 20;
-    if(left < 8) left = 8;
-    if(top < 8) top = 8;
-    cpBox.style.left = left + 'px';
-    cpBox.style.top = top + 'px';
-
-    const currentColor = el.querySelector('rect')?.getAttribute('fill') || '#ff0000';
-    const hsv = hex2hsv(currentColor);
-    cpH = hsv[0];
-    cpS = hsv[1];
-    cpV = hsv[2];
-    cpA = 1;
-
-    svCX = cpS; svTX = cpS; svCY = 1 - cpV; svTY = 1 - cpV;
-    hCY = cpH; hTY = cpH; aCY = 1 - cpA;
-    updateColorPicker();
-    svTh.style.left = (svCX * 100) + '%';
-    svTh.style.top = (svCY * 100) + '%';
-    const hH = hueTr.getBoundingClientRect().height || 160;
-    const aH = aTr.getBoundingClientRect().height || 160;
-    hueTh.style.top = (hCY * hH) + 'px';
-    aTh.style.top = (aCY * aH) + 'px';
-    cpOverlay.classList.add('open');
-}
-
-function closeColorPicker(){
-    cpOverlay.classList.remove('open');
-    sendState();
-}
-
-cpOverlay.addEventListener('mousedown', function(e){
-    if(e.target === cpOverlay){ closeColorPicker(); }
-});
-
-let dSV = false, dH = false, dA = false;
-const cl = (v, a, b) => Math.max(a, Math.min(b, v));
-
-svEl.addEventListener('mousedown', (e) => { e.preventDefault(); dSV = true; doSV(e); });
-hueTr.addEventListener('mousedown', (e) => { e.preventDefault(); dH = true; doH(e); });
-aTr.addEventListener('mousedown', (e) => { e.preventDefault(); dA = true; doA(e); });
-
-document.addEventListener('mousemove', (e) => {
-    if(dSV) { doSV(e); sendState(); }
-    if(dH) { doH(e); sendState(); }
-    if(dA) { doA(e); sendState(); }
-});
-
-document.addEventListener('mouseup', () => { dSV = dH = dA = false; });
-
-function doSV(e){
-    const r = svEl.getBoundingClientRect();
-    cpS = cl((e.clientX - r.left) / r.width, 0, 1);
-    cpV = cl(1 - (e.clientY - r.top) / r.height, 0, 1);
-    svTX = cpS;
-    svTY = 1 - cpV;
-    updateColorPicker();
-    startAnim();
-}
-
-function doH(e){
-    const r = hueTr.getBoundingClientRect();
-    cpH = cl((e.clientY - r.top) / r.height, 0, 0.9999);
-    hTY = cpH;
-    updateColorPicker();
-    startAnim();
-}
-
-function doA(e){
-    const r = aTr.getBoundingClientRect();
-    cpA = cl(1 - ((e.clientY - r.top) / r.height), 0, 1);
-    aCY = 1 - cpA;
-    updateColorPicker();
-    startAnim();
-}
-
-// ============================================
-// STATE SYNC
-// ============================================
-async function startSync(){
-    setInterval(async () => {
-        if(!sessionId) return;
-        const {data, error} = await client.from('n3sk').select('state, is_active').in('id', [sessionId, partnerId]).limit(1);
-        if(error || !data || data.length === 0) { location.reload(); return; }
-        const validData = data.find(d => d.state);
-        if(validData && validData.state) applyState(validData.state);
-    }, 500);
-}
-
+// STATE
 async function sendState(){
     if(!sessionId) return;
     
-    const currentState = {
+    const state = {
         toggles: {
-            box: document.getElementById('tgl-box').classList.contains('on'),
-            skeleton: document.getElementById('tgl-skeleton').classList.contains('on'),
-            snapline: document.getElementById('tgl-snapline').classList.contains('on'),
-            healthbar: document.getElementById('tgl-healthbar').classList.contains('on'),
-            espEnabled: document.getElementById('espEnabled').classList.contains('on')
-        },
-        colors: {
-            boxcolor: getSwatchColor('sw-boxcolor'),
-            skeletoncolor: getSwatchColor('sw-skeletoncolor'),
-            snaplinecolor: getSwatchColor('sw-snaplinecolor'),
-            healthbarcolor: getSwatchColor('sw-healthbarcolor')
+            esp: document.getElementById('espToggle').classList.contains('on'),
+            box: document.getElementById('drawBoxToggle').classList.contains('on'),
+            health: document.getElementById('healthToggle').classList.contains('on'),
+            skeleton: document.getElementById('skeletonToggle').classList.contains('on'),
+            snapline: document.getElementById('snaplineToggle').classList.contains('on')
         },
         settings: {
+            thickness: parseFloat(document.getElementById('thicknessSlider').value),
             boxType: document.getElementById('boxType').value,
-            boxThickness: parseFloat(document.getElementById('boxThickness').value)
+            boxColor: document.getElementById('boxColorSwatch').style.background
         }
     };
-
-    const jsonString = JSON.stringify(currentState);
-    if(jsonString !== lastSentState){
-        lastSentState = jsonString;
-        isUpdatingLocally = true;
-        setTimeout(() => { isUpdatingLocally = false; }, 500);
-        await client.from('n3sk').update({state: currentState}).in('id', [sessionId, partnerId]);
+    
+    const json = JSON.stringify(state);
+    if(json !== lastState){
+        lastState = json;
+        isUpdating = true;
+        setTimeout(() => { isUpdating = false; }, 400);
+        await client.from('n3sk').update({state}).in('id', [sessionId, partnerId]);
     }
 }
 
-function getSwatchColor(id){
-    const el = document.getElementById(id);
-    return el?.querySelector('rect')?.getAttribute('fill') || '#ffffff';
+async function startSync(){
+    setInterval(async () => {
+        if(!sessionId) return;
+        const {data} = await client.from('n3sk').select('state').in('id', [sessionId, partnerId]).limit(1);
+        if(data?.[0]?.state && !isUpdating) applyState(data[0].state);
+    }, 400);
 }
 
 function applyState(s){
-    if(isUpdatingLocally) return;
-    setConnStatus(true);
-    
-    const tm = {box: 'tgl-box', skeleton: 'tgl-skeleton', snapline: 'tgl-snapline', healthbar: 'tgl-healthbar'};
-    for(let k in tm){
-        const el = document.getElementById(tm[k]);
-        if(el && s.toggles) el.classList.toggle('on', !!s.toggles[k]);
+    if(s.toggles){
+        if(s.toggles.esp !== undefined) document.getElementById('espToggle').classList.toggle('on', !!s.toggles.esp);
+        if(s.toggles.box !== undefined) document.getElementById('drawBoxToggle').classList.toggle('on', !!s.toggles.box);
+        if(s.toggles.health !== undefined) document.getElementById('healthToggle').classList.toggle('on', !!s.toggles.health);
+        if(s.toggles.skeleton !== undefined) document.getElementById('skeletonToggle').classList.toggle('on', !!s.toggles.skeleton);
+        if(s.toggles.snapline !== undefined) document.getElementById('snaplineToggle').classList.toggle('on', !!s.toggles.snapline);
     }
-    
-    if(s.toggles && s.toggles.espEnabled !== undefined){
-        document.getElementById('espEnabled').classList.toggle('on', !!s.toggles.espEnabled);
-    }
-    
-    const cm = {boxcolor: 'sw-boxcolor', skeletoncolor: 'sw-skeletoncolor', snaplinecolor: 'sw-snaplinecolor', healthbarcolor: 'sw-healthbarcolor'};
-    for(let k in cm){
-        const el = document.getElementById(cm[k]);
-        if(el && s.colors && s.colors[k]){
-            const rect = el.querySelector('rect');
-            if(rect) rect.setAttribute('fill', s.colors[k]);
-        }
-    }
-    
     if(s.settings){
+        if(s.settings.thickness) { document.getElementById('thicknessSlider').value = s.settings.thickness; document.getElementById('thicknessValue').textContent = s.settings.thickness.toFixed(1); }
         if(s.settings.boxType) document.getElementById('boxType').value = s.settings.boxType;
-        if(s.settings.boxThickness !== undefined){
-            document.getElementById('boxThickness').value = s.settings.boxThickness;
-            document.getElementById('thicknessValue').textContent = s.settings.boxThickness.toFixed(1);
-        }
+        if(s.settings.boxColor) document.getElementById('boxColorSwatch').style.background = s.settings.boxColor;
     }
-    
     scheduleRender();
 }
 
-// ============================================
-// INPUT HANDLERS
-// ============================================
-function updateThickness(value){
-    document.getElementById('thicknessValue').textContent = parseFloat(value).toFixed(1);
-    sendState();
-}
-
-function updateBoxType(value){
-    sendState();
-}
-
-// ============================================
-// QR CODE
-// ============================================
-function showGlobalQr(){
-    const targetId = isGlobal ? sessionId : partnerId;
-    client.from('n3sk').select('token').eq('id', targetId).single()
-    .then(({data, error}) => {
-        if(data && data.token){
-            const globalLink = `https://n3sk.xyz/?token=${data.token}`;
+// QR
+function showQR(){
+    const id = isGlobal ? sessionId : partnerId;
+    client.from('n3sk').select('token').eq('id', id).single().then(({data}) => {
+        if(data?.token){
             document.getElementById('qr-modal').classList.add('active');
             document.getElementById('qrcode-global').innerHTML = '';
-            new QRCode(document.getElementById("qrcode-global"), {
-                text: globalLink, width: 220, height: 220,
-                colorDark: "#000000", colorLight: "#ffffff",
+            new QRCode(document.getElementById('qrcode-global'), {
+                text: `https://n3sk.xyz/?token=${data.token}`,
+                width: 200, height: 200,
+                colorDark: "#000", colorLight: "#fff",
                 correctLevel: QRCode.CorrectLevel.H
             });
         }
     });
 }
 
-function closeGlobalQr(){
+function closeQR(){
     document.getElementById('qr-modal').classList.remove('active');
 }
 
-// ============================================
-// PREVIEW CANVAS
-// ============================================
-const canvas = document.getElementById('espCanvas');
-const ctx = canvas.getContext('2d', { alpha: false });
-let canvasWidth = 0, canvasHeight = 0, renderScheduled = false;
-let boxOpacity = 0, targetBoxOpacity = 0;
+// CANVAS
+const canvas = document.getElementById('previewCanvas');
+const ctx = canvas.getContext('2d', {alpha: false});
+let renderScheduled = false;
 
 function resizeCanvas(){
-    const rect = canvas.parentElement.getBoundingClientRect();
-    const nw = rect.width, nh = rect.height - 45;
-    const dpr = window.devicePixelRatio || 1;
-    if(canvasWidth !== nw || canvasHeight !== nh){
-        canvas.width = nw * dpr;
-        canvas.height = nh * dpr;
-        canvas.style.width = nw + 'px';
-        canvas.style.height = nh + 'px';
-        ctx.scale(dpr, dpr);
-        canvasWidth = nw;
-        canvasHeight = nh;
-        scheduleRender();
-    }
+    canvas.width = 300;
+    canvas.height = 400;
 }
-
-window.addEventListener('resize', resizeCanvas);
 
 function scheduleRender(){
     if(!renderScheduled){
         renderScheduled = true;
-        requestAnimationFrame(renderPreview);
+        requestAnimationFrame(renderCanvas);
     }
 }
 
-function renderPreview(){
+function renderCanvas(){
     renderScheduled = false;
-    if(!canvasWidth || !canvasHeight) return;
-    
-    ctx.save();
-    ctx.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0);
     ctx.fillStyle = '#050505';
-    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    if(bgImage && bgImage.complete && bgImage.naturalWidth > 0){
-        const s = Math.min(canvasWidth / bgImage.width, canvasHeight / bgImage.height);
-        const w = bgImage.width * s;
-        const h = bgImage.height * s;
-        ctx.drawImage(bgImage, (canvasWidth - w) / 2, (canvasHeight - h) / 2, w, h);
+    if(bgImage?.complete){
+        const scale = Math.min(canvas.width / bgImage.width, canvas.height / bgImage.height);
+        const w = bgImage.width * scale, h = bgImage.height * scale;
+        ctx.drawImage(bgImage, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
     }
 
-    const isBox = document.getElementById('tgl-box').classList.contains('on');
-    const isHp = document.getElementById('tgl-healthbar').classList.contains('on');
-    const bC = getSwatchColor('sw-boxcolor');
-    const hC = getSwatchColor('sw-healthbarcolor');
-    const thickness = parseFloat(document.getElementById('boxThickness').value);
-
-    const bH = canvasHeight * 0.75;
-    const bW = bH * 0.45;
-    const bX = (canvasWidth - bW) / 2;
-    const bY = (canvasHeight - bH) / 2 + 20;
-
-    targetBoxOpacity = isBox ? 1 : 0;
-    boxOpacity = lerp(boxOpacity, targetBoxOpacity, 0.05);
-
-    if(boxOpacity > 0.01){
-        ctx.globalAlpha = boxOpacity;
-        ctx.strokeStyle = bC;
+    const isBox = document.getElementById('drawBoxToggle').classList.contains('on');
+    if(isBox){
+        const thickness = parseFloat(document.getElementById('thicknessSlider').value);
+        ctx.strokeStyle = document.getElementById('boxColorSwatch').style.background;
         ctx.lineWidth = thickness;
-        const l = bW * 0.25;
+        const bW = canvas.width * 0.4;
+        const bH = canvas.height * 0.6;
+        const bX = (canvas.width - bW) / 2;
+        const bY = (canvas.height - bH) / 2;
+        const corner = bW * 0.15;
         
         ctx.beginPath();
-        ctx.moveTo(bX, bY + l);
+        ctx.moveTo(bX, bY + corner);
         ctx.lineTo(bX, bY);
-        ctx.lineTo(bX + l, bY);
+        ctx.lineTo(bX + corner, bY);
         ctx.stroke();
         
         ctx.beginPath();
-        ctx.moveTo(bX + bW - l, bY);
+        ctx.moveTo(bX + bW - corner, bY);
         ctx.lineTo(bX + bW, bY);
-        ctx.lineTo(bX + bW, bY + l);
+        ctx.lineTo(bX + bW, bY + corner);
         ctx.stroke();
         
         ctx.beginPath();
-        ctx.moveTo(bX, bY + bH - l);
+        ctx.moveTo(bX, bY + bH - corner);
         ctx.lineTo(bX, bY + bH);
-        ctx.lineTo(bX + l, bY + bH);
+        ctx.lineTo(bX + corner, bY + bH);
         ctx.stroke();
         
         ctx.beginPath();
-        ctx.moveTo(bX + bW - l, bY + bH);
+        ctx.moveTo(bX + bW - corner, bY + bH);
         ctx.lineTo(bX + bW, bY + bH);
-        ctx.lineTo(bX + bW, bY + bH - l);
+        ctx.lineTo(bX + bW, bY + bH - corner);
         ctx.stroke();
-        
-        ctx.globalAlpha = 1.0;
     }
 
-    if(isHp){
-        const bw = 6;
-        const bx = bX - 12;
-        const currentHpHeight = bH;
+    const isHealth = document.getElementById('healthToggle').classList.contains('on');
+    if(isHealth){
+        const bW = canvas.width * 0.4;
+        const bH = canvas.height * 0.6;
+        const bX = (canvas.width - bW) / 2;
+        const bY = (canvas.height - bH) / 2;
+        const barW = 6;
+        const barX = bX - 12;
         
-        ctx.fillStyle = 'rgba(15,15,15,0.8)';
-        ctx.fillRect(bx, bY, bw, bH);
-        ctx.fillStyle = hC;
-        ctx.fillRect(bx, bY + (bH - currentHpHeight), bw, currentHpHeight);
+        ctx.fillStyle = 'rgba(20, 20, 20, 0.8)';
+        ctx.fillRect(barX, bY, barW, bH);
+        ctx.fillStyle = '#00ff00';
+        ctx.fillRect(barX, bY, barW, bH);
     }
-    
-    ctx.restore();
-    
-    if(Math.abs(boxOpacity - targetBoxOpacity) > 0.01) scheduleRender();
+
+    if(Math.abs(canvas.width) > 0) scheduleRender();
 }
 
 resizeCanvas();
 scheduleRender();
+
+function openColorPicker(el, key){
+    // Placeholder - pode adicionar color picker depois
+    alert('Color picker em desenvolvimento');
+}
 </script>
 </body>
 </html>
