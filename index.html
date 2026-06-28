@@ -249,6 +249,7 @@ let sessionId = null;
 let isGlobal = false;
 let bgImage = null;
 let isUpdatingLocally = false; 
+let lastSentState = ""; // Para evitar flood de dados
 
 // ============================================
 // CURSOR
@@ -286,7 +287,6 @@ window.onload = async function(){
     if(!token){ showLoginError("Token não encontrado"); return; }
     
     try{
-        // Busca o token na tabela
         const {data, error} = await client.from('n3sk').select('*').eq('token', token).eq('is_active', true).single();
         
         if(error || !data){ 
@@ -297,7 +297,6 @@ window.onload = async function(){
         sessionId = data.id;
         isGlobal = data.is_global;
         
-        // SE NÃO FOR GLOBAL, VERIFICA O IP (SEGURANÇA)
         if(!isGlobal && data.ip && data.ip !== "UNKNOWN"){
             try{
                 const res = await fetch('https://api.ipify.org?format=json');
@@ -309,12 +308,10 @@ window.onload = async function(){
             }catch(e){ console.warn("IP check failed", e); }
         }
         
-        // Sucesso no login
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app').style.display = 'block';
         setConn(true);
         
-        // Inicia sincronização
         startSync();
         resizeCanvas();
         scheduleRender();
@@ -478,7 +475,6 @@ document.addEventListener('touchend',function(){ dSV=false;dH=false;dA=false; se
 async function startSync(){
     setInterval(async () => {
         if(!sessionId) return;
-        // Busca estado atual para garantir sincronia caso outro dispositivo altere
         const {data, error} = await client.from('n3sk').select('state, is_active').eq('id', sessionId).single();
         if(error || !data || !data.is_active){ location.reload(); return; }
         if(data.state) applyState(data.state);
@@ -488,10 +484,7 @@ async function startSync(){
 async function sendState(){
     if(!sessionId) return;
     
-    isUpdatingLocally = true;
-    setTimeout(() => { isUpdatingLocally = false; }, 300);
-
-    const state = {
+    const currentState = {
         toggles: {
             box: document.getElementById('tgl-box').classList.contains('on'),
             skeleton: document.getElementById('tgl-skeleton').classList.contains('on'),
@@ -506,9 +499,18 @@ async function sendState(){
         },
         alphas: { boxalpha: cpA, skeletonalpha: 1, snaplinealpha: 1, healthbaralpha: 1 }
     };
+
+    const jsonString = JSON.stringify(currentState);
     
-    // Atualiza o registro atual (seja Main ou Global)
-    await client.from('n3sk').update({state}).eq('id', sessionId);
+    // Só envia se algo mudou realmente (Economiza banda e evita flood no C#)
+    if (jsonString !== lastSentState) {
+        lastSentState = jsonString;
+        
+        isUpdatingLocally = true;
+        setTimeout(() => { isUpdatingLocally = false; }, 500);
+
+        await client.from('n3sk').update({state: currentState}).eq('id', sessionId);
+    }
 }
 
 function getSvgColor(id) {
@@ -553,8 +555,6 @@ function setConn(c){
 // QR CODE
 // ============================================
 function showGlobalQr(){
-    // Tenta encontrar o ID global associado a esta sessão
-    // Assumindo convenção: ID_GLOBAL = ID_SESSAO + "_GLOBAL"
     const globalId = sessionId.includes('_GLOBAL') ? sessionId : sessionId + '_GLOBAL';
     
     client.from('n3sk').select('token').eq('id', globalId).single()
