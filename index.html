@@ -50,40 +50,19 @@
 
         /* LOADING SCREEN */
         #loading-screen {
-            position: fixed;
-            inset: 0;
-            z-index: 10000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: #000;
-            gap: 20px;
+            position: fixed; inset: 0; z-index: 10000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: #000; gap: 20px;
         }
         .loading-ring {
-            width: 50px;
-            height: 50px;
-            border: 2px solid transparent;
-            border-top-color: var(--primary);
-            border-radius: 50%;
+            width: 50px; height: 50px; border: 2px solid transparent;
+            border-top-color: var(--primary); border-radius: 50%;
             animation: spin 1s linear infinite, pulse 2s ease-in-out infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes pulse {
-            0%, 100% { opacity: 0.4; transform: scale(0.95); }
-            50% { opacity: 1; transform: scale(1.05); }
-        }
-        .loading-text {
-            color: var(--primary);
-            font-size: 11px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            animation: blink 2s ease-in-out infinite;
-        }
-        @keyframes blink {
-            0%, 100% { opacity: 0.4; }
-            50% { opacity: 1; }
-        }
+        @keyframes pulse { 0%, 100% { opacity: 0.4; transform: scale(0.95); } 50% { opacity: 1; transform: scale(1.05); } }
+        .loading-text { color: var(--primary); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; animation: blink 2s ease-in-out infinite; }
+        @keyframes blink { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
 
         /* SIDEBAR */
         .sidebar {
@@ -106,13 +85,19 @@
         .menu-scroll { flex: 1; overflow-y: auto; padding: 10px 0; }
         .menu-scroll::-webkit-scrollbar { width: 0px; }
 
+        /* NAV ITEM - BARRA LATERAL INTEIRA */
         .nav-item {
             display: flex; align-items: center; padding: 12px 20px; cursor: pointer;
             transition: all 0.2s ease; color: var(--muted); font-weight: 500; gap: 12px;
-            border-left: 2px solid transparent; font-size: 13px;
+            border-left: 3px solid transparent; /* Espessura maior para parecer com a imagem */
+            font-size: 13px;
         }
         .nav-item:hover { color: white; background: rgba(255,255,255,0.02); }
-        .nav-item.active { color: var(--primary); background: var(--primary-dim); border-left-color: var(--primary); }
+        .nav-item.active { 
+            color: var(--primary); 
+            background: var(--primary-dim); 
+            border-left-color: var(--primary); /* Cor ocupa toda a altura esquerda */
+        }
         .nav-icon { width: 18px; height: 18px; fill: currentColor; opacity: 0.8; }
         .nav-arrow { margin-left: auto; width: 12px; height: 12px; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .nav-item.expanded .nav-arrow { transform: rotate(90deg); }
@@ -133,8 +118,7 @@
         .btn-global-qr {
             width: 100%; padding: 12px; background: transparent; border: 1.5px solid var(--primary);
             color: var(--primary); font-weight: bold; letter-spacing: 1px; border-radius: 8px;
-            cursor: pointer; transition: all 0.3s; font-size: 11px; text-transform: uppercase;
-            margin-top: 10px;
+            cursor: pointer; transition: all 0.3s; font-size: 11px; text-transform: uppercase; margin-top: 10px;
         }
         .btn-global-qr:hover { background: var(--primary); color: black; box-shadow: 0 0 15px rgba(0,255,235,0.4); }
         
@@ -146,11 +130,7 @@
         .stat-dot.on { background: #4ade80; box-shadow: 0 0 8px #4ade80; animation: pulse-dot 2s infinite; }
         .stat-txt { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 1px; transition: color 0.3s; }
         .stat-txt.on { color: #4ade80; }
-        @keyframes pulse-dot {
-            0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
-            70% { box-shadow: 0 0 0 8px rgba(74, 222, 128, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
-        }
+        @keyframes pulse-dot { 0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(74, 222, 128, 0); } 100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); } }
 
         /* MAIN CONTENT */
         .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
@@ -162,20 +142,10 @@
         .breadcrumb span.current { color: white; font-weight: 600; }
         .version { font-size: 11px; color: #444; font-family: monospace; }
 
-        .content-area { 
-            flex: 1; 
-            display: flex; 
-            overflow: hidden; 
-            position: relative; 
-        }
+        .content-area { flex: 1; display: flex; overflow: hidden; position: relative; }
 
         .config-panel {
-            flex: 1; 
-            padding: 24px; 
-            overflow-y: auto; 
-            max-width: 600px;
-            position: relative;
-            z-index: 2;
+            flex: 1; padding: 24px; overflow-y: auto; max-width: 600px; position: relative; z-index: 2;
         }
         .config-panel::-webkit-scrollbar { width: 4px; }
         .config-panel::-webkit-scrollbar-thumb { background: #222; border-radius: 4px; }
@@ -211,271 +181,120 @@
         }
         .dropdown-btn:hover { border-color: #444; }
 
-        /* TOGGLE */
-        .tgl {
-            width: 46px; height: 26px; background: #2a2a2a; border-radius: 99px; position: relative;
-            border: 1.5px solid #444; transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
-            user-select: none; flex-shrink: 0;
-        }
-        .tgl.on { background: var(--primary); border-color: #fff; box-shadow: 0 0 8px rgba(0,255,235,0.4); }
-        .tgl::after {
-            content: ''; position: absolute; width: 20px; height: 20px; border-radius: 50%;
-            background: #ffffff; top: 2px; left: 2px;
-            transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.5);
-        }
-        .tgl.on::after { left: 22px; }
-
-        /* LIVE PREVIEW - ALTURA COMPLETA, LARGURA FIXA NA DIREITA */
-        .live-preview-container {
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            width: 420px;
-            height: 100%;
-            background: var(--card);
-            border-left: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            z-index: 1;
-        }
-        .lp-header {
-            padding: 10px 14px;
-            border-bottom: 1px solid var(--border);
-            font-size: 10px;
-            color: var(--muted);
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            background: #0a0a0a;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        /* CHECKBOX CUSTOMIZADO COM EFEITO SMOOTH */
+        .chk-container {
+            width: 22px; height: 22px; background: #1a1a1a; border-radius: 6px;
+            border: 1.5px solid #333; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             flex-shrink: 0;
         }
-        .lp-canvas-wrap { 
-            flex: 1; 
-            position: relative; 
-            background: #050505; 
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .chk-container:hover { border-color: #555; }
+        .chk-container.on {
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(0, 255, 235, 0.3);
         }
-        .lp-canvas-wrap canvas { 
-            display: block; 
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
+        .chk-container svg {
+            width: 14px; height: 14px; stroke: #000; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+            fill: none; opacity: 0; transform: scale(0.5); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+        .chk-container.on svg { opacity: 1; transform: scale(1); }
+
+        /* LIVE PREVIEW */
+        .live-preview-container {
+            position: absolute; top: 0; right: 0; bottom: 0; width: 420px; height: 100%;
+            background: var(--card); border-left: 1px solid var(--border);
+            display: flex; flex-direction: column; overflow: hidden; z-index: 1;
+        }
+        .lp-header {
+            padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 10px;
+            color: var(--muted); font-weight: 600; letter-spacing: 0.5px; background: #0a0a0a;
+            display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+        }
+        .lp-canvas-wrap { flex: 1; position: relative; background: #050505; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .lp-canvas-wrap canvas { display: block; max-width: 100%; max-height: 100%; object-fit: contain; }
 
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* COLOR PICKER */
-        .cp-overlay {
-            display: none; 
-            position: fixed; 
-            inset: 0; 
-            z-index: 9000;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(4px);
-            animation: fadeIn 0.2s ease;
-        }
-        .cp-overlay.open { display: flex; align-items: center; justify-content: center; }
-        
-        .cp-box {
-            position: relative;
-            background: #1a1a1a;
-            border-radius: 12px;
-            padding: 16px;
+        /* COLOR PICKER NA LATERAL (SEM OVERLAY ESCURO) */
+        .cp-sidebar {
+            position: absolute;
+            top: 0; right: 0; bottom: 0;
             width: 320px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-            border: 1px solid #2a2a2a;
+            background: #111;
+            border-left: 1px solid var(--border);
+            z-index: 20;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; flex-direction: column;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
         }
+        .cp-sidebar.open { transform: translateX(0); }
         
         .cp-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
+            padding: 16px; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            background: #0a0a0a;
         }
-        .cp-title-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .cp-dot {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: var(--primary);
-        }
-        .cp-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #fff;
-        }
+        .cp-title-group { display: flex; align-items: center; gap: 10px; }
+        .cp-dot { width: 16px; height: 16px; border-radius: 50%; background: var(--primary); }
+        .cp-title { font-size: 14px; font-weight: 600; color: #fff; }
         .cp-close {
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #666;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: all 0.2s;
+            width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+            color: #666; cursor: pointer; border-radius: 6px; transition: all 0.2s;
         }
-        .cp-close:hover {
-            background: #2a2a2a;
-            color: #fff;
-        }
+        .cp-close:hover { background: #222; color: #fff; }
+        
+        .cp-body { padding: 16px; flex: 1; overflow-y: auto; }
+        
+        .cp-sliders-container { display: flex; gap: 12px; margin-bottom: 16px; height: 240px; }
         
         .cp-saturation {
-            width: 100%;
-            height: 240px;
-            border-radius: 8px;
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 16px;
-            cursor: crosshair;
-            background: linear-gradient(to right, #fff, var(--primary));
+            flex: 1; border-radius: 8px; position: relative; overflow: hidden;
+            cursor: crosshair; background: linear-gradient(to right, #fff, var(--primary));
         }
-        .cp-sat-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to bottom, transparent, #000);
-            pointer-events: none;
-        }
+        .cp-sat-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, #000); pointer-events: none; }
         .cp-sat-handle {
-            position: absolute;
-            width: 18px;
-            height: 18px;
-            border: 3px solid #fff;
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-            pointer-events: none;
-            transition: transform 0.05s;
+            position: absolute; width: 18px; height: 18px; border: 3px solid #fff; border-radius: 50%;
+            transform: translate(-50%, -50%); box-shadow: 0 2px 8px rgba(0,0,0,0.4); pointer-events: none;
         }
         
         .cp-hue-slider {
-            width: 24px;
-            height: 240px;
-            border-radius: 8px;
-            position: relative;
-            cursor: pointer;
-            background: linear-gradient(to bottom, 
-                #ff0000 0%, 
-                #ffff00 17%, 
-                #00ff00 33%, 
-                #00ffff 50%, 
-                #0000ff 67%, 
-                #ff00ff 83%, 
-                #ff0000 100%
-            );
-            float: right;
-            margin-left: 12px;
+            width: 24px; border-radius: 8px; position: relative; cursor: pointer;
+            background: linear-gradient(to bottom, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
         }
         .cp-hue-handle {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 28px;
-            height: 10px;
-            background: #fff;
-            border: 2px solid #fff;
-            border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            transition: top 0.05s;
+            position: absolute; left: 50%; transform: translateX(-50%); width: 28px; height: 10px;
+            background: #fff; border: 2px solid #fff; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
         
-        .cp-sliders-container {
-            display: flex;
-            align-items: stretch;
-            margin-bottom: 16px;
-        }
-        
-        .cp-alpha-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
         .cp-alpha-slider {
-            width: 100%;
-            height: 24px;
-            border-radius: 8px;
-            position: relative;
-            cursor: pointer;
-            background-image: 
-                linear-gradient(45deg, #333 25%, transparent 25%), 
-                linear-gradient(-45deg, #333 25%, transparent 25%), 
-                linear-gradient(45deg, transparent 75%, #333 75%), 
-                linear-gradient(-45deg, transparent 75%, #333 75%);
-            background-size: 10px 10px;
-            background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
-            overflow: hidden;
+            width: 100%; height: 24px; border-radius: 8px; position: relative; cursor: pointer;
+            background-image: linear-gradient(45deg, #333 25%, transparent 25%), linear-gradient(-45deg, #333 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #333 75%), linear-gradient(-45deg, transparent 75%, #333 75%);
+            background-size: 10px 10px; background-position: 0 0, 0 5px, 5px -5px, -5px 0px; overflow: hidden; margin-bottom: 16px;
         }
-        .cp-alpha-gradient {
-            position: absolute;
-            inset: 0;
-            border-radius: 8px;
-        }
+        .cp-alpha-gradient { position: absolute; inset: 0; border-radius: 8px; }
         .cp-alpha-handle {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 28px;
-            height: 28px;
-            background: #fff;
-            border: 3px solid #fff;
-            border-radius: 50%;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-            margin-left: -14px;
-            transition: left 0.05s;
+            position: absolute; top: 50%; transform: translateY(-50%); width: 28px; height: 28px;
+            background: #fff; border: 3px solid #fff; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.4); margin-left: -14px;
         }
         
         .cp-hex-container {
-            display: flex;
-            align-items: center;
-            background: #0a0a0a;
-            border-radius: 6px;
-            padding: 10px 12px;
-            border: 1px solid #2a2a2a;
-            clear: both;
+            display: flex; align-items: center; background: #0a0a0a; border-radius: 6px;
+            padding: 10px 12px; border: 1px solid #2a2a2a;
         }
         .cp-hex-input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: #fff;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            font-weight: 600;
-            outline: none;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            flex: 1; background: transparent; border: none; color: #fff;
+            font-family: 'Courier New', monospace; font-size: 13px; font-weight: 600;
+            outline: none; text-transform: uppercase; letter-spacing: 1px;
         }
         .cp-copy-btn {
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #666;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: all 0.2s;
-            margin-left: 8px;
+            width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+            color: #666; cursor: pointer; border-radius: 4px; transition: all 0.2s; margin-left: 8px;
         }
-        .cp-copy-btn:hover {
-            background: #2a2a2a;
-            color: var(--primary);
-        }
+        .cp-copy-btn:hover { background: #2a2a2a; color: var(--primary); }
 
         .sw-container {
             width: 36px; height: 24px; flex-shrink: 0; border-radius: 4px; overflow: hidden;
@@ -498,8 +317,7 @@
         #qrcode-global { display: inline-block; padding: 15px; background: white; border-radius: 12px; margin-bottom: 20px; }
         .qr-close-btn {
             background: var(--primary); color: black; border: none; padding: 10px 30px;
-            border-radius: 8px; font-weight: bold; cursor: pointer; letter-spacing: 1px;
-            transition: background 0.2s;
+            border-radius: 8px; font-weight: bold; cursor: pointer; letter-spacing: 1px; transition: background 0.2s;
         }
         .qr-close-btn:hover { background: #fff; }
 
@@ -515,6 +333,7 @@
             .content-area { flex-direction: column; }
             .live-preview-container { position: relative; top: 0; right: 0; width: 100%; height: 60vh; border-left: none; border-top: 1px solid var(--border); }
             .config-panel { max-width: 100%; }
+            .cp-sidebar { width: 100%; }
         }
     </style>
 </head>
@@ -529,24 +348,24 @@
 <!-- CUSTOM CURSOR -->
 <div id="custom-cursor"></div>
 
-<!-- COLOR PICKER -->
-<div class="cp-overlay" id="cpOl">
-    <div class="cp-box" id="cpBox">
-        <div class="cp-header">
-            <div class="cp-title-group">
-                <div class="cp-dot" id="cpDot"></div>
-                <div class="cp-title" id="cpTitle">Health bar (color)</div>
-            </div>
-            <div class="cp-close" onclick="closeCP()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </div>
+<!-- COLOR PICKER NA LATERAL -->
+<div class="cp-sidebar" id="cpSidebar">
+    <div class="cp-header">
+        <div class="cp-title-group">
+            <div class="cp-dot" id="cpDot"></div>
+            <div class="cp-title" id="cpTitle">ESP Color</div>
         </div>
-        
+        <div class="cp-close" onclick="closeCP()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </div>
+    </div>
+    
+    <div class="cp-body">
         <div class="cp-sliders-container">
-            <div class="cp-saturation" id="cpSaturation" style="flex: 1;">
+            <div class="cp-saturation" id="cpSaturation">
                 <div class="cp-sat-overlay"></div>
                 <div class="cp-sat-handle" id="cpSatHandle"></div>
             </div>
@@ -556,20 +375,18 @@
             </div>
         </div>
         
-        <div class="cp-alpha-container">
-            <div class="cp-alpha-slider" id="cpAlphaSlider">
-                <div class="cp-alpha-gradient" id="cpAlphaGradient"></div>
-                <div class="cp-alpha-handle" id="cpAlphaHandle"></div>
-            </div>
-            
-            <div class="cp-hex-container">
-                <input type="text" class="cp-hex-input" id="cpHexInput" value="00FFEB" maxlength="6">
-                <div class="cp-copy-btn" onclick="copyHex()" title="Copy">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
-                </div>
+        <div class="cp-alpha-slider" id="cpAlphaSlider">
+            <div class="cp-alpha-gradient" id="cpAlphaGradient"></div>
+            <div class="cp-alpha-handle" id="cpAlphaHandle"></div>
+        </div>
+        
+        <div class="cp-hex-container">
+            <input type="text" class="cp-hex-input" id="cpHexInput" value="00FFEB" maxlength="6">
+            <div class="cp-copy-btn" onclick="copyHex()" title="Copy">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
             </div>
         </div>
     </div>
@@ -653,7 +470,10 @@
                             </div>
                             <div class="feat-title">Enable AimBot</div>
                         </div>
-                        <div class="tgl" id="tgl-enable-aim" onclick="tg(this)"></div>
+                        <!-- CHECKBOX NO LUGAR DE TOGGLE -->
+                        <div class="chk-container" id="tgl-enable-aim" onclick="tg(this)">
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
                     </div>
                     <div class="feat-desc">Automatically locks onto enemy targets.</div>
 
@@ -677,7 +497,9 @@
                             </div>
                             <div class="feat-title">Enable ESP</div>
                         </div>
-                        <div class="tgl" id="tgl-enable-esp" onclick="tg(this)"></div>
+                        <div class="chk-container" id="tgl-enable-esp" onclick="tg(this)">
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
                     </div>
                     <div class="feat-desc">Displays visual information about players through walls.</div>
 
@@ -701,23 +523,33 @@
                 <div class="feature-card">
                     <div class="control-row">
                         <span class="c-label">Box ESP</span>
-                        <div class="tgl" id="tgl-box" onclick='tg(this)'></div>
+                        <div class="chk-container" id="tgl-box" onclick='tg(this)'>
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
                     </div>
                     <div class="control-row">
                         <span class="c-label">Skeleton</span>
-                        <div class="tgl" id="tgl-skeleton" onclick='tg(this)'></div>
+                        <div class="chk-container" id="tgl-skeleton" onclick='tg(this)'>
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
                     </div>
                     <div class="control-row">
                         <span class="c-label">Health Bar</span>
-                        <div class="tgl" id="tgl-healthbar" onclick='tg(this)'></div>
+                        <div class="chk-container" id="tgl-healthbar" onclick='tg(this)'>
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
                     </div>
                     <div class="control-row">
                         <span class="c-label">Snapline</span>
-                        <div class="tgl" id="tgl-snapline" onclick='tg(this)'></div>
+                        <div class="chk-container" id="tgl-snapline" onclick='tg(this)'>
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
                     </div>
                     <div class="control-row">
                         <span class="c-label">Player Name</span>
-                        <div class="tgl" id="tgl-name" onclick='tg(this)'></div>
+                        <div class="chk-container" id="tgl-name" onclick='tg(this)'>
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
                     </div>
                     
                     <div class="control-row">
@@ -736,7 +568,7 @@
 
         </div>
 
-        <!-- LIVE PREVIEW - ALTURA COMPLETA, LARGURA FIXA NA DIREITA -->
+        <!-- LIVE PREVIEW -->
         <div class="live-preview-container">
             <div class="lp-header">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -765,10 +597,8 @@
     document.addEventListener('mousedown', () => cur.classList.add('clicking'));
     document.addEventListener('mouseup', () => cur.classList.remove('clicking'));
     function loop(){
-        cx += (mx-cx)*0.13;
-        cy += (my-cy)*0.13;
-        cur.style.left = cx+'px';
-        cur.style.top = cy+'px';
+        cx += (mx-cx)*0.13; cy += (my-cy)*0.13;
+        cur.style.left = cx+'px'; cur.style.top = cy+'px';
         requestAnimationFrame(loop);
     }
     loop();
@@ -823,6 +653,7 @@ function updateValue(key, value) {
     sendState();
 }
 
+// TOGGLE CHECKBOX
 function tg(el){ 
     el.classList.toggle('on'); 
     scheduleRender();
@@ -840,40 +671,34 @@ let partnerId = null;
 let isGlobal = false;
 let bgImage = null;
 let isUpdatingLocally = false; 
-let lastSentState = "";
 
 window.onload = async function(){
     const token = new URLSearchParams(window.location.search).get('token');
     
     if(!token){
+        // Para teste local sem token, descomente abaixo:
+        // document.getElementById('loading-screen').style.display = 'none';
+        // document.getElementById('app-container').style.display = 'flex';
+        // resizeCanvas(); scheduleRender(); setConn(true);
         return;
     }
     
     try{
         const {data, error} = await client.from('n3sk').select('*').eq('token', token).eq('is_active', true).single();
         
-        if(error || !data){ 
-            alert("Token inválido");
-            return; 
-        }
+        if(error || !data){ alert("Token inválido"); return; }
         
         sessionId = data.id;
         isGlobal = data.is_global;
         
-        if(isGlobal) {
-            partnerId = sessionId.replace('_GLOBAL', '');
-        } else {
-            partnerId = sessionId + '_GLOBAL';
-        }
+        if(isGlobal) partnerId = sessionId.replace('_GLOBAL', '');
+        else partnerId = sessionId + '_GLOBAL';
 
         if(!isGlobal && data.ip && data.ip !== "UNKNOWN"){
             try{
                 const res = await fetch('https://api.ipify.org?format=json');
                 const ipData = await res.json();
-                if(ipData.ip !== data.ip){ 
-                    alert("Acesso negado"); 
-                    return; 
-                }
+                if(ipData.ip !== data.ip){ alert("Acesso negado"); return; }
             }catch(e){ console.warn("IP check failed", e); }
         }
         
@@ -892,10 +717,7 @@ window.onload = async function(){
         resizeCanvas();
         scheduleRender();
         
-    }catch(e){ 
-        console.error(e);
-        alert("Erro ao validar token");
-    }
+    }catch(e){ console.error(e); alert("Erro ao validar token"); }
 };
 
 function setConn(c){
@@ -907,22 +729,12 @@ function setConn(c){
 async function startSync(){
     setInterval(async () => {
         if(!sessionId) return;
-        
         try {
-            const {data, error} = await client.from('n3sk')
-                .select('state')
-                .in('id', [sessionId, partnerId])
-                .limit(1);
-            
+            const {data, error} = await client.from('n3sk').select('state').in('id', [sessionId, partnerId]).limit(1);
             if(error || !data || data.length === 0) return;
-            
             const validData = data.find(d => d.state);
-            if(validData && validData.state) {
-                applyState(validData.state);
-            }
-        } catch(e) {
-            console.error('Sync error:', e);
-        }
+            if(validData && validData.state) applyState(validData.state);
+        } catch(e) { console.error('Sync error:', e); }
     }, 500);
 }
 
@@ -939,82 +751,60 @@ async function sendState(){
             snapline: document.getElementById('tgl-snapline').classList.contains('on'),
             name: document.getElementById('tgl-name').classList.contains('on')
         },
-        values: {
-            thickness: document.getElementById('val-thickness').textContent,
-            fov: document.getElementById('val-fov').textContent
-        },
-        colors: {
-            esp: document.getElementById('sw-espcolor').querySelector('rect').getAttribute('fill')
-        }
+        values: { thickness: document.getElementById('val-thickness').textContent, fov: document.getElementById('val-fov').textContent },
+        colors: { esp: document.getElementById('sw-espcolor').querySelector('rect').getAttribute('fill') }
     };
     
     try {
         isUpdatingLocally = true;
-        
-        await client.from('n3sk')
-            .update({ state: state })
-            .in('id', [sessionId, partnerId]);
-        
+        await client.from('n3sk').update({ state: state }).in('id', [sessionId, partnerId]);
         setTimeout(() => { isUpdatingLocally = false; }, 300);
-    } catch(e) {
-        console.error('Send state error:', e);
-        isUpdatingLocally = false;
-    }
+    } catch(e) { console.error('Send state error:', e); isUpdatingLocally = false; }
 }
 
 function applyState(state){
     if(isUpdatingLocally || !state) return;
     
     const toggleMap = {
-        'tgl-enable-esp': state.toggles?.esp,
-        'tgl-enable-aim': state.toggles?.aim,
-        'tgl-box': state.toggles?.box,
-        'tgl-skeleton': state.toggles?.skeleton,
-        'tgl-healthbar': state.toggles?.healthbar,
-        'tgl-snapline': state.toggles?.snapline,
+        'tgl-enable-esp': state.toggles?.esp, 'tgl-enable-aim': state.toggles?.aim,
+        'tgl-box': state.toggles?.box, 'tgl-skeleton': state.toggles?.skeleton,
+        'tgl-healthbar': state.toggles?.healthbar, 'tgl-snapline': state.toggles?.snapline,
         'tgl-name': state.toggles?.name
     };
     
     for(const [id, value] of Object.entries(toggleMap)){
         const el = document.getElementById(id);
         if(el && value !== undefined){
-            if(value) el.classList.add('on');
-            else el.classList.remove('on');
+            if(value) el.classList.add('on'); else el.classList.remove('on');
         }
     }
     
     if(state.values?.thickness){
         const el = document.querySelector('#content-visuals-players input[type=range]');
-        if(el){
-            el.value = state.values.thickness;
-            document.getElementById('val-thickness').textContent = state.values.thickness;
-        }
+        if(el){ el.value = state.values.thickness; document.getElementById('val-thickness').textContent = state.values.thickness; }
     }
     
     if(state.colors?.esp){
         const swatch = document.getElementById('sw-espcolor');
-        if(swatch){
-            const rect = swatch.querySelector('rect');
-            if(rect) rect.setAttribute('fill', state.colors.esp);
-        }
+        if(swatch){ const rect = swatch.querySelector('rect'); if(rect) rect.setAttribute('fill', state.colors.esp); }
     }
     
     scheduleRender();
 }
 
-// COLOR PICKER
-var cpTarget=null,cpH=0.47,cpS=1,cpV=1,cpA=1;
-var cpOl=document.getElementById('cpOl'), cpBox=document.getElementById('cpBox');
-var cpSaturation=document.getElementById('cpSaturation');
-var cpSatHandle=document.getElementById('cpSatHandle');
-var cpHueSlider=document.getElementById('cpHueSlider');
-var cpHueHandle=document.getElementById('cpHueHandle');
-var cpAlphaSlider=document.getElementById('cpAlphaSlider');
-var cpAlphaHandle=document.getElementById('cpAlphaHandle');
-var cpAlphaGradient=document.getElementById('cpAlphaGradient');
-var cpHexInput=document.getElementById('cpHexInput');
-var cpDot=document.getElementById('cpDot');
-var cpTitle=document.getElementById('cpTitle');
+// COLOR PICKER LOGIC (NA LATERAL)
+var cpTarget=null, cpH=0.47, cpS=1, cpV=1, cpA=1;
+var cpSidebar = document.getElementById('cpSidebar');
+var cpSaturation = document.getElementById('cpSaturation');
+var cpSatHandle = document.getElementById('cpSatHandle');
+var cpHueSlider = document.getElementById('cpHueSlider');
+var cpHueHandle = document.getElementById('cpHueHandle');
+var cpAlphaSlider = document.getElementById('cpAlphaSlider');
+var cpAlphaHandle = document.getElementById('cpAlphaHandle');
+var cpAlphaGradient = document.getElementById('cpAlphaGradient');
+var cpHexInput = document.getElementById('cpHexInput');
+var cpDot = document.getElementById('cpDot');
+var cpTitle = document.getElementById('cpTitle');
 
 function h2r(h,s,v){
   var r,g,b,i=Math.floor(h*6),f=h*6-i,p=v*(1-s),q=v*(1-f*s),t=v*(1-(1-f)*s);
@@ -1038,7 +828,7 @@ function updateCP(){
   var rgb=h2r(cpH,cpS,cpV);
   var hex=r2h(rgb[0],rgb[1],rgb[2]);
   
-  cpAlphaGradient.style.background='linear-gradient(to right,transparent,'+hHex+')';
+  cpAlphaGradient.style.background='linear-gradient(to right,transparent,'+hex+')';
   cpDot.style.background=hex;
   
   if(cpTarget){
@@ -1058,50 +848,46 @@ function openCP(el, title){
 
   if(currentColor){
       var hsv=hex2hsv(currentColor);
-      cpH=hsv[0];cpS=hsv[1];cpV=hsv[2];cpA=1;
+      cpH=hsv[0]; cpS=hsv[1]; cpV=hsv[2]; cpA=1;
   }
   
   updateCP();
   
-  var satRect = cpSaturation.getBoundingClientRect();
-  cpSatHandle.style.left = (cpS * satRect.width) + 'px';
-  cpSatHandle.style.top = ((1-cpV) * satRect.height) + 'px';
+  // Posiciona os handles corretamente ao abrir
+  setTimeout(() => {
+      var satRect = cpSaturation.getBoundingClientRect();
+      cpSatHandle.style.left = (cpS * satRect.width) + 'px';
+      cpSatHandle.style.top = ((1-cpV) * satRect.height) + 'px';
+      
+      var hueRect = cpHueSlider.getBoundingClientRect();
+      cpHueHandle.style.top = (cpH * hueRect.height) + 'px';
+      
+      var alphaRect = cpAlphaSlider.getBoundingClientRect();
+      cpAlphaHandle.style.left = (cpA * alphaRect.width) + 'px';
+  }, 50);
   
-  var hueRect = cpHueSlider.getBoundingClientRect();
-  cpHueHandle.style.top = (cpH * hueRect.height) + 'px';
-  
-  var alphaRect = cpAlphaSlider.getBoundingClientRect();
-  cpAlphaHandle.style.left = (cpA * alphaRect.width) + 'px';
-  
-  cpOl.classList.add('open');
+  cpSidebar.classList.add('open');
 }
 
 function closeCP(){
-    cpOl.classList.remove('open');
+    cpSidebar.classList.remove('open');
     sendState();
 }
 
-cpOl.addEventListener('mousedown',function(e){
-  if(e.target===cpOl){closeCP();}
+var dSat=false, dHue=false, dAlpha=false;
+
+cpSaturation.addEventListener('mousedown', function(e){ e.preventDefault(); dSat=true; updateSat(e); });
+cpHueSlider.addEventListener('mousedown', function(e){ e.preventDefault(); dHue=true; updateHue(e); });
+cpAlphaSlider.addEventListener('mousedown', function(e){ e.preventDefault(); dAlpha=true; updateAlpha(e); });
+
+document.addEventListener('mousemove', function(e){
+    if(dSat) updateSat(e);
+    if(dHue) updateHue(e);
+    if(dAlpha) updateAlpha(e);
 });
 
-var dSat=false,dHue=false,dAlpha=false;
-
-cpSaturation.addEventListener('mousedown',function(e){e.preventDefault();dSat=true;updateSat(e)});
-cpHueSlider.addEventListener('mousedown',function(e){e.preventDefault();dHue=true;updateHue(e)});
-cpAlphaSlider.addEventListener('mousedown',function(e){e.preventDefault();dAlpha=true;updateAlpha(e)});
-
-document.addEventListener('mousemove',function(e){
-    if(dSat){ updateSat(e); }
-    if(dHue){ updateHue(e); }
-    if(dAlpha){ updateAlpha(e); }
-});
-
-document.addEventListener('mouseup',function(){ 
-    if(dSat||dHue||dAlpha){
-        dSat=false; dHue=false; dAlpha=false;
-        sendState();
-    }
+document.addEventListener('mouseup', function(){ 
+    if(dSat||dHue||dAlpha){ dSat=false; dHue=false; dAlpha=false; sendState(); }
 });
 
 function updateSat(e){
@@ -1136,7 +922,6 @@ function copyHex(){
 // QR CODE
 function showGlobalQr(){
     const targetId = isGlobal ? sessionId : partnerId; 
-    
     client.from('n3sk').select('token').eq('id', targetId).single()
     .then(({data, error}) => {
         if(data && data.token){
@@ -1145,12 +930,9 @@ function showGlobalQr(){
             document.getElementById('qrcode-global').innerHTML = ''; 
             new QRCode(document.getElementById("qrcode-global"), {
                 text: globalLink, width: 200, height: 200,
-                colorDark: "#000000", colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
+                colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H
             });
-        } else {
-            alert("Erro ao gerar QR");
-        }
+        } else { alert("Erro ao gerar QR"); }
     });
 }
 function closeGlobalQr(){ document.getElementById('qr-modal').classList.remove('active'); }
@@ -1165,13 +947,10 @@ function resizeCanvas() {
   var nw = rect.width, nh = rect.height; 
   var dpr = window.devicePixelRatio || 1;
   if (canvasWidth !== nw || canvasHeight !== nh) { 
-      canvas.width = nw * dpr; 
-      canvas.height = nh * dpr; 
-      canvas.style.width = nw + 'px'; 
-      canvas.style.height = nh + 'px';
+      canvas.width = nw * dpr; canvas.height = nh * dpr; 
+      canvas.style.width = nw + 'px'; canvas.style.height = nh + 'px';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      canvasWidth = nw; 
-      canvasHeight = nh; 
+      canvasWidth = nw; canvasHeight = nh; 
       scheduleRender(); 
   }
 }
@@ -1191,14 +970,20 @@ function renderPreview() {
       var scaleX = canvasWidth / bgImage.width;
       var scaleY = canvasHeight / bgImage.height;
       var s = Math.min(scaleX, scaleY) * 0.9;
-      
-      var w = bgImage.width * s;
-      var h = bgImage.height * s;
-      
-      var x = (canvasWidth - w) / 2;
-      var y = (canvasHeight - h) / 2;
-      
+      var w = bgImage.width * s; var h = bgImage.height * s;
+      var x = (canvasWidth - w) / 2; var y = (canvasHeight - h) / 2;
       ctx.drawImage(bgImage, x, y, w, h);
+  }
+
+  // Exemplo de desenho ESP baseado nos toggles
+  const isEspOn = document.getElementById('tgl-enable-esp').classList.contains('on');
+  const isBoxOn = document.getElementById('tgl-box').classList.contains('on');
+  const espColor = document.getElementById('sw-espcolor').querySelector('rect').getAttribute('fill');
+  
+  if(isEspOn && isBoxOn) {
+      ctx.strokeStyle = espColor;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(canvasWidth/2 - 40, canvasHeight/2 - 60, 80, 120);
   }
 
   ctx.restore();
