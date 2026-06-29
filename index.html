@@ -203,16 +203,16 @@
         .control-actions { display: flex; align-items: center; gap: 12px; }
 
 /* ============================================ */
-/* CHECKBOX COM EFEITO DE ONDA DIAGONAL (SWEEP) */
+/* CHECKBOX FINAL: SMOOTH SOLID + SLIDE UP CHECK */
 /* ============================================ */
 .chk-container {
     width: 24px; height: 24px; border-radius: 6px;
-    background: #1a1a1a; /* Cor base escura */
-    border: none; /* Sem borda quando desativado */
+    background: #1a1a1a; /* Fundo cinza escuro quando off */
+    border: none; 
     display: flex; align-items: center; justify-content: center;
     cursor: pointer; flex-shrink: 0;
     position: relative;
-    overflow: hidden; /* Essencial para cortar a onda */
+    overflow: hidden; /* Garante que nada vaze */
     transition: background 0.3s ease;
 }
 
@@ -220,46 +220,44 @@
     background: #252525; 
 }
 
-/* O elemento que faz a animação de preenchimento */
+/* Camada de cor sólida (Fundo Neon) */
 .chk-container::before {
     content: '';
     position: absolute;
-    /* Tamanho gigante para cobrir tudo ao girar */
-    width: 200%; 
-    height: 200%;
+    inset: 0; /* Cobre tudo exatamente */
     background: var(--primary);
+    border-radius: 6px;
     
-    /* Posicionamento inicial: canto inferior direito, fora da visão */
-    top: 100%;
-    left: 100%;
-    
-    /* Rotação inicial: inclinado para criar a diagonal */
-    transform: translate(-50%, -50%) rotate(45deg) scale(0);
-    
+    /* Estado inicial: invisível e levemente menor */
     opacity: 0;
-    z-index: 0;
+    transform: scale(0.8);
     
-    /* Transição suave sem bounce */
-    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    /* Transição super suave */
+    transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+    z-index: 0;
 }
 
-/* Estado Ativado */
+/* Quando ativado */
 .chk-container.on {
-    background: #000;
+    background: #000; /* Reseta o fundo base */
 }
 
-/* A mágica acontece aqui: gira e escala para preencher */
 .chk-container.on::before {
     opacity: 1;
-    /* Move para o centro e aumenta para cobrir o quadrado */
-    transform: translate(-50%, -50%) rotate(45deg) scale(1.5);
+    transform: scale(1); /* Preenche 100% suavemente */
 }
 
-/* Ícone do check */
+/* Ícone do Check */
 .chk-icon {
     width: 14px; height: 14px;
     position: relative;
-    z-index: 1; /* Fica acima da cor */
+    z-index: 1;
+    /* Permite que o ícone se mova para o efeito de slide */
+    transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
+    
+    /* Estado inicial: um pouco abaixo e transparente */
+    transform: translateY(4px);
+    opacity: 0;
 }
 
 .chk-icon path {
@@ -270,14 +268,19 @@
     stroke-linejoin: round;
     stroke-dasharray: 30;
     stroke-dashoffset: 30;
-    /* Animação do traço sincronizada */
-    transition: stroke-dashoffset 0.35s cubic-bezier(0.25, 1, 0.5, 1),
-                stroke 0.3s ease;
+    /* O desenho acontece junto com o slide */
+    transition: stroke-dashoffset 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Estado Ativado do Ícone */
+.chk-container.on .chk-icon {
+    /* Sobe para o centro e aparece */
+    transform: translateY(0);
+    opacity: 1;
 }
 
 .chk-container.on .chk-icon path {
-    stroke: #111 !important; 
-    stroke-dashoffset: 0; /* Desenha o check completamente */
+    stroke-dashoffset: 0; /* Desenha o check completo */
 }
 
         .color-dot {
