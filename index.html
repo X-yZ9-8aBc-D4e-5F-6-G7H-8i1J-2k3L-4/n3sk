@@ -82,16 +82,16 @@
         .menu-scroll { flex: 1; overflow-y: auto; padding: 10px 0; position: relative; }
         .menu-scroll::-webkit-scrollbar { width: 0px; }
 
-        /* INDICADOR ATIVO NA SIDEBAR */
+        /* INDICADOR ATIVO NA SIDEBAR - BOLINHA QUE SE MOVE */
         .nav-indicator {
-            position: absolute; left: 0; top: 0; width: 3px; height: 46px;
-            background: var(--primary); border-radius: 0 2px 2px 0;
-            transition: top 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 0 10px rgba(0, 255, 235, 0.4);
+            position: absolute; left: 10px; top: 0; width: 8px; height: 8px;
+            background: var(--primary); border-radius: 50%;
+            transition: top 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 0 12px rgba(0, 255, 235, 0.6);
             pointer-events: none;
         }
 
-        /* ESTILO DO MENU - BARRA ESQUERDA PEQUENA */
+        /* ESTILO DO MENU - BARRA ESQUERDA */
         .nav-item {
             display: flex; align-items: center; padding: 12px 20px; cursor: pointer;
             transition: all 0.2s ease; color: var(--muted); font-weight: 500; gap: 12px;
@@ -100,7 +100,7 @@
         .nav-item:hover { color: white; background: rgba(255,255,255,0.02); }
         .nav-item.active { 
             color: var(--primary);
-            background: rgba(0, 255, 235, 0.05);
+            background: rgba(0, 255, 235, 0.03);
         }
         
         .nav-icon { width: 18px; height: 18px; fill: currentColor; opacity: 0.8; }
@@ -192,13 +192,13 @@
         input[type=range] { -webkit-appearance: none; width: 100%; height: 4px; background: #222; border-radius: 2px; }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none; width: 12px; height: 12px; background: var(--primary); border-radius: 50%; cursor: pointer;
-            box-shadow: 0 0 8px rgba(0, 255, 235, 0.4);
+            box-shadow: 0 0 8px rgba(0, 255, 235, 0.4); transition: all 0.2s ease;
         }
 
         /* CHECKBOX E COLOR DOT */
         .control-actions { display: flex; align-items: center; gap: 12px; }
 
-        /* CHECKBOX MAIOR E CORRIGIDA */
+        /* CHECKBOX */
         .chk-container {
             width: 24px; height: 24px; border-radius: 6px;
             border: 2px solid #333; background: transparent;
@@ -217,15 +217,16 @@
         }
         .chk-container.on .chk-icon { transform: scale(1); }
 
-        /* BOLINHA DE COR - QUADRADO */
+        /* QUADRADO DE COR */
         .color-dot {
-            width: 28px; height: 28px; border-radius: 6px;
+            width: 20px; height: 20px; border-radius: 4px;
             background: #333; 
             border: none;
             cursor: pointer; flex-shrink: 0;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s;
+            box-shadow: 0 0 8px rgba(0,0,0,0.3);
         }
-        .color-dot:hover { transform: scale(1.05); box-shadow: 0 0 12px rgba(255,255,255,0.2); }
+        .color-dot:hover { transform: scale(1.08); }
 
         /* PREVIEW AO VIVO */
         .live-preview-container {
@@ -244,21 +245,21 @@
         }
         .lp-canvas-wrap canvas { display: block; max-width: 100%; max-height: 100%; object-fit: contain; }
 
-        /* COLOR PICKER FLUTUANTE - REDESENHADO */
+        /* COLOR PICKER FLUTUANTE - GRANDE COMO IMAGEM 3 */
         .cp-floating-panel {
-            position: absolute;
-            top: 0; left: 0;
-            width: 340px;
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            width: 500px;
             background: #111;
             border: 1px solid var(--border);
             border-radius: 12px;
             z-index: 1000;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.8);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.9);
             
             opacity: 0;
             visibility: hidden;
-            transform: translateY(-20px) scale(0.95);
-            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             
             display: flex; 
             flex-direction: column;
@@ -267,11 +268,11 @@
         .cp-floating-panel.open {
             opacity: 1;
             visibility: visible;
-            transform: translateY(0) scale(1);
+            transform: translate(-50%, -50%) scale(1);
         }
 
         .cp-header {
-            padding: 16px; 
+            padding: 16px 20px; 
             border-bottom: 1px solid #222; 
             display: flex; 
             align-items: center; 
@@ -285,15 +286,15 @@
         }
         
         .cp-dot { 
-            width: 16px; 
-            height: 16px; 
-            border-radius: 4px; 
+            width: 14px; 
+            height: 14px; 
+            border-radius: 3px; 
             background: var(--primary); 
             box-shadow: 0 0 8px var(--primary); 
         }
         
         .cp-title { 
-            font-size: 13px; 
+            font-size: 14px; 
             font-weight: 600; 
             color: #fff; 
         }
@@ -316,21 +317,16 @@
         }
         
         .cp-body { 
-            padding: 16px; 
+            padding: 24px; 
             flex: 1; 
             display: flex; 
             flex-direction: column; 
             gap: 16px; 
         }
         
-        .cp-main-container {
-            display: flex;
-            gap: 12px;
-            height: 180px;
-        }
-        
         .cp-saturation {
-            flex: 1;
+            width: 100%;
+            height: 280px;
             border-radius: 8px; 
             position: relative; 
             overflow: hidden;
@@ -347,17 +343,23 @@
         
         .cp-sat-handle {
             position: absolute; 
-            width: 16px; 
-            height: 16px; 
+            width: 14px; 
+            height: 14px; 
             border: 3px solid #fff; 
             border-radius: 50%;
             transform: translate(-50%, -50%); 
             box-shadow: 0 2px 8px rgba(0,0,0,0.4); 
             pointer-events: none;
         }
+
+        .cp-hue-alpha-container {
+            display: flex;
+            gap: 16px;
+            height: 60px;
+        }
         
         .cp-hue-slider {
-            width: 20px;
+            width: 40px;
             height: 100%; 
             border-radius: 8px; 
             position: relative; 
@@ -369,22 +371,23 @@
             position: absolute; 
             left: 50%; 
             transform: translate(-50%, -50%);
-            width: 24px; 
+            width: 48px; 
             height: 8px; 
             background: #fff; 
             border-radius: 2px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            margin-left: -24px;
         }
-        
+
         .cp-alpha-slider {
-            width: 100%; 
-            height: 20px; 
+            flex: 1;
+            height: 100%; 
             border-radius: 8px; 
             position: relative; 
             cursor: pointer;
             background-image: linear-gradient(45deg, #333 25%, transparent 25%), linear-gradient(-45deg, #333 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #333 75%), linear-gradient(-45deg, transparent 75%, #333 75%);
-            background-size: 8px 8px; 
-            background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+            background-size: 10px 10px; 
+            background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
         }
         
         .cp-alpha-gradient { 
@@ -397,13 +400,13 @@
             position: absolute; 
             top: 50%; 
             transform: translateY(-50%);
-            width: 24px; 
-            height: 24px; 
+            width: 28px; 
+            height: 28px; 
             background: #fff; 
             border: 3px solid #fff; 
             border-radius: 50%;
             box-shadow: 0 2px 6px rgba(0,0,0,0.4); 
-            margin-left: -12px;
+            margin-left: -14px;
         }
         
         .cp-hex-container {
@@ -411,7 +414,7 @@
             align-items: center; 
             background: #0a0a0a; 
             border-radius: 6px;
-            padding: 10px 12px; 
+            padding: 12px 14px; 
             border: 1px solid #2a2a2a;
         }
         
@@ -421,7 +424,7 @@
             border: none; 
             color: #fff;
             font-family: 'Courier New', monospace; 
-            font-size: 12px; 
+            font-size: 13px; 
             font-weight: 600;
             outline: none; 
             text-transform: uppercase; 
@@ -481,6 +484,7 @@
             .content-area { flex-direction: column; }
             .live-preview-container { position: relative; top: 0; right: 0; width: 100%; height: 60vh; border-left: none; border-top: 1px solid var(--border); }
             .config-panel { max-width: 100%; }
+            .cp-floating-panel { width: 90vw; }
         }
     </style>
 </head>
@@ -496,12 +500,12 @@
 <!-- CUSTOM CURSOR -->
 <div id="custom-cursor"></div>
 
-<!-- COLOR PICKER FLUTUANTE -->
+<!-- COLOR PICKER FLUTUANTE GRANDE -->
 <div class="cp-floating-panel" id="cpPanel">
     <div class="cp-header">
         <div class="cp-title-group">
             <div class="cp-dot" id="cpDot"></div>
-            <div class="cp-title" id="cpTitle">ESP Color</div>
+            <div class="cp-title" id="cpTitle">Health bar (color)</div>
         </div>
         <div class="cp-close" onclick="closeCP()">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -512,21 +516,24 @@
     </div>
     
     <div class="cp-body">
-        <div class="cp-main-container">
-            <div class="cp-saturation" id="cpSaturation">
-                <div class="cp-sat-overlay"></div>
-                <div class="cp-sat-handle" id="cpSatHandle"></div>
-            </div>
+        <!-- SATURATION GRANDE -->
+        <div class="cp-saturation" id="cpSaturation">
+            <div class="cp-sat-overlay"></div>
+            <div class="cp-sat-handle" id="cpSatHandle"></div>
+        </div>
+        
+        <!-- HUE E ALPHA -->
+        <div class="cp-hue-alpha-container">
             <div class="cp-hue-slider" id="cpHueSlider">
                 <div class="cp-hue-handle" id="cpHueHandle"></div>
             </div>
+            <div class="cp-alpha-slider" id="cpAlphaSlider">
+                <div class="cp-alpha-gradient" id="cpAlphaGradient"></div>
+                <div class="cp-alpha-handle" id="cpAlphaHandle"></div>
+            </div>
         </div>
         
-        <div class="cp-alpha-slider" id="cpAlphaSlider">
-            <div class="cp-alpha-gradient" id="cpAlphaGradient"></div>
-            <div class="cp-alpha-handle" id="cpAlphaHandle"></div>
-        </div>
-        
+        <!-- HEX INPUT -->
         <div class="cp-hex-container">
             <input type="text" class="cp-hex-input" id="cpHexInput" value="00FFEB" maxlength="6">
             <div class="cp-copy-btn" onclick="copyHex()" title="Copy">
@@ -772,14 +779,14 @@
     loop();
 })();
 
-// NAV INDICATOR
+// NAV INDICATOR - BOLINHA QUE SE MOVE
 function updateNavIndicator() {
     const activeNav = document.querySelector('.nav-item.active');
     const indicator = document.getElementById('navIndicator');
     if (activeNav) {
         const rect = activeNav.getBoundingClientRect();
         const menuRect = document.querySelector('.menu-scroll').getBoundingClientRect();
-        const top = rect.top - menuRect.top;
+        const top = rect.top - menuRect.top + (rect.height / 2) - 4;
         indicator.style.top = top + 'px';
     }
 }
@@ -1031,17 +1038,6 @@ function updateCP(){
 function openCP(el, title){
   cpTarget=el;
   if(title) cpTitle.textContent = title;
-  
-  var rect = el.getBoundingClientRect();
-  var panelLeft = rect.right + 15; 
-  var panelTop = rect.top - 10;
-
-  if (panelLeft + 340 > window.innerWidth) {
-      panelLeft = rect.left - 355;
-  }
-
-  cpPanel.style.left = panelLeft + 'px';
-  cpPanel.style.top = panelTop + 'px';
   
   var currentColor = el.style.backgroundColor || '#00FFEB';
   let hsv;
