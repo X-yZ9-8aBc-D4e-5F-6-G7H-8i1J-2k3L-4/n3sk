@@ -132,18 +132,20 @@
         .nav-arrow { margin-left: auto; width: 12px; height: 12px; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); fill: currentColor; opacity: 0.5; }
         .nav-item.expanded .nav-arrow { transform: rotate(90deg); opacity: 1; }
 
-        /* SUBMENU */
-        .submenu { 
-            max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
-            background: rgba(0,0,0,0.2); position: relative;
-        }
-        .submenu.open { max-height: 200px; }
-        
-        /* Linha conectora vertical do submenu */
-        .submenu::before {
-            content: ''; position: absolute; left: 35px; top: 0; bottom: 0;
-            width: 1px; background: #2a2a2a; z-index: 1;
-        }
+    .submenu { 
+    max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+    background: rgba(0,0,0,0.2); position: relative;
+    padding-top: 0; /* Garante sem padding extra */
+}
+.submenu.open { max-height: 200px; }
+
+/* Linha conectora vertical do submenu - CORRIGIDO */
+.submenu::before {
+    content: ''; position: absolute; left: 35px; 
+    top: 21px; /* ← Começa do meio do primeiro item */
+    bottom: 0; /* ← Vai até o final */
+    width: 1px; background: #2a2a2a; z-index: 1;
+}
 
         .sub-item {
             padding: 10px 20px 10px 50px; color: #555; cursor: pointer; transition: 0.2s; font-size: 12px; position: relative; z-index: 2;
@@ -706,11 +708,15 @@ function updateNavIndicator() {
         const rect = activeNav.getBoundingClientRect();
         const menuRect = document.querySelector('.menu-scroll').getBoundingClientRect();
         const top = rect.top - menuRect.top;
-        // Centraliza verticalmente (Botão 48px, Indicador 24px -> offset 12px)
-        indicator.style.top = (top + 12) + 'px';
+        
+        // Calcula o offset dinamicamente
+        const indicatorHeight = indicator.offsetHeight; // 24px
+        const navHeight = rect.height; // 48px
+        const offset = (navHeight - indicatorHeight) / 2;
+        
+        indicator.style.top = (top + offset) + 'px';
     }
 }
-
 // SUB INDICATOR (Bolinha Deslizante) - CORRIGIDO
 function updateSubIndicator(activeItem) {
     const indicator = document.getElementById('subIndicator');
@@ -745,6 +751,12 @@ function handleNavClick(menuId) {
     sub.classList.toggle('open');
     
     updateNavIndicator();
+
+
+         setTimeout(() => {
+        updateNavIndicator(); // Re-centraliza após animação
+    }, 300);
+
     
     if(sub.classList.contains('open')) {
         const firstItem = sub.querySelector('.sub-item');
