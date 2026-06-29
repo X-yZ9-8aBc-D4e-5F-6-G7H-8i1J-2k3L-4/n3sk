@@ -88,16 +88,29 @@
         .menu-scroll { flex: 1; overflow-y: auto; padding: 10px 0; position: relative; }
         .menu-scroll::-webkit-scrollbar { width: 0px; }
 
-        /* INDICADOR ATIVO NA SIDEBAR - PEQUENO E SMOOTH */
+        /* INDICADOR PRINCIPAL (Barra Esquerda Pequena) */
         .nav-indicator {
             position: absolute; left: 0; top: 0; 
-            width: 3px; /* Bem fino */
-            height: 20px; /* Pequeno, estilo pill */
+            width: 3px; height: 20px; /* Pequeno e centralizado */
             background: var(--primary); 
             border-radius: 0 4px 4px 0;
-            /* Efeito smooth com bounce leve */
             transition: top 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             box-shadow: 0 0 10px rgba(0, 255, 235, 0.4);
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* INDICADOR DO SUBMENU (A Bolinha Deslizante) */
+        .sub-indicator {
+            position: absolute; left: 32px; top: 0;
+            width: 6px; height: 6px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--primary);
+            /* Transform Y -50% garante que fique centralizado verticalmente no topo calculado */
+            transform: translateY(-50%);
+            /* Transição suave para descer/subir */
+            transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             pointer-events: none;
             z-index: 5;
         }
@@ -111,44 +124,34 @@
         }
         .nav-item:hover { color: white; background: rgba(255,255,255,0.02); }
         
-        /* Estado Ativo: Texto e Ícone BRANCOS */
-        .nav-item.active { 
-            color: white; 
-        }
+        .nav-item.active { color: white; }
         
-        /* Ícone segue a cor do texto (Branco quando ativo) */
         .nav-icon { width: 18px; height: 18px; fill: currentColor; opacity: 0.8; transition: 0.2s; }
         .nav-item.active .nav-icon { opacity: 1; } 
         
         .nav-arrow { margin-left: auto; width: 12px; height: 12px; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); fill: currentColor; opacity: 0.5; }
         .nav-item.expanded .nav-arrow { transform: rotate(90deg); opacity: 1; }
 
-        /* SUBMENU COM LINHA CONECTORA */
+        /* SUBMENU */
         .submenu { 
             max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
             background: rgba(0,0,0,0.2); position: relative;
         }
         .submenu.open { max-height: 200px; }
+        
+        /* Linha conectora vertical do submenu */
         .submenu::before {
-            content: ''; position: absolute; left: 35px; top: 10px; bottom: 10px;
+            content: ''; position: absolute; left: 35px; top: 0; bottom: 0;
             width: 1px; background: #2a2a2a; z-index: 1;
         }
+
         .sub-item {
             padding: 10px 20px 10px 50px; color: #555; cursor: pointer; transition: 0.2s; font-size: 12px; position: relative; z-index: 2;
+            height: 40px; /* Altura fixa ajuda no cálculo */
+            display: flex; align-items: center; /* Centraliza texto verticalmente */
         }
         .sub-item:hover { color: #aaa; }
         .sub-item.active { color: var(--primary); font-weight: 600; }
-        
-        /* BOLINHA DO SUBMENU COM EFEITO SMOOTH */
-        .sub-item.active::before {
-            content: ''; position: absolute; left: 32px; 
-            /* Top é controlado via JS ou CSS relativo, mas aqui usamos top fixo relativo ao item */
-            top: 50%; transform: translateY(-50%);
-            width: 5px; height: 5px; background: var(--primary); border-radius: 50%;
-            box-shadow: 0 0 5px var(--primary);
-            /* Transição suave para a posição vertical */
-            transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
 
         .sidebar-footer { padding: 20px; border-top: 1px solid var(--border); background: #080808; }
         .btn-global-qr {
@@ -218,7 +221,6 @@
         }
         input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 
-        /* CHECKBOX E COLOR DOT */
         .control-actions { display: flex; align-items: center; gap: 12px; }
 
         .chk-container {
@@ -239,7 +241,6 @@
         }
         .chk-container.on .chk-icon { transform: scale(1); }
 
-        /* BOLINHA DE COR - QUADRADO */
         .color-dot {
             width: 28px; height: 28px; border-radius: 6px;
             background: #333; 
@@ -249,11 +250,6 @@
             position: relative;
         }
         .color-dot:hover { transform: scale(1.05); box-shadow: 0 0 12px rgba(255,255,255,0.2); }
-        .color-dot.alpha-active::after {
-            content: ''; position: absolute; bottom: -2px; right: -2px;
-            width: 8px; height: 8px; background: #fff; border-radius: 50%;
-            border: 1px solid #000;
-        }
 
         /* PREVIEW AO VIVO */
         .live-preview-container {
@@ -308,179 +304,75 @@
             justify-content: space-between;
         }
         
-        .cp-title-group { 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-        }
+        .cp-title-group { display: flex; align-items: center; gap: 10px; }
         
         .cp-dot { 
-            width: 14px; 
-            height: 14px; 
-            border-radius: 4px; 
-            background: var(--primary); 
-            box-shadow: 0 0 8px var(--primary); 
-            transition: background 0.1s;
+            width: 14px; height: 14px; border-radius: 4px; background: var(--primary); 
+            box-shadow: 0 0 8px var(--primary); transition: background 0.1s;
         }
         
-        .cp-title { 
-            font-size: 12px; 
-            font-weight: 600; 
-            color: #fff; 
-        }
+        .cp-title { font-size: 12px; font-weight: 600; color: #fff; }
         
         .cp-close {
-            width: 24px; 
-            height: 24px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            color: #666; 
-            cursor: pointer; 
-            border-radius: 4px; 
-            transition: all 0.2s;
+            width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+            color: #666; cursor: pointer; border-radius: 4px; transition: all 0.2s;
         }
+        .cp-close:hover { background: #222; color: #fff; }
         
-        .cp-close:hover { 
-            background: #222; 
-            color: #fff; 
-        }
+        .cp-body { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
         
-        .cp-body { 
-            padding: 16px; 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 14px; 
-        }
-        
-        .cp-main-container {
-            display: flex;
-            gap: 12px;
-            height: 160px;
-        }
+        .cp-main-container { display: flex; gap: 12px; height: 160px; }
         
         .cp-saturation {
-            flex: 1;
-            border-radius: 8px; 
-            position: relative; 
-            overflow: hidden;
-            cursor: crosshair; 
-            background: linear-gradient(to right, #fff, var(--primary));
+            flex: 1; border-radius: 8px; position: relative; overflow: hidden;
+            cursor: crosshair; background: linear-gradient(to right, #fff, var(--primary));
             transition: background 0.05s linear; 
         }
-        
-        .cp-sat-overlay { 
-            position: absolute; 
-            inset: 0; 
-            background: linear-gradient(to bottom, transparent, #000); 
-            pointer-events: none; 
-        }
+        .cp-sat-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, #000); pointer-events: none; }
         
         .cp-sat-handle {
-            position: absolute; 
-            width: 14px; 
-            height: 14px; 
-            border: 2px solid #fff; 
-            border-radius: 50%;
-            transform: translate(-50%, -50%); 
-            box-shadow: 0 2px 6px rgba(0,0,0,0.5); 
-            pointer-events: none;
+            position: absolute; width: 14px; height: 14px; border: 2px solid #fff; border-radius: 50%;
+            transform: translate(-50%, -50%); box-shadow: 0 2px 6px rgba(0,0,0,0.5); pointer-events: none;
             transition: left 0.05s linear, top 0.05s linear;
         }
         
         .cp-hue-slider {
-            width: 18px;
-            height: 100%; 
-            border-radius: 8px; 
-            position: relative; 
-            cursor: pointer;
+            width: 18px; height: 100%; border-radius: 8px; position: relative; cursor: pointer;
             background: linear-gradient(to bottom, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
         }
-        
         .cp-hue-handle {
-            position: absolute; 
-            left: 50%; 
-            transform: translate(-50%, -50%);
-            width: 22px; 
-            height: 6px; 
-            background: #fff; 
-            border-radius: 2px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            transition: top 0.05s linear;
+            position: absolute; left: 50%; transform: translate(-50%, -50%);
+            width: 22px; height: 6px; background: #fff; border-radius: 2px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3); transition: top 0.05s linear;
         }
         
         .cp-alpha-slider {
-            width: 100%; 
-            height: 18px; 
-            border-radius: 8px; 
-            position: relative; 
-            cursor: pointer;
+            width: 100%; height: 18px; border-radius: 8px; position: relative; cursor: pointer;
             background-image: linear-gradient(45deg, #333 25%, transparent 25%), linear-gradient(-45deg, #333 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #333 75%), linear-gradient(-45deg, transparent 75%, #333 75%);
-            background-size: 8px 8px; 
-            background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+            background-size: 8px 8px; background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
         }
-        
-        .cp-alpha-gradient { 
-            position: absolute; 
-            inset: 0; 
-            border-radius: 8px; 
-            transition: background 0.05s linear;
-        }
+        .cp-alpha-gradient { position: absolute; inset: 0; border-radius: 8px; transition: background 0.05s linear; }
         
         .cp-alpha-handle {
-            position: absolute; 
-            top: 50%; 
-            transform: translateY(-50%);
-            width: 14px; 
-            height: 14px; 
-            background: #fff; 
-            border: 2px solid #fff; 
-            border-radius: 50%;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.4); 
-            margin-left: -7px;
-            transition: left 0.05s linear;
+            position: absolute; top: 50%; transform: translateY(-50%);
+            width: 14px; height: 14px; background: #fff; border: 2px solid #fff; border-radius: 50%;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4); margin-left: -7px; transition: left 0.05s linear;
         }
         
         .cp-hex-container {
-            display: flex; 
-            align-items: center; 
-            background: #0a0a0a; 
-            border-radius: 6px;
-            padding: 8px 12px; 
-            border: 1px solid #2a2a2a;
+            display: flex; align-items: center; background: #0a0a0a; border-radius: 6px;
+            padding: 8px 12px; border: 1px solid #2a2a2a;
         }
-        
         .cp-hex-input {
-            flex: 1; 
-            background: transparent; 
-            border: none; 
-            color: #fff;
-            font-family: 'Courier New', monospace; 
-            font-size: 12px; 
-            font-weight: 600;
-            outline: none; 
-            text-transform: uppercase; 
-            letter-spacing: 0.5px;
+            flex: 1; background: transparent; border: none; color: #fff;
+            font-family: 'Courier New', monospace; font-size: 12px; font-weight: 600;
+            outline: none; text-transform: uppercase; letter-spacing: 0.5px;
         }
-        
         .cp-copy-btn {
-            width: 24px; 
-            height: 24px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            color: #666; 
-            cursor: pointer; 
-            border-radius: 4px; 
-            transition: all 0.2s; 
-            margin-left: 8px;
+            width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+            color: #666; cursor: pointer; border-radius: 4px; transition: all 0.2s; margin-left: 8px;
         }
-        
-        .cp-copy-btn:hover { 
-            background: #2a2a2a; 
-            color: var(--primary); 
-        }
+        .cp-copy-btn:hover { background: #2a2a2a; color: var(--primary); }
 
         /* MODAL QR */
         #qr-modal {
@@ -599,7 +491,7 @@
     </div>
     
     <div class="menu-scroll">
-        <!-- Indicador que se move suavemente (Pequeno) -->
+        <!-- Indicador Principal (Barra Esquerda) -->
         <div class="nav-indicator" id="navIndicator"></div>
         
         <div class="nav-item" id="nav-aimbot" onclick="handleNavClick('aimbot')">
@@ -617,6 +509,9 @@
             <svg class="nav-arrow" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
         </div>
         <div class="submenu open" id="sub-visuals">
+            <!-- Bolinha Deslizante Única -->
+            <div class="sub-indicator" id="subIndicator"></div>
+            
             <div class="sub-item active" onclick="switchTab('visuals-players', event)">Players</div>
             <div class="sub-item" onclick="switchTab('visuals-weapons', event)">Weapons</div>
         </div>
@@ -698,7 +593,6 @@
                 </div>
 
                 <div class="feature-card">
-                    <!-- BOX ESP -->
                     <div class="control-row">
                         <span class="c-label">Box ESP</span>
                         <div class="control-actions">
@@ -709,7 +603,6 @@
                         </div>
                     </div>
 
-                    <!-- SKELETON -->
                     <div class="control-row">
                         <span class="c-label">Skeleton</span>
                         <div class="control-actions">
@@ -720,7 +613,6 @@
                         </div>
                     </div>
 
-                    <!-- HEALTH BAR -->
                     <div class="control-row">
                         <span class="c-label">Health Bar</span>
                         <div class="control-actions">
@@ -731,7 +623,6 @@
                         </div>
                     </div>
 
-                    <!-- SNAPLINE -->
                     <div class="control-row">
                         <span class="c-label">Snapline</span>
                         <div class="control-actions">
@@ -742,7 +633,6 @@
                         </div>
                     </div>
 
-                    <!-- PLAYER NAME -->
                     <div class="control-row">
                         <span class="c-label">Player Name</span>
                         <div class="control-actions">
@@ -753,7 +643,6 @@
                         </div>
                     </div>
                     
-                    <!-- ESP COLOR (GLOBAL) -->
                     <div class="control-row">
                         <span class="c-label">ESP Color</span>
                         <div class="control-actions">
@@ -809,27 +698,37 @@
     loop();
 })();
 
-// NAV INDICATOR - EFEITO SMOOTH E PEQUENO
+// NAV INDICATOR (Barra Esquerda)
 function updateNavIndicator() {
     const activeNav = document.querySelector('.nav-item.active');
     const indicator = document.getElementById('navIndicator');
     if (activeNav && indicator) {
         const rect = activeNav.getBoundingClientRect();
         const menuRect = document.querySelector('.menu-scroll').getBoundingClientRect();
-        // Calcula a posição relativa dentro do scroll container
         const top = rect.top - menuRect.top;
+        // Centraliza verticalmente (Botão 46px, Indicador 20px -> offset 13px)
+        indicator.style.top = (top + 13) + 'px';
+    }
+}
+
+// SUB INDICATOR (Bolinha Deslizante)
+function updateSubIndicator(activeItem) {
+    const indicator = document.getElementById('subIndicator');
+    if (activeItem && indicator) {
+        const subMenu = activeItem.parentElement; // Pega o container .submenu
+        const subRect = subMenu.getBoundingClientRect();
+        const itemRect = activeItem.getBoundingClientRect();
         
-        // Centraliza verticalmente o indicador pequeno (20px) no botão (46px)
-        // Offset = (AlturaBotão - AlturaIndicador) / 2
-        const offset = (46 - 20) / 2; 
+        // Calcula a posição relativa ao submenu
+        // Adicionamos metade da altura do item para centralizar a bolinha
+        const relativeTop = (itemRect.top - subRect.top) + (itemRect.height / 2);
         
-        indicator.style.top = (top + offset) + 'px';
+        indicator.style.top = relativeTop + 'px';
     }
 }
 
 // NAVIGATION
 function handleNavClick(menuId) {
-    // Fecha outros menus
     if (menuId === 'visuals') {
         document.getElementById('nav-aimbot').classList.remove('expanded', 'active');
         document.getElementById('sub-aimbot').classList.remove('open');
@@ -845,12 +744,13 @@ function handleNavClick(menuId) {
     nav.classList.toggle('active');
     sub.classList.toggle('open');
     
-    // Atualiza o indicador smooth
     updateNavIndicator();
     
     if(sub.classList.contains('open')) {
         const firstItem = sub.querySelector('.sub-item');
-        if(firstItem) firstItem.click();
+        if(firstItem) {
+            firstItem.click(); // Simula clique para atualizar a bolinha
+        }
     }
 }
 
@@ -867,12 +767,11 @@ function switchTab(tabId, event) {
     else if(tabId.includes('visuals-weapons')) bc.innerHTML = 'Visuals <span style="opacity:0.5">•</span> <span class="current">Weapons</span>';
     else if(tabId === 'settings') bc.innerHTML = 'System <span style="opacity:0.5">•</span> <span class="current">Settings</span>';
 
-    // Remove active de todos os sub-itens
     document.querySelectorAll('.sub-item').forEach(el => el.classList.remove('active'));
-    
-    // Adiciona active ao clicado (isso aciona a transição CSS da bolinha)
     if(event && event.target.classList.contains('sub-item')) {
         event.target.classList.add('active');
+        // Move a bolinha suavemente para o item clicado
+        updateSubIndicator(event.target);
     }
     
     scheduleRender();
@@ -940,6 +839,12 @@ window.onload = async function(){
         resizeCanvas();
         scheduleRender();
         updateNavIndicator();
+        
+        // Inicializa a posição da bolinha do submenu
+        setTimeout(() => {
+            const activeSub = document.querySelector('#sub-visuals .sub-item.active');
+            if(activeSub) updateSubIndicator(activeSub);
+        }, 100);
         
     }catch(e){ console.error(e); alert("Erro ao validar token"); }
 };
