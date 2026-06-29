@@ -549,7 +549,7 @@ function startFirebaseSync() {
         const data = snapshot.val();
         
         // PROTEÇÃO ANTI-LOOP: Ignora atualização se clicamos manualmente há < 800ms
-        if (Date.now() - lastManualClickTime < 800) return;
+        if (Date.now() - lastManualClickTime < 1) return;
         
         if (data) applyState(data);
     });
