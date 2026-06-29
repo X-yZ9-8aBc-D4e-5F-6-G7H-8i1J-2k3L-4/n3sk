@@ -203,25 +203,47 @@
         .control-actions { display: flex; align-items: center; gap: 12px; }
 
 /* ============================================ */
-/* CHECKBOX COM EFEITO DE DESENHO + ANIMAÇÃO DIAGONAL */
+/* CHECKBOX ATUALIZADO: SEM BORDA E CHECK ESCURO */
 /* ============================================ */
 .chk-container {
     width: 24px; height: 24px; border-radius: 6px;
-    border: none; background: #1a1a1a;
+    /* Fundo cinza escuro da interface */
+    background: #1a1a1a; 
+    /* Sem borda por padrão */
+    border: none; 
     display: flex; align-items: center; justify-content: center;
     cursor: pointer; flex-shrink: 0;
     position: relative;
-    overflow: hidden;
-    transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: visible;
+    transition: all 0.3s ease;
 }
 
-.chk-container:hover { background: #252525; }
+.chk-container:hover { 
+    background: #252525; 
+}
+
+/* Camada de cor (fundo neon quando ativado) */
+.chk-container::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--primary);
+    border-radius: 6px;
+    opacity: 0;
+    transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 0;
+}
 
 .chk-container.on {
-    background: var(--primary);
+    /* Quando ativo, mantém o fundo preto mas mostra a camada ::before neon */
+    background: #000;
 }
 
-/* Ícone do check com animação diagonal */
+.chk-container.on::before {
+    opacity: 1;
+}
+
+/* Ícone do check */
 .chk-icon {
     width: 14px; height: 14px;
     position: relative;
@@ -230,40 +252,21 @@
 
 .chk-icon path {
     fill: none;
-    stroke: #4a4a4a;
-    stroke-width: 2.5;
+    /* Cor escura (quase preta) para o check */
+    stroke: #111 !important; 
+    stroke-width: 3;
     stroke-linecap: round;
     stroke-linejoin: round;
     stroke-dasharray: 30;
     stroke-dashoffset: 30;
-    opacity: 0;
-    transform-origin: center;
-    transition: stroke-dashoffset 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-                opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.chk-container.on .chk-icon {
-    animation: slideCheckmark 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    transition: stroke-dashoffset 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.15s,
+                stroke 0.3s ease 0.15s;
 }
 
 .chk-container.on .chk-icon path {
-    stroke: #3a3a3a;
+    /* Mantém escuro mesmo quando ativo para contraste suave ou mude para #fff se quiser branco */
+    stroke: #111 !important; 
     stroke-dashoffset: 0;
-    opacity: 1;
-}
-
-@keyframes slideCheckmark {
-    0% {
-        transform: translate(12px, -12px);
-        opacity: 0;
-    }
-    50% {
-        opacity: 1;
-    }
-    100% {
-        transform: translate(0, 0);
-        opacity: 1;
-    }
 }
 
         .color-dot {
