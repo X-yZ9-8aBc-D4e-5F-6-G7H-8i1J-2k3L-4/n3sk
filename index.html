@@ -141,9 +141,9 @@
 
 /* Linha conectora vertical do submenu - CORRIGIDO */
 .submenu::before {
-    content: ''; position: absolute; left: 35px; 
-    top: 21px; /* ← Começa do meio do primeiro item */
-    bottom: 0; /* ← Vai até o final */
+    content: ''; position: absolute; left: 35px;
+    top: 21px;     /* ← Começa no MEIO do 1º item */
+    bottom: 21px;  /* ← Termina no MEIO do último */
     width: 1px; background: #2a2a2a; z-index: 1;
 }
 
@@ -750,19 +750,17 @@ function handleNavClick(menuId) {
     nav.classList.toggle('active');
     sub.classList.toggle('open');
     
+    // Atualizar IMEDIATAMENTE
     updateNavIndicator();
-
-
-         setTimeout(() => {
-        updateNavIndicator(); // Re-centraliza após animação
-    }, 300);
-
+    
+    // Depois ajustar quando a transição acabar (400ms)
+    setTimeout(() => {
+        updateNavIndicator();
+    }, 400);
     
     if(sub.classList.contains('open')) {
         const firstItem = sub.querySelector('.sub-item');
-        if(firstItem) {
-            firstItem.click(); // Simula clique para atualizar a bolinha
-        }
+        if(firstItem) firstItem.click();
     }
 }
 
