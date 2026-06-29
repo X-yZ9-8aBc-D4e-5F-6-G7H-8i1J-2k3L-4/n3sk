@@ -749,8 +749,10 @@ function handleNavClick(menuId) {
     nav.classList.toggle('active');
     sub.classList.toggle('open');
     
-    // Atualizar IMEDIATAMENTE - UMA VEZ APENAS ✅
-    updateNavIndicator();
+    // Chama uma única vez com delay REDUZIDO ⚡
+    setTimeout(() => {
+        updateNavIndicator();
+    }, 300); // ← Mudou de 400 para 100ms
     
     if(sub.classList.contains('open')) {
         const firstItem = sub.querySelector('.sub-item');
