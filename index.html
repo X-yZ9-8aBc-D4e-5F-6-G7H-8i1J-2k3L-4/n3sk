@@ -734,7 +734,7 @@ function updateSubIndicator(activeItem) {
     }
 }
 
-// FUNÇÃO PRINCIPAL DE NAVEGAÇÃO - CORRIGIDA
+// FUNÇÃO PRINCIPAL DE NAVEGAÇÃO - CORRIGIDA SEM O EFEITO "VAI E VOLTA"
 function handleNavClick(menuId) {
     // Remove active e expanded de todos os nav-items
     document.querySelectorAll('.nav-item').forEach(item => {
@@ -760,15 +760,24 @@ function handleNavClick(menuId) {
         }
     }
     
-    // Atualiza indicador após um pequeno delay para a animação começar
-    setTimeout(() => {
-        updateNavIndicator();
-    }, 50);
-    
-    // Atualiza novamente após a animação do submenu completar
-    setTimeout(() => {
-        updateNavIndicator();
-    }, 400);
+    // Calcula a posição FINAL considerando o estado após a animação
+    // Se o submenu vai abrir, precisamos considerar a altura final dele
+    requestAnimationFrame(() => {
+        const activeNav = document.querySelector('.nav-item.active');
+        const indicator = document.getElementById('navIndicator');
+        
+        if (activeNav && indicator) {
+            // Calcula a posição final do nav-item
+            // Se tem submenu aberto, precisamos considerar o offsetTop final
+            let finalTop = activeNav.offsetTop;
+            const navHeight = activeNav.offsetHeight;
+            const indicatorHeight = indicator.offsetHeight;
+            const offset = (navHeight - indicatorHeight) / 2;
+            
+            // Aplica a posição diretamente sem delay
+            indicator.style.top = (finalTop + offset) + 'px';
+        }
+    });
     
     // Se abriu submenu, clica no primeiro item ativo ou no primeiro item
     if(sub && sub.classList.contains('open')) {
@@ -777,7 +786,7 @@ function handleNavClick(menuId) {
             // Simula click para carregar o conteúdo
             setTimeout(() => {
                 activeItem.click();
-            }, 100);
+            }, 50);
         }
     } else {
         // Se não tem submenu (como Settings), carrega o conteúdo diretamente
