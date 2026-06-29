@@ -202,8 +202,8 @@
 
         .control-actions { display: flex; align-items: center; gap: 12px; }
 
- /* ============================================ */
-/* CHECKBOX COM EFEITO DE DESENHO + ONDA ARREDONDADA */
+/* ============================================ */
+/* CHECKBOX COM EFEITO DE DESENHO + EXPANSÃO SUAVE */
 /* ============================================ */
 .chk-container {
     width: 24px; height: 24px; border-radius: 6px;
@@ -216,14 +216,16 @@
 }
 .chk-container:hover { border-color: #555; }
 
-/* Camada de cor que vem do canto SUPERIOR ESQUERDO com formato arredondado */
+/* Camada de cor que se expande do canto SUPERIOR ESQUERDO */
 .chk-container::before {
     content: '';
     position: absolute;
-    inset: -2px; /* Expande um pouco para cobrir os cantos */
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     background: var(--primary);
-    clip-path: circle(0% at top left);
-    transition: clip-path 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: top left;
+    transform: scale(0);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 0;
 }
 
@@ -232,7 +234,7 @@
 }
 
 .chk-container.on::before {
-    clip-path: circle(200% at top left); /* Aumentado de 150% para 200% */
+    transform: scale(1);
 }
 
 /* Ícone do check desenhado à mão */
@@ -256,7 +258,6 @@
 .chk-container.on .chk-icon path {
     stroke-dashoffset: 0;
 }
-
         .color-dot {
             width: 28px; height: 28px; border-radius: 6px;
             background: #333; 
