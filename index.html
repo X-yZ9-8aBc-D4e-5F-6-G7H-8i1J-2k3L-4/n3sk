@@ -733,7 +733,6 @@ function updateSubIndicator(activeItem) {
     }
 }
 
-// NAVIGATION
 function handleNavClick(menuId) {
     if (menuId === 'visuals') {
         document.getElementById('nav-aimbot').classList.remove('expanded', 'active');
@@ -750,10 +749,9 @@ function handleNavClick(menuId) {
     nav.classList.toggle('active');
     sub.classList.toggle('open');
     
-    // Atualizar IMEDIATAMENTE
-    updateNavIndicator();
+    // REMOVA ESTE: updateNavIndicator(); ❌
     
-    // Depois ajustar quando a transição acabar (400ms)
+    // MANTENHA APENAS ESTE - Chama uma única vez após a transição
     setTimeout(() => {
         updateNavIndicator();
     }, 400);
