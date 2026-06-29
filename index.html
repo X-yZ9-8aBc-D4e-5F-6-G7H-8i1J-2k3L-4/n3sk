@@ -203,7 +203,7 @@
         .control-actions { display: flex; align-items: center; gap: 12px; }
 
 /* ============================================ */
-/* CHECKBOX FINAL: SMOOTH SOLID + SLIDE UP CHECK */
+/* CHECKBOX: SEQUÊNCIA (COR PRIMEIRO, CHECK DEPOIS) */
 /* ============================================ */
 .chk-container {
     width: 24px; height: 24px; border-radius: 6px;
@@ -212,7 +212,7 @@
     display: flex; align-items: center; justify-content: center;
     cursor: pointer; flex-shrink: 0;
     position: relative;
-    overflow: hidden; /* Garante que nada vaze */
+    overflow: hidden; 
     transition: background 0.3s ease;
 }
 
@@ -224,7 +224,7 @@
 .chk-container::before {
     content: '';
     position: absolute;
-    inset: 0; /* Cobre tudo exatamente */
+    inset: 0; 
     background: var(--primary);
     border-radius: 6px;
     
@@ -232,14 +232,14 @@
     opacity: 0;
     transform: scale(0.8);
     
-    /* Transição super suave */
+    /* Transição super suave SEM DELAY (acontece primeiro) */
     transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
     z-index: 0;
 }
 
 /* Quando ativado */
 .chk-container.on {
-    background: #000; /* Reseta o fundo base */
+    background: #000; 
 }
 
 .chk-container.on::before {
@@ -252,12 +252,14 @@
     width: 14px; height: 14px;
     position: relative;
     z-index: 1;
-    /* Permite que o ícone se mova para o efeito de slide */
-    transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
     
     /* Estado inicial: um pouco abaixo e transparente */
-    transform: translateY(4px);
+    transform: translateY(5px);
     opacity: 0;
+    
+    /* AQUI ESTÁ O TRUQUE: delay de 0.2s para esperar a cor terminar */
+    transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1) 0.2s, 
+                opacity 0.3s ease 0.2s;
 }
 
 .chk-icon path {
@@ -268,19 +270,20 @@
     stroke-linejoin: round;
     stroke-dasharray: 30;
     stroke-dashoffset: 30;
-    /* O desenho acontece junto com o slide */
-    transition: stroke-dashoffset 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+    
+    /* O desenho também tem delay para sincronizar com o slide */
+    transition: stroke-dashoffset 0.35s cubic-bezier(0.25, 1, 0.5, 1) 0.2s;
 }
 
 /* Estado Ativado do Ícone */
 .chk-container.on .chk-icon {
-    /* Sobe para o centro e aparece */
+    /* Sobe para o centro e aparece (após o delay) */
     transform: translateY(0);
     opacity: 1;
 }
 
 .chk-container.on .chk-icon path {
-    stroke-dashoffset: 0; /* Desenha o check completo */
+    stroke-dashoffset: 0; /* Desenha o check completo (após o delay) */
 }
 
         .color-dot {
