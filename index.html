@@ -203,7 +203,7 @@
         .control-actions { display: flex; align-items: center; gap: 12px; }
 
 /* ============================================ */
-/* CHECKBOX CORRIGIDO - ANIMAÇÃO RÁPIDA */
+/* CHECKBOX CORRIGIDO - ANIMAÇÃO RÁPIDA E ESTÁVEL */
 /* ============================================ */
 .chk-container {
     width: 24px; height: 24px; border-radius: 6px;
@@ -213,7 +213,7 @@
     cursor: pointer; flex-shrink: 0;
     position: relative;
     overflow: hidden; 
-    transition: background 0.3s ease;
+    transition: background 0.2s ease; /* Transição de fundo mais rápida */
 }
 
 .chk-container:hover { 
@@ -229,7 +229,7 @@
     border-radius: 6px;
     opacity: 0;
     transform: scale(0.8);
-    transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
     z-index: 0;
 }
 
@@ -242,7 +242,7 @@
     transform: scale(1);
 }
 
-/* Ícone do Check - ANIMAÇÃO ACELERADA */
+/* Ícone do Check - ANIMAÇÃO ACELERADA (0.08s) */
 .chk-icon {
     width: 14px; height: 14px;
     position: relative;
@@ -251,8 +251,9 @@
     
     transform: translateY(5px);
     opacity: 0;
-    transition: transform 0.15s cubic-bezier(0.25, 1, 0.5, 1), 
-                opacity 0.15s ease;
+    /* Velocidade aumentada para 0.08s */
+    transition: transform 0.08s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                opacity 0.08s ease;
 }
 
 .chk-icon path {
@@ -263,7 +264,8 @@
     stroke-linejoin: round;
     stroke-dasharray: 30;
     stroke-dashoffset: 30;
-    transition: stroke-dashoffset 0.15s cubic-bezier(0.25, 1, 0.5, 1);
+    /* Velocidade aumentada para 0.08s */
+    transition: stroke-dashoffset 0.08s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .chk-container.on .chk-icon {
@@ -780,7 +782,16 @@ function switchTab(tabId, event) {
 }
 
 function updateValue(key, value) { document.getElementById('val-' + key).textContent = value; sendState(); }
-function tg(el){ el.classList.toggle('on'); scheduleRender(); sendState(); }
+
+// FUNÇÃO TG CORRIGIDA PARA EVITAR LOOP DE LIGA/DESLIGA
+function tg(el){ 
+    // Verifica se já estamos atualizando localmente para evitar conflito
+    if(isUpdatingLocally) return;
+    
+    el.classList.toggle('on'); 
+    scheduleRender(); 
+    sendState(); 
+}
 
 const SUPA_URL = "https://gkzxuerurfedfwuxhimf.supabase.co";
 const SUPA_KEY = "sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6";
