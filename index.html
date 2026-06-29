@@ -49,16 +49,24 @@
             border-color: #fff;
         }
 
-        /* TELA DE CARREGAMENTO */
+        /* TELA DE CARREGAMENTO - ATUALIZADA */
         #loading-screen {
-            position: fixed; inset: 0; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; gap: 40px;
+            position: fixed; inset: 0; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; gap: 30px;
         }
-        .loading-ring { width: 50px; height: 50px; border: 2px solid transparent; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite, pulse 2s ease-in-out infinite; }
+        .loading-ring { width: 40px; height: 40px; border: 2px solid transparent; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%, 100% { opacity: 0.4; transform: scale(0.95); } 50% { opacity: 1; transform: scale(1.05); } }
-        .loading-text { color: var(--primary); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; animation: blink 2s ease-in-out infinite; }
-        @keyframes blink { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
-        .loading-subtitle { color: var(--muted); font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
+        
+        .loading-text { color: var(--primary); font-size: 12px; letter-spacing: 4px; text-transform: uppercase; font-weight: 600; }
+        
+        /* NOVO TEXTO EM BAIXO */
+        .loading-subtitle { 
+            color: var(--muted); 
+            font-size: 11px; 
+            letter-spacing: 1px; 
+            text-transform: uppercase; 
+            margin-top: 10px;
+            opacity: 0.7;
+        }
 
         /* BARRA LATERAL (SIDEBAR) */
         .sidebar {
@@ -82,30 +90,37 @@
         .menu-scroll { flex: 1; overflow-y: auto; padding: 10px 0; position: relative; }
         .menu-scroll::-webkit-scrollbar { width: 0px; }
 
-        /* INDICADOR ATIVO NA SIDEBAR - BOLINHA QUE SE MOVE */
+        /* INDICADOR ATIVO NA SIDEBAR - EFEITO SMOOTH */
         .nav-indicator {
-            position: absolute; left: 10px; top: 0; width: 8px; height: 8px;
-            background: var(--primary); border-radius: 50%;
-            transition: top 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 0 12px rgba(0, 255, 235, 0.6);
+            position: absolute; left: 0; top: 0; width: 3px; height: 46px;
+            background: var(--primary); border-radius: 0 2px 2px 0;
+            /* Efeito smooth com bounce leve */
+            transition: top 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 0 10px rgba(0, 255, 235, 0.4);
             pointer-events: none;
+            z-index: 5;
         }
 
-        /* ESTILO DO MENU - BARRA ESQUERDA */
+        /* ESTILO DO MENU - IGUAL IMAGEM 4 */
         .nav-item {
             display: flex; align-items: center; padding: 12px 20px; cursor: pointer;
             transition: all 0.2s ease; color: var(--muted); font-weight: 500; gap: 12px;
             font-size: 13px; height: 46px; position: relative;
+            /* Fundo cinza escuro sutil por padrão */
+            background: transparent;
         }
         .nav-item:hover { color: white; background: rgba(255,255,255,0.02); }
+        
+        /* Estado Ativo: Cor na esquerda (via indicador), texto branco/ciano */
         .nav-item.active { 
-            color: var(--primary);
-            background: rgba(0, 255, 235, 0.03);
+            color: white; /* Ícone e texto ficam brancos ou ciano claro */
         }
         
-        .nav-icon { width: 18px; height: 18px; fill: currentColor; opacity: 0.8; }
-        .nav-arrow { margin-left: auto; width: 12px; height: 12px; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .nav-item.expanded .nav-arrow { transform: rotate(90deg); }
+        .nav-icon { width: 18px; height: 18px; fill: currentColor; opacity: 0.8; transition: 0.2s; }
+        .nav-item.active .nav-icon { opacity: 1; fill: var(--primary); }
+        
+        .nav-arrow { margin-left: auto; width: 12px; height: 12px; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); fill: currentColor; opacity: 0.5; }
+        .nav-item.expanded .nav-arrow { transform: rotate(90deg); opacity: 1; }
 
         /* SUBMENU COM LINHA CONECTORA */
         .submenu { 
@@ -189,16 +204,16 @@
         
         .slider-wrap { display: flex; align-items: center; gap: 12px; width: 60%; }
         .s-val { font-size: 11px; color: var(--muted); width: 25px; text-align: right; font-family: monospace;}
-        input[type=range] { -webkit-appearance: none; width: 100%; height: 4px; background: #222; border-radius: 2px; }
+        input[type=range] { -webkit-appearance: none; width: 100%; height: 4px; background: #222; border-radius: 2px; transition: background 0.2s; }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none; width: 12px; height: 12px; background: var(--primary); border-radius: 50%; cursor: pointer;
-            box-shadow: 0 0 8px rgba(0, 255, 235, 0.4); transition: all 0.2s ease;
+            box-shadow: 0 0 8px rgba(0, 255, 235, 0.4); transition: transform 0.1s;
         }
+        input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 
         /* CHECKBOX E COLOR DOT */
         .control-actions { display: flex; align-items: center; gap: 12px; }
 
-        /* CHECKBOX */
         .chk-container {
             width: 24px; height: 24px; border-radius: 6px;
             border: 2px solid #333; background: transparent;
@@ -217,16 +232,22 @@
         }
         .chk-container.on .chk-icon { transform: scale(1); }
 
-        /* QUADRADO DE COR */
+        /* BOLINHA DE COR - QUADRADO (IGUAL IMAGEM 3) */
         .color-dot {
-            width: 20px; height: 20px; border-radius: 4px;
+            width: 28px; height: 28px; border-radius: 6px; /* Quadrado arredondado */
             background: #333; 
             border: none;
             cursor: pointer; flex-shrink: 0;
-            transition: transform 0.2s;
-            box-shadow: 0 0 8px rgba(0,0,0,0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
         }
-        .color-dot:hover { transform: scale(1.08); }
+        .color-dot:hover { transform: scale(1.05); box-shadow: 0 0 12px rgba(255,255,255,0.2); }
+        /* Indicador visual se tiver alpha < 1 */
+        .color-dot.alpha-active::after {
+            content: ''; position: absolute; bottom: -2px; right: -2px;
+            width: 8px; height: 8px; background: #fff; border-radius: 50%;
+            border: 1px solid #000;
+        }
 
         /* PREVIEW AO VIVO */
         .live-preview-container {
@@ -245,12 +266,11 @@
         }
         .lp-canvas-wrap canvas { display: block; max-width: 100%; max-height: 100%; object-fit: contain; }
 
-        /* COLOR PICKER FLUTUANTE - GRANDE COMO IMAGEM 3 */
+        /* COLOR PICKER FLUTUANTE - REDESENHADA (IGUAL IMAGEM 3) */
         .cp-floating-panel {
-            position: fixed;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
-            width: 500px;
+            position: absolute;
+            top: 0; left: 0;
+            width: 300px; /* Tamanho reduzido e bonito */
             background: #111;
             border: 1px solid var(--border);
             border-radius: 12px;
@@ -259,20 +279,24 @@
             
             opacity: 0;
             visibility: hidden;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            /* Animação smooth de entrada */
+            transform: translateY(15px) scale(0.95);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             
             display: flex; 
             flex-direction: column;
+            pointer-events: none; /* Evita clique quando invisível */
         }
 
         .cp-floating-panel.open {
             opacity: 1;
             visibility: visible;
-            transform: translate(-50%, -50%) scale(1);
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
         }
 
         .cp-header {
-            padding: 16px 20px; 
+            padding: 14px 16px; 
             border-bottom: 1px solid #222; 
             display: flex; 
             align-items: center; 
@@ -285,16 +309,18 @@
             gap: 10px; 
         }
         
+        /* Preview da cor atual no header (Quadrado) */
         .cp-dot { 
             width: 14px; 
             height: 14px; 
-            border-radius: 3px; 
+            border-radius: 4px; 
             background: var(--primary); 
             box-shadow: 0 0 8px var(--primary); 
+            transition: background 0.1s;
         }
         
         .cp-title { 
-            font-size: 14px; 
+            font-size: 12px; 
             font-weight: 600; 
             color: #fff; 
         }
@@ -317,21 +343,28 @@
         }
         
         .cp-body { 
-            padding: 24px; 
+            padding: 16px; 
             flex: 1; 
             display: flex; 
             flex-direction: column; 
-            gap: 16px; 
+            gap: 14px; 
+        }
+        
+        .cp-main-container {
+            display: flex;
+            gap: 12px;
+            height: 160px; /* Altura ajustada */
         }
         
         .cp-saturation {
-            width: 100%;
-            height: 280px;
+            flex: 1;
             border-radius: 8px; 
             position: relative; 
             overflow: hidden;
             cursor: crosshair; 
             background: linear-gradient(to right, #fff, var(--primary));
+            /* Smooth update do background */
+            transition: background 0.05s linear; 
         }
         
         .cp-sat-overlay { 
@@ -345,21 +378,16 @@
             position: absolute; 
             width: 14px; 
             height: 14px; 
-            border: 3px solid #fff; 
+            border: 2px solid #fff; 
             border-radius: 50%;
             transform: translate(-50%, -50%); 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4); 
+            box-shadow: 0 2px 6px rgba(0,0,0,0.5); 
             pointer-events: none;
-        }
-
-        .cp-hue-alpha-container {
-            display: flex;
-            gap: 16px;
-            height: 60px;
+            transition: left 0.05s linear, top 0.05s linear; /* Smooth movement */
         }
         
         .cp-hue-slider {
-            width: 40px;
+            width: 18px;
             height: 100%; 
             border-radius: 8px; 
             position: relative; 
@@ -371,42 +399,44 @@
             position: absolute; 
             left: 50%; 
             transform: translate(-50%, -50%);
-            width: 48px; 
-            height: 8px; 
+            width: 22px; 
+            height: 6px; 
             background: #fff; 
             border-radius: 2px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            margin-left: -24px;
+            transition: top 0.05s linear; /* Smooth movement */
         }
-
+        
         .cp-alpha-slider {
-            flex: 1;
-            height: 100%; 
+            width: 100%; 
+            height: 18px; 
             border-radius: 8px; 
             position: relative; 
             cursor: pointer;
             background-image: linear-gradient(45deg, #333 25%, transparent 25%), linear-gradient(-45deg, #333 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #333 75%), linear-gradient(-45deg, transparent 75%, #333 75%);
-            background-size: 10px 10px; 
-            background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
+            background-size: 8px 8px; 
+            background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
         }
         
         .cp-alpha-gradient { 
             position: absolute; 
             inset: 0; 
             border-radius: 8px; 
+            transition: background 0.05s linear;
         }
         
         .cp-alpha-handle {
             position: absolute; 
             top: 50%; 
             transform: translateY(-50%);
-            width: 28px; 
-            height: 28px; 
+            width: 14px; 
+            height: 14px; 
             background: #fff; 
-            border: 3px solid #fff; 
+            border: 2px solid #fff; 
             border-radius: 50%;
             box-shadow: 0 2px 6px rgba(0,0,0,0.4); 
-            margin-left: -14px;
+            margin-left: -7px;
+            transition: left 0.05s linear; /* Smooth movement */
         }
         
         .cp-hex-container {
@@ -414,7 +444,7 @@
             align-items: center; 
             background: #0a0a0a; 
             border-radius: 6px;
-            padding: 12px 14px; 
+            padding: 8px 12px; 
             border: 1px solid #2a2a2a;
         }
         
@@ -424,7 +454,7 @@
             border: none; 
             color: #fff;
             font-family: 'Courier New', monospace; 
-            font-size: 13px; 
+            font-size: 12px; 
             font-weight: 600;
             outline: none; 
             text-transform: uppercase; 
@@ -484,7 +514,6 @@
             .content-area { flex-direction: column; }
             .live-preview-container { position: relative; top: 0; right: 0; width: 100%; height: 60vh; border-left: none; border-top: 1px solid var(--border); }
             .config-panel { max-width: 100%; }
-            .cp-floating-panel { width: 90vw; }
         }
     </style>
 </head>
@@ -500,12 +529,12 @@
 <!-- CUSTOM CURSOR -->
 <div id="custom-cursor"></div>
 
-<!-- COLOR PICKER FLUTUANTE GRANDE -->
+<!-- COLOR PICKER FLUTUANTE -->
 <div class="cp-floating-panel" id="cpPanel">
     <div class="cp-header">
         <div class="cp-title-group">
             <div class="cp-dot" id="cpDot"></div>
-            <div class="cp-title" id="cpTitle">Health bar (color)</div>
+            <div class="cp-title" id="cpTitle">ESP Color</div>
         </div>
         <div class="cp-close" onclick="closeCP()">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -516,24 +545,21 @@
     </div>
     
     <div class="cp-body">
-        <!-- SATURATION GRANDE -->
-        <div class="cp-saturation" id="cpSaturation">
-            <div class="cp-sat-overlay"></div>
-            <div class="cp-sat-handle" id="cpSatHandle"></div>
-        </div>
-        
-        <!-- HUE E ALPHA -->
-        <div class="cp-hue-alpha-container">
+        <div class="cp-main-container">
+            <div class="cp-saturation" id="cpSaturation">
+                <div class="cp-sat-overlay"></div>
+                <div class="cp-sat-handle" id="cpSatHandle"></div>
+            </div>
             <div class="cp-hue-slider" id="cpHueSlider">
                 <div class="cp-hue-handle" id="cpHueHandle"></div>
             </div>
-            <div class="cp-alpha-slider" id="cpAlphaSlider">
-                <div class="cp-alpha-gradient" id="cpAlphaGradient"></div>
-                <div class="cp-alpha-handle" id="cpAlphaHandle"></div>
-            </div>
         </div>
         
-        <!-- HEX INPUT -->
+        <div class="cp-alpha-slider" id="cpAlphaSlider">
+            <div class="cp-alpha-gradient" id="cpAlphaGradient"></div>
+            <div class="cp-alpha-handle" id="cpAlphaHandle"></div>
+        </div>
+        
         <div class="cp-hex-container">
             <input type="text" class="cp-hex-input" id="cpHexInput" value="00FFEB" maxlength="6">
             <div class="cp-copy-btn" onclick="copyHex()" title="Copy">
@@ -570,6 +596,7 @@
     </div>
     
     <div class="menu-scroll">
+        <!-- Indicador que se move suavemente -->
         <div class="nav-indicator" id="navIndicator"></div>
         
         <div class="nav-item" id="nav-aimbot" onclick="handleNavClick('aimbot')">
@@ -779,20 +806,22 @@
     loop();
 })();
 
-// NAV INDICATOR - BOLINHA QUE SE MOVE
+// NAV INDICATOR - EFEITO SMOOTH
 function updateNavIndicator() {
     const activeNav = document.querySelector('.nav-item.active');
     const indicator = document.getElementById('navIndicator');
-    if (activeNav) {
+    if (activeNav && indicator) {
         const rect = activeNav.getBoundingClientRect();
         const menuRect = document.querySelector('.menu-scroll').getBoundingClientRect();
-        const top = rect.top - menuRect.top + (rect.height / 2) - 4;
+        // Calcula a posição relativa dentro do scroll container
+        const top = rect.top - menuRect.top;
         indicator.style.top = top + 'px';
     }
 }
 
 // NAVIGATION
 function handleNavClick(menuId) {
+    // Fecha outros menus
     if (menuId === 'visuals') {
         document.getElementById('nav-aimbot').classList.remove('expanded', 'active');
         document.getElementById('sub-aimbot').classList.remove('open');
@@ -808,6 +837,7 @@ function handleNavClick(menuId) {
     nav.classList.toggle('active');
     sub.classList.toggle('open');
     
+    // Atualiza o indicador smooth
     updateNavIndicator();
     
     if(sub.classList.contains('open')) {
@@ -988,7 +1018,7 @@ function applyState(state){
     scheduleRender();
 }
 
-// COLOR PICKER LOGIC
+// COLOR PICKER LOGIC - REFEITA E SINCRONIZADA
 var cpTarget=null, cpH=0.47, cpS=1, cpV=1, cpA=1;
 var cpPanel=document.getElementById('cpPanel');
 var cpSaturation=document.getElementById('cpSaturation');
@@ -1015,6 +1045,14 @@ function hex2hsv(hex){
   return[h/6,s,v];
 }
 
+function rgbStringToHex(rgbStr) {
+    if (!rgbStr) return '#00FFEB';
+    if (rgbStr.startsWith('#')) return rgbStr;
+    const match = rgbStr.match(/\d+/g);
+    if (!match || match.length < 3) return '#00FFEB';
+    return r2h(parseInt(match[0]), parseInt(match[1]), parseInt(match[2]));
+}
+
 function updateCP(){
   var hRgb=h2r(cpH,1,1); 
   var hHex=r2h(hRgb[0],hRgb[1],hRgb[2]);
@@ -1024,11 +1062,15 @@ function updateCP(){
   var rgb=h2r(cpH,cpS,cpV);
   var hex=r2h(rgb[0],rgb[1],rgb[2]);
   
+  // Atualiza gradiente alpha
   cpAlphaGradient.style.background='linear-gradient(to right,transparent,'+hex+')';
+  
+  // Atualiza preview no header (quadrado)
   cpDot.style.background=hex;
   cpDot.style.boxShadow = `0 0 8px ${hex}`;
   
   if(cpTarget){
+    // Aplica cor na bolinha alvo
     cpTarget.style.background = hex;
     cpHexInput.value = hex.replace('#','').toUpperCase();
     scheduleRender();
@@ -1039,18 +1081,35 @@ function openCP(el, title){
   cpTarget=el;
   if(title) cpTitle.textContent = title;
   
+  // Posicionamento inteligente
+  var rect = el.getBoundingClientRect();
+  var panelLeft = rect.right + 15; 
+  var panelTop = rect.top - 10;
+
+  if (panelLeft + 300 > window.innerWidth) {
+      panelLeft = rect.left - 315;
+  }
+
+  cpPanel.style.left = panelLeft + 'px';
+  cpPanel.style.top = panelTop + 'px';
+  
+  // SINCRONIZAÇÃO: Pega a cor exata da bolinha clicada
   var currentColor = el.style.backgroundColor || '#00FFEB';
   let hsv;
   if(currentColor.startsWith('#')) {
       hsv = hex2hsv(currentColor);
   } else {
-      hsv = [0.5, 1, 1]; 
+      // Converte RGB string para Hex primeiro
+      const hex = rgbStringToHex(currentColor);
+      hsv = hex2hsv(hex);
   }
   
+  // Atualiza valores internos
   cpH=hsv[0]; cpS=hsv[1]; cpV=hsv[2]; cpA=1;
   
   updateCP();
   
+  // Posiciona handles suavemente
   var satRect = cpSaturation.getBoundingClientRect();
   cpSatHandle.style.left = (cpS * satRect.width) + 'px';
   cpSatHandle.style.top = ((1-cpV) * satRect.height) + 'px';
@@ -1061,6 +1120,7 @@ function openCP(el, title){
   var alphaRect = cpAlphaSlider.getBoundingClientRect();
   cpAlphaHandle.style.left = (cpA * alphaRect.width) + 'px';
   
+  // Abre com animação smooth
   cpPanel.classList.add('open');
 }
 
