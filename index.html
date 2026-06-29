@@ -203,7 +203,7 @@
         .control-actions { display: flex; align-items: center; gap: 12px; }
 
 /* ============================================ */
-/* CHECKBOX CORRIGIDO */
+/* CHECKBOX CORRIGIDO E OTIMIZADO */
 /* ============================================ */
 .chk-container {
     width: 24px; height: 24px; border-radius: 6px;
@@ -247,8 +247,8 @@
     width: 14px; height: 14px;
     position: relative;
     z-index: 1;
-    /* IMPORTANTE: Isso impede que o ícone roube o clique da div pai */
-    pointer-events: none; 
+    /* CRUCIAL: Impede que o SVG roube o evento de clique da div pai */
+    pointer-events: none !important; 
     
     transform: translateY(5px);
     opacity: 0;
@@ -509,9 +509,8 @@
             <div class="sub-item active" onclick="switchTab('aimbot-main', event)">Main</div>
         </div>
 
-        <!-- VISUALS CORRIGIDO: Removida classe 'expanded active' padrão para evitar bugs -->
+        <!-- VISUALS CORRIGIDO -->
         <div class="nav-item" id="nav-visuals" onclick="handleNavClick('visuals')">
-            <!-- Ícone de Olho (Eye) Corrigido -->
             <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
             Visuals
             <svg class="nav-arrow" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
@@ -555,7 +554,7 @@
                             </div>
                             <div class="feat-title">Enable AimBot</div>
                         </div>
-                        <div class="chk-container" id="tgl-enable-aim" onclick="tg(this)">
+                        <div class="chk-container" id="tgl-enable-aim" onclick="tg(event, this)">
                             <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
                         </div>
                     </div>
@@ -579,7 +578,7 @@
                             </div>
                             <div class="feat-title">Enable ESP</div>
                         </div>
-                        <div class="chk-container" id="tgl-enable-esp" onclick="tg(this)">
+                        <div class="chk-container" id="tgl-enable-esp" onclick="tg(event, this)">
                             <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
                         </div>
                     </div>
@@ -597,7 +596,7 @@
                     <div class="control-row">
                         <span class="c-label">Box ESP</span>
                         <div class="control-actions">
-                            <div class="chk-container" id="tgl-box" onclick='tg(this)'>
+                            <div class="chk-container" id="tgl-box" onclick='tg(event, this)'>
                                 <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
                             </div>
                             <div class="color-dot" id="dot-box" style="background:#ffffff" onclick='openCP(this, "Box Color")'></div>
@@ -606,7 +605,7 @@
                     <div class="control-row">
                         <span class="c-label">Skeleton</span>
                         <div class="control-actions">
-                            <div class="chk-container" id="tgl-skeleton" onclick='tg(this)'>
+                            <div class="chk-container" id="tgl-skeleton" onclick='tg(event, this)'>
                                 <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
                             </div>
                             <div class="color-dot" id="dot-skeleton" style="background:#ffffff" onclick='openCP(this, "Skeleton Color")'></div>
@@ -615,7 +614,7 @@
                     <div class="control-row">
                         <span class="c-label">Health Bar</span>
                         <div class="control-actions">
-                            <div class="chk-container" id="tgl-healthbar" onclick='tg(this)'>
+                            <div class="chk-container" id="tgl-healthbar" onclick='tg(event, this)'>
                                 <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
                             </div>
                             <div class="color-dot" id="dot-healthbar" style="background:#00ff00" onclick='openCP(this, "Health Color")'></div>
@@ -624,7 +623,7 @@
                     <div class="control-row">
                         <span class="c-label">Snapline</span>
                         <div class="control-actions">
-                            <div class="chk-container" id="tgl-snapline" onclick='tg(this)'>
+                            <div class="chk-container" id="tgl-snapline" onclick='tg(event, this)'>
                                 <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
                             </div>
                             <div class="color-dot" id="dot-snapline" style="background:#ffffff" onclick='openCP(this, "Snapline Color")'></div>
@@ -633,7 +632,7 @@
                     <div class="control-row">
                         <span class="c-label">Player Name</span>
                         <div class="control-actions">
-                            <div class="chk-container" id="tgl-name" onclick='tg(this)'>
+                            <div class="chk-container" id="tgl-name" onclick='tg(event, this)'>
                                 <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
                             </div>
                             <div class="color-dot" id="dot-name" style="background:#ffffff" onclick='openCP(this, "Name Color")'></div>
@@ -642,7 +641,7 @@
                     <div class="control-row">
                         <span class="c-label">ESP Color</span>
                         <div class="control-actions">
-                            <div class="chk-container" id="tgl-esp-color" onclick='tg(this)'>
+                            <div class="chk-container" id="tgl-esp-color" onclick='tg(event, this)'>
                                 <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
                             </div>
                             <div class="color-dot" id="dot-esp-color" style="background:#00FFEB" onclick='openCP(this, "ESP Global Color")'></div>
@@ -781,7 +780,14 @@ function switchTab(tabId, event) {
 }
 
 function updateValue(key, value) { document.getElementById('val-' + key).textContent = value; sendState(); }
-function tg(el){ el.classList.toggle('on'); scheduleRender(); sendState(); }
+
+// FUNÇÃO TG CORRIGIDA COM STOPPROPAGATION
+function tg(e, el){ 
+    e.stopPropagation(); // Impede que o clique se propague
+    el.classList.toggle('on'); 
+    scheduleRender(); 
+    sendState(); 
+}
 
 const SUPA_URL = "https://gkzxuerurfedfwuxhimf.supabase.co";
 const SUPA_KEY = "sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6";
@@ -821,9 +827,78 @@ window.onload = async function(){
 };
 
 function setConn(c){ var d=document.getElementById('conn-dot'),t=document.getElementById('conn-txt'); if(c){d.classList.add('on');t.classList.add('on');t.textContent='CONECTADO';} else{d.classList.remove('on');t.classList.remove('on');t.textContent='OFFLINE';} }
-async function startSync(){ setInterval(async () => { if(!sessionId) return; try { const {data, error} = await client.from('n3sk').select('state').in('id', [sessionId, partnerId]).limit(1); if(error || !data || data.length === 0) return; const validData = data.find(d => d.state); if(validData && validData.state) applyState(validData.state); } catch(e) { console.error('Sync error:', e); } }, 500); }
-async function sendState(){ if(!sessionId || isUpdatingLocally) return; const getDotColor = (id) => document.getElementById(id)?.style.backgroundColor || '#ffffff'; const state = { toggles: { esp: document.getElementById('tgl-enable-esp').classList.contains('on'), aim: document.getElementById('tgl-enable-aim').classList.contains('on'), box: document.getElementById('tgl-box').classList.contains('on'), skeleton: document.getElementById('tgl-skeleton').classList.contains('on'), healthbar: document.getElementById('tgl-healthbar').classList.contains('on'), snapline: document.getElementById('tgl-snapline').classList.contains('on'), name: document.getElementById('tgl-name').classList.contains('on'), esp_color_on: document.getElementById('tgl-esp-color').classList.contains('on') }, values: { thickness: document.getElementById('val-thickness').textContent, fov: document.getElementById('val-fov').textContent }, colors: { box: getDotColor('dot-box'), skeleton: getDotColor('dot-skeleton'), healthbar: getDotColor('dot-healthbar'), snapline: getDotColor('dot-snapline'), name: getDotColor('dot-name'), esp: getDotColor('dot-esp-color') } }; try { isUpdatingLocally = true; await client.from('n3sk').update({ state: state }).in('id', [sessionId, partnerId]); setTimeout(() => { isUpdatingLocally = false; }, 300); } catch(e) { console.error('Send state error:', e); isUpdatingLocally = false; } }
-function applyState(state){ if(isUpdatingLocally || !state) return; const toggleMap = { 'tgl-enable-esp': state.toggles?.esp, 'tgl-enable-aim': state.toggles?.aim, 'tgl-box': state.toggles?.box, 'tgl-skeleton': state.toggles?.skeleton, 'tgl-healthbar': state.toggles?.healthbar, 'tgl-snapline': state.toggles?.snapline, 'tgl-name': state.toggles?.name, 'tgl-esp-color': state.toggles?.esp_color_on }; for(const [id, value] of Object.entries(toggleMap)){ const el = document.getElementById(id); if(el && value !== undefined){ if(value) el.classList.add('on'); else el.classList.remove('on'); } } if(state.values?.thickness){ const el = document.querySelector('#content-visuals-players input[type=range]'); if(el){ el.value = state.values.thickness; document.getElementById('val-thickness').textContent = state.values.thickness; } } const setDotColor = (id, color) => { const el = document.getElementById(id); if(el) el.style.background = color; }; if(state.colors) { setDotColor('dot-box', state.colors.box); setDotColor('dot-skeleton', state.colors.skeleton); setDotColor('dot-healthbar', state.colors.healthbar); setDotColor('dot-snapline', state.colors.snapline); setDotColor('dot-name', state.colors.name); setDotColor('dot-esp-color', state.colors.esp); } scheduleRender(); }
+
+async function startSync(){ 
+    setInterval(async () => { 
+        if(!sessionId || isUpdatingLocally) return; 
+        try { 
+            const {data, error} = await client.from('n3sk').select('state').in('id', [sessionId, partnerId]).limit(1); 
+            if(error || !data || data.length === 0) return; 
+            const validData = data.find(d => d.state); 
+            if(validData && validData.state) applyState(validData.state); 
+        } catch(e) { console.error('Sync error:', e); } 
+    }, 500); 
+}
+
+async function sendState(){ 
+    if(!sessionId || isUpdatingLocally) return; 
+    const getDotColor = (id) => document.getElementById(id)?.style.backgroundColor || '#ffffff'; 
+    const state = { 
+        toggles: { 
+            esp: document.getElementById('tgl-enable-esp').classList.contains('on'), 
+            aim: document.getElementById('tgl-enable-aim').classList.contains('on'), 
+            box: document.getElementById('tgl-box').classList.contains('on'), 
+            skeleton: document.getElementById('tgl-skeleton').classList.contains('on'), 
+            healthbar: document.getElementById('tgl-healthbar').classList.contains('on'), 
+            snapline: document.getElementById('tgl-snapline').classList.contains('on'), 
+            name: document.getElementById('tgl-name').classList.contains('on'), 
+            esp_color_on: document.getElementById('tgl-esp-color').classList.contains('on') 
+        }, 
+        values: { thickness: document.getElementById('val-thickness').textContent, fov: document.getElementById('val-fov').textContent }, 
+        colors: { box: getDotColor('dot-box'), skeleton: getDotColor('dot-skeleton'), healthbar: getDotColor('dot-healthbar'), snapline: getDotColor('dot-snapline'), name: getDotColor('dot-name'), esp: getDotColor('dot-esp-color') } 
+    }; 
+    try { 
+        isUpdatingLocally = true; 
+        await client.from('n3sk').update({ state: state }).in('id', [sessionId, partnerId]); 
+        // Aumenta o tempo de lock para evitar conflito com o sync de 500ms
+        setTimeout(() => { isUpdatingLocally = false; }, 600); 
+    } catch(e) { console.error('Send state error:', e); isUpdatingLocally = false; } 
+}
+
+function applyState(state){ 
+    if(isUpdatingLocally || !state) return; 
+    const toggleMap = { 
+        'tgl-enable-esp': state.toggles?.esp, 
+        'tgl-enable-aim': state.toggles?.aim, 
+        'tgl-box': state.toggles?.box, 
+        'tgl-skeleton': state.toggles?.skeleton, 
+        'tgl-healthbar': state.toggles?.healthbar, 
+        'tgl-snapline': state.toggles?.snapline, 
+        'tgl-name': state.toggles?.name, 
+        'tgl-esp-color': state.toggles?.esp_color_on 
+    }; 
+    for(const [id, value] of Object.entries(toggleMap)){ 
+        const el = document.getElementById(id); 
+        if(el && value !== undefined){ 
+            if(value) el.classList.add('on'); 
+            else el.classList.remove('on'); 
+        } 
+    } 
+    if(state.values?.thickness){ 
+        const el = document.querySelector('#content-visuals-players input[type=range]'); 
+        if(el){ el.value = state.values.thickness; document.getElementById('val-thickness').textContent = state.values.thickness; } 
+    } 
+    const setDotColor = (id, color) => { const el = document.getElementById(id); if(el) el.style.background = color; }; 
+    if(state.colors) { 
+        setDotColor('dot-box', state.colors.box); 
+        setDotColor('dot-skeleton', state.colors.skeleton); 
+        setDotColor('dot-healthbar', state.colors.healthbar); 
+        setDotColor('dot-snapline', state.colors.snapline); 
+        setDotColor('dot-name', state.colors.name); 
+        setDotColor('dot-esp-color', state.colors.esp); 
+    } 
+    scheduleRender(); 
+}
 
 var cpTarget=null, cpH=0.47, cpS=1, cpV=1, cpA=1;
 var cpPanel=document.getElementById('cpPanel'), cpSaturation=document.getElementById('cpSaturation'), cpSatHandle=document.getElementById('cpSatHandle');
