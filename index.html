@@ -749,19 +749,17 @@ function handleNavClick(menuId) {
     nav.classList.toggle('active');
     sub.classList.toggle('open');
     
-    // UMA CHAMADA APENAS ✅
-    updateNavIndicator();
-    
-    // REMOVA ISTO ❌
-    // setTimeout(() => {
-    //     updateNavIndicator();
-    // }, 300);
+    // Delay pequeno pra renderizar antes de calcular
+    setTimeout(() => {
+        updateNavIndicator();
+    }, 50);
     
     if(sub.classList.contains('open')) {
         const firstItem = sub.querySelector('.sub-item');
         if(firstItem) firstItem.click();
     }
 }
+    
 function switchTab(tabId, event) {
     if(event) event.stopPropagation();
     
@@ -781,8 +779,8 @@ function switchTab(tabId, event) {
         updateSubIndicator(event.target);
     }
     
-    // ADICIONE ISTO - Recalcula a barra verde quando muda de aba
-    updateNavIndicator();
+    // REMOVA ESTA LINHA
+    // updateNavIndicator();
     
     scheduleRender();
 }
