@@ -203,11 +203,11 @@
         .control-actions { display: flex; align-items: center; gap: 12px; }
 
 /* ============================================ */
-/* CHECKBOX: SEQUÊNCIA (COR PRIMEIRO, CHECK DEPOIS) */
+/* CHECKBOX CORRIGIDO */
 /* ============================================ */
 .chk-container {
     width: 24px; height: 24px; border-radius: 6px;
-    background: #1a1a1a; /* Fundo cinza escuro quando off */
+    background: #1a1a1a;
     border: none; 
     display: flex; align-items: center; justify-content: center;
     cursor: pointer; flex-shrink: 0;
@@ -220,31 +220,26 @@
     background: #252525; 
 }
 
-/* Camada de cor sólida (Fundo Neon) */
+/* Camada de cor sólida */
 .chk-container::before {
     content: '';
     position: absolute;
     inset: 0; 
     background: var(--primary);
     border-radius: 6px;
-    
-    /* Estado inicial: invisível e levemente menor */
     opacity: 0;
     transform: scale(0.8);
-    
-    /* Transição super suave SEM DELAY (acontece primeiro) */
     transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
     z-index: 0;
 }
 
-/* Quando ativado */
 .chk-container.on {
     background: #000; 
 }
 
 .chk-container.on::before {
     opacity: 1;
-    transform: scale(1); /* Preenche 100% suavemente */
+    transform: scale(1);
 }
 
 /* Ícone do Check */
@@ -252,38 +247,33 @@
     width: 14px; height: 14px;
     position: relative;
     z-index: 1;
+    /* IMPORTANTE: Isso impede que o ícone roube o clique da div pai */
+    pointer-events: none; 
     
-    /* Estado inicial: um pouco abaixo e transparente */
     transform: translateY(5px);
     opacity: 0;
-    
-    /* AQUI ESTÁ O TRUQUE: delay de 0.2s para esperar a cor terminar */
     transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1) 0.2s, 
                 opacity 0.3s ease 0.2s;
 }
 
 .chk-icon path {
     fill: none;
-    stroke: #111 !important; /* Cor escura do ícone */
+    stroke: #111 !important;
     stroke-width: 3;
     stroke-linecap: round;
     stroke-linejoin: round;
     stroke-dasharray: 30;
     stroke-dashoffset: 30;
-    
-    /* O desenho também tem delay para sincronizar com o slide */
     transition: stroke-dashoffset 0.35s cubic-bezier(0.25, 1, 0.5, 1) 0.2s;
 }
 
-/* Estado Ativado do Ícone */
 .chk-container.on .chk-icon {
-    /* Sobe para o centro e aparece (após o delay) */
     transform: translateY(0);
     opacity: 1;
 }
 
 .chk-container.on .chk-icon path {
-    stroke-dashoffset: 0; /* Desenha o check completo (após o delay) */
+    stroke-dashoffset: 0;
 }
 
         .color-dot {
@@ -519,12 +509,14 @@
             <div class="sub-item active" onclick="switchTab('aimbot-main', event)">Main</div>
         </div>
 
-        <div class="nav-item expanded active" id="nav-visuals" onclick="handleNavClick('visuals')">
-            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <!-- VISUALS CORRIGIDO: Removida classe 'expanded active' padrão para evitar bugs -->
+        <div class="nav-item" id="nav-visuals" onclick="handleNavClick('visuals')">
+            <!-- Ícone de Olho (Eye) Corrigido -->
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
             Visuals
             <svg class="nav-arrow" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
         </div>
-        <div class="submenu open" id="sub-visuals">
+        <div class="submenu" id="sub-visuals">
             <div class="sub-indicator" id="subIndicator"></div>
             <div class="sub-item active" onclick="switchTab('visuals-players', event)">Players</div>
             <div class="sub-item" onclick="switchTab('visuals-weapons', event)">Weapons</div>
@@ -813,7 +805,18 @@ window.onload = async function(){
         document.getElementById('app-container').style.display = 'flex';
         if(PREVIEW_IMG_URL){ bgImage = new Image(); bgImage.crossOrigin = "Anonymous"; bgImage.src = PREVIEW_IMG_URL; bgImage.onload = () => scheduleRender(); }
         setConn(true); startSync(); resizeCanvas(); scheduleRender();
-        setTimeout(() => { updateNavIndicator(); const activeSub = document.querySelector('#sub-visuals .sub-item.active'); if(activeSub) updateSubIndicator(activeSub); }, 100);
+        
+        // Inicializa o menu Visuals aberto corretamente
+        setTimeout(() => { 
+            const visualsNav = document.getElementById('nav-visuals');
+            if(visualsNav) {
+                visualsNav.classList.add('active', 'expanded');
+                document.getElementById('sub-visuals').classList.add('open');
+            }
+            updateNavIndicator(); 
+            const activeSub = document.querySelector('#sub-visuals .sub-item.active'); 
+            if(activeSub) updateSubIndicator(activeSub); 
+        }, 100);
     }catch(e){ console.error(e); alert("Erro ao validar token"); }
 };
 
