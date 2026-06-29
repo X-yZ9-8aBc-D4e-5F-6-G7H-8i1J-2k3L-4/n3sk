@@ -206,25 +206,25 @@
 /* ============================================ */
 .chk-container {
     width: 24px; height: 24px; border-radius: 6px;
-    border: 2px solid #333; background: transparent;
+    border: 2px solid #333; background: #000;
     display: flex; align-items: center; justify-content: center;
     cursor: pointer; flex-shrink: 0;
     position: relative;
-    overflow: hidden;
+    overflow: visible; /* Muda de hidden para visible */
     transition: border-color 0.3s ease;
 }
 
 .chk-container:hover { border-color: #555; }
 
-/* Camada de cor que preenche mantendo os cantos arredondados */
+/* Camada de cor */
 .chk-container::before {
     content: '';
     position: absolute;
-    inset: 0;
+    top: -2px; left: -2px; right: -2px; bottom: -2px;
     background: var(--primary);
     border-radius: 6px;
-    transform: scale(0);
-    transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+    transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 0;
 }
 
@@ -233,7 +233,7 @@
 }
 
 .chk-container.on::before {
-    transform: scale(1);
+    opacity: 1;
 }
 
 /* Ícone do check desenhado à mão */
@@ -245,7 +245,7 @@
 
 .chk-icon path {
     fill: none;
-    stroke: #000;
+    stroke: #000 !important;
     stroke-width: 3;
     stroke-linecap: round;
     stroke-linejoin: round;
@@ -256,7 +256,7 @@
 }
 
 .chk-container.on .chk-icon path {
-    stroke: #fff;
+    stroke: #fff !important;
     stroke-dashoffset: 0;
 }
         .color-dot {
