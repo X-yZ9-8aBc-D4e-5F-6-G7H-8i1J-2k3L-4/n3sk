@@ -201,70 +201,73 @@
         input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 
         .control-actions { display: flex; align-items: center; gap: 12px; }
-/* ============================================ */
-/* CHECKBOX COM EFEITO DIAGONAL + CHECK DESCENDO */
-/* ============================================ */
-.chk-container {
-    width: 24px; 
-    height: 24px; 
-    border-radius: 6px;
-    border: none; /* SEM CONTORNO */
-    background: transparent;
-    display: flex; 
-    align-items: center; 
-    justify-content: center;
-    cursor: pointer; 
-    flex-shrink: 0;
-    position: relative;
-    overflow: hidden;
-}
 
-/* Preenchimento que vem do canto INFERIOR DIREITO na diagonal */
-.chk-container::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--primary);
-    border-radius: 6px;
-    clip-path: circle(0% at bottom right);
-    transition: clip-path 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 0;
-}
+        /* ============================================ */
+        /* CHECKBOX COM EFEITO DIAGONAL + CHECK DESCENDO */
+        /* ============================================ */
+        .chk-container {
+            width: 24px; 
+            height: 24px; 
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            cursor: pointer; 
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
 
-.chk-container.on::before {
-    clip-path: circle(150% at bottom right);
-}
+        /* Preenchimento que vem do canto INFERIOR DIREITO na diagonal */
+        .chk-container::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--primary);
+            border-radius: 6px;
+            clip-path: circle(0% at bottom right);
+            transition: clip-path 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 0;
+        }
 
-/* Ícone do check desenhado à mão */
-.chk-icon {
-    width: 14px; 
-    height: 14px;
-    position: relative;
-    z-index: 1;
-}
+        .chk-container.on::before {
+            clip-path: circle(150% at bottom right);
+        }
 
-.chk-icon path {
-    fill: none;
-    stroke: #000; /* Check ESCURO */
-    stroke-width: 3;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-dasharray: 30;
-    stroke-dashoffset: 30;
-    /* Check começa invisível e lá de cima */
-    transform: translateY(-20px);
-    opacity: 0;
-    transition: stroke-dashoffset 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.25s,
-                transform 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.25s,
-                opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.25s;
-}
+        /* Ícone do check desenhado à mão */
+        .chk-icon {
+            width: 14px; 
+            height: 14px;
+            position: relative;
+            z-index: 1;
+        }
 
-/* Quando ativo: check desce para o centro */
-.chk-container.on .chk-icon path {
-    stroke-dashoffset: 0;
-    transform: translateY(0);
-    opacity: 1;
-}
+        .chk-icon path {
+            fill: none;
+            stroke: #000;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 30;
+            stroke-dashoffset: 30;
+            /* Check começa invisível e lá de cima */
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: stroke-dashoffset 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.25s,
+                        transform 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.25s,
+                        opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.25s;
+        }
+
+        /* Quando ativo: check desce para o centro */
+        .chk-container.on .chk-icon path {
+            stroke-dashoffset: 0;
+            transform: translateY(0);
+            opacity: 1;
+        }
+
         .color-dot {
             width: 28px; height: 28px; border-radius: 6px;
             background: #333; 
@@ -499,7 +502,7 @@
         </div>
 
         <div class="nav-item expanded active" id="nav-visuals" onclick="handleNavClick('visuals')">
-            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             Visuals
             <svg class="nav-arrow" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
         </div>
