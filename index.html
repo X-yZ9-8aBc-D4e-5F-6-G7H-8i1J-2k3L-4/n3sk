@@ -749,12 +749,8 @@ function handleNavClick(menuId) {
     nav.classList.toggle('active');
     sub.classList.toggle('open');
     
-    // REMOVA ESTE: updateNavIndicator(); ❌
-    
-    // MANTENHA APENAS ESTE - Chama uma única vez após a transição
-    setTimeout(() => {
-        updateNavIndicator();
-    }, 400);
+    // Atualizar IMEDIATAMENTE - UMA VEZ APENAS ✅
+    updateNavIndicator();
     
     if(sub.classList.contains('open')) {
         const firstItem = sub.querySelector('.sub-item');
