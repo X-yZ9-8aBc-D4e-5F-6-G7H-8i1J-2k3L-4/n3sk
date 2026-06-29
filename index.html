@@ -749,19 +749,19 @@ function handleNavClick(menuId) {
     nav.classList.toggle('active');
     sub.classList.toggle('open');
     
-    updateNavIndicator(); // Imediato
+    // UMA CHAMADA APENAS ✅
+    updateNavIndicator();
     
-    // ADICIONE ISTO - Recalcula após animação do submenu
-    setTimeout(() => {
-        updateNavIndicator();
-    }, 300);
+    // REMOVA ISTO ❌
+    // setTimeout(() => {
+    //     updateNavIndicator();
+    // }, 300);
     
     if(sub.classList.contains('open')) {
         const firstItem = sub.querySelector('.sub-item');
         if(firstItem) firstItem.click();
     }
 }
-
 function switchTab(tabId, event) {
     if(event) event.stopPropagation();
     
