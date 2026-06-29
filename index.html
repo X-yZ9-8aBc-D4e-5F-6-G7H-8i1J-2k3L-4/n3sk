@@ -139,9 +139,10 @@
         }
         .submenu.open { max-height: 200px; }
         
-        /* Linha conectora vertical do submenu */
+        /* Linha conectora vertical do submenu - CORRIGIDA PARA COINCIDIR COM A BOLINHA */
         .submenu::before {
-            content: ''; position: absolute; left: 35px; top: 0; bottom: 0;
+            content: ''; position: absolute; left: 34.5px; /* 32px (left da bolinha) + 3px (metade da largura) */
+            top: 0; bottom: 0;
             width: 1px; background: #2a2a2a; z-index: 1;
         }
 
