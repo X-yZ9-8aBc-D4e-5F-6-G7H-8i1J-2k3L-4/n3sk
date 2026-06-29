@@ -203,7 +203,7 @@
         .control-actions { display: flex; align-items: center; gap: 12px; }
 
 /* ============================================ */
-/* CHECKBOX COM EFEITO DE DESENHO + EXPANSÃO SUAVE */
+/* CHECKBOX COM EFEITO DE DESENHO + REVELAÇÃO SUAVE */
 /* ============================================ */
 .chk-container {
     width: 24px; height: 24px; border-radius: 6px;
@@ -216,17 +216,14 @@
 }
 .chk-container:hover { border-color: #555; }
 
-/* Camada de cor que se expande do canto SUPERIOR ESQUERDO */
+/* Camada de cor que se revela do canto SUPERIOR ESQUERDO */
 .chk-container::before {
     content: '';
     position: absolute;
-    top: -3px; left: -3px;
-    width: calc(100% + 6px); height: calc(100% + 6px);
+    inset: 0;
     background: var(--primary);
-    /* SEM border-radius — o overflow:hidden do container faz o corte */
-    transform-origin: top left;
-    transform: scale(0);
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    clip-path: inset(100% 0 0 100%); /* Começa escondido (cortado em cima e esquerda) */
+    transition: clip-path 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 0;
 }
 
@@ -235,7 +232,7 @@
 }
 
 .chk-container.on::before {
-    transform: scale(1);
+    clip-path: inset(0 0 0 0); /* Totalmente visível */
 }
 
 /* Ícone do check desenhado à mão */
