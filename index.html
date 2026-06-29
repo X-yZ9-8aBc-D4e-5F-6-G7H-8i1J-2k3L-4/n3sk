@@ -749,8 +749,12 @@ function handleNavClick(menuId) {
     nav.classList.toggle('active');
     sub.classList.toggle('open');
     
-    // Chama imediatamente - a transição CSS faz o resto
-    updateNavIndicator();
+    updateNavIndicator(); // Imediato
+    
+    // ADICIONE ISTO - Recalcula após animação do submenu
+    setTimeout(() => {
+        updateNavIndicator();
+    }, 300);
     
     if(sub.classList.contains('open')) {
         const firstItem = sub.querySelector('.sub-item');
@@ -774,9 +778,11 @@ function switchTab(tabId, event) {
     document.querySelectorAll('.sub-item').forEach(el => el.classList.remove('active'));
     if(event && event.target.classList.contains('sub-item')) {
         event.target.classList.add('active');
-        // Move a bolinha suavemente para o item clicado
         updateSubIndicator(event.target);
     }
+    
+    // ADICIONE ISTO - Recalcula a barra verde quando muda de aba
+    updateNavIndicator();
     
     scheduleRender();
 }
