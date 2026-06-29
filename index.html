@@ -749,10 +749,12 @@ function handleNavClick(menuId) {
     nav.classList.toggle('active');
     sub.classList.toggle('open');
     
-    // Chama uma única vez com delay REDUZIDO ⚡
+    // REMOVA ESTE: updateNavIndicator(); ❌
+    
+    // MANTENHA APENAS ESTE - Chama uma única vez após a transição
     setTimeout(() => {
         updateNavIndicator();
-    }, 300); // ← Mudou de 400 para 100ms
+    }, 300);
     
     if(sub.classList.contains('open')) {
         const firstItem = sub.querySelector('.sub-item');
