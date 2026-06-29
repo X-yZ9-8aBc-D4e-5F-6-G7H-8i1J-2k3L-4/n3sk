@@ -5,7 +5,6 @@
     <meta name='viewport' content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no'>
     <title>N3SK Cloud Control</title>
     
-    <!-- Bibliotecas Externas -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -59,7 +58,7 @@
         .loading-text { color: var(--primary); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; animation: blink 2s ease-in-out infinite; }
         @keyframes blink { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
 
-        /* BARRA LATERAL (SIDEBAR) */
+        /* SIDEBAR */
         .sidebar {
             width: 240px; background: var(--sidebar); border-right: 1px solid var(--border);
             display: flex; flex-direction: column; flex-shrink: 0; z-index: 10;
@@ -80,7 +79,7 @@
         .menu-scroll { flex: 1; overflow-y: auto; padding: 10px 0; }
         .menu-scroll::-webkit-scrollbar { width: 0px; }
 
-        /* ESTILO DO MENU - BARRA ESQUERDA PEQUENA */
+        /* NAV ITEM STYLE */
         .nav-item {
             display: flex; align-items: center; padding: 12px 20px; cursor: pointer;
             transition: all 0.2s ease; color: var(--muted); font-weight: 500; gap: 12px;
@@ -98,7 +97,6 @@
         .nav-arrow { margin-left: auto; width: 12px; height: 12px; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .nav-item.expanded .nav-arrow { transform: rotate(90deg); }
 
-        /* SUBMENU COM LINHA CONECTORA */
         .submenu { 
             max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
             background: rgba(0,0,0,0.2); position: relative;
@@ -142,7 +140,7 @@
             100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
         }
 
-        /* ÁREA PRINCIPAL */
+        /* MAIN CONTENT */
         .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); position: relative; }
         .top-bar {
             height: 50px; border-bottom: 1px solid var(--border); display: flex; align-items: center;
@@ -186,10 +184,10 @@
             box-shadow: 0 0 8px rgba(0, 255, 235, 0.4);
         }
 
-        /* CHECKBOX E COLOR DOT */
-        .control-actions { display: flex; align-items: center; gap: 12px; }
+        /* CHECKBOX & COLOR DOT CONTAINER */
+        .control-actions { display: flex; align-items: center; gap: 12px; position: relative; }
 
-        /* CHECKBOX MAIOR E CORRIGIDA */
+        /* CHECKBOX STYLE */
         .chk-container {
             width: 24px; height: 24px; border-radius: 6px;
             border: 2px solid #333; background: transparent;
@@ -208,17 +206,75 @@
         }
         .chk-container.on .chk-icon { transform: scale(1); }
 
-        /* BOLINHA DE COR */
+        /* COLOR DOT - SEM BORDA, APENAS COR SÓLIDA */
         .color-dot {
             width: 18px; height: 18px; border-radius: 50%;
-            background: #333; border: 2px solid #444;
+            background: #333; 
+            border: none; /* Remove contorno */
             cursor: pointer; flex-shrink: 0;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s;
         }
-        .color-dot:hover { transform: scale(1.1); box-shadow: 0 0 8px rgba(255,255,255,0.2); }
-        .color-dot.active { border-color: #fff; }
+        .color-dot:hover { transform: scale(1.1); }
 
-        /* PREVIEW AO VIVO */
+        /* FLOATING COLOR PICKER POPUP (Ao lado da bolinha) */
+        .cp-popup {
+            position: absolute;
+            top: 50%; left: 100%; transform: translate(10px, -50%); /* Posiciona ao lado */
+            width: 240px;
+            background: #151515;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 12px;
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            
+            /* Efeito Smooth de Deslize */
+            opacity: 0; visibility: hidden;
+            transform: translate(0px, -50%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+        .cp-popup.open {
+            opacity: 1; visibility: visible;
+            transform: translate(10px, -50%);
+            pointer-events: auto;
+        }
+
+        .cp-saturation {
+            width: 100%; height: 120px; border-radius: 6px; position: relative; overflow: hidden;
+            cursor: crosshair; background: linear-gradient(to right, #fff, var(--primary));
+            margin-bottom: 10px;
+        }
+        .cp-sat-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, #000); pointer-events: none; }
+        .cp-sat-handle {
+            position: absolute; width: 12px; height: 12px; border: 2px solid #fff; border-radius: 50%;
+            transform: translate(-50%, -50%); box-shadow: 0 2px 4px rgba(0,0,0,0.4); pointer-events: none;
+        }
+        
+        .cp-hue-slider {
+            width: 100%; height: 8px; border-radius: 4px; position: relative; cursor: pointer;
+            background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+            margin-bottom: 10px;
+        }
+        .cp-hue-handle {
+            position: absolute; top: 50%; transform: translate(-50%, -50%);
+            width: 10px; height: 10px; background: #fff; border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .cp-alpha-slider {
+            width: 100%; height: 8px; border-radius: 4px; position: relative; cursor: pointer;
+            background-image: linear-gradient(45deg, #333 25%, transparent 25%), linear-gradient(-45deg, #333 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #333 75%), linear-gradient(-45deg, transparent 75%, #333 75%);
+            background-size: 6px 6px; background-position: 0 0, 0 3px, 3px -3px, -3px 0px;
+        }
+        .cp-alpha-gradient { position: absolute; inset: 0; border-radius: 4px; }
+        .cp-alpha-handle {
+            position: absolute; top: 50%; transform: translate(-50%, -50%);
+            width: 10px; height: 10px; background: #fff; border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* LIVE PREVIEW */
         .live-preview-container {
             position: absolute; top: 0; right: 0; bottom: 0; width: 420px; height: 100%;
             background: var(--card); border-left: 1px solid var(--border);
@@ -235,82 +291,7 @@
         }
         .lp-canvas-wrap canvas { display: block; max-width: 100%; max-height: 100%; object-fit: contain; }
 
-        /* COLOR PICKER LATERAL (DRAWER) */
-        .cp-side-panel {
-            position: absolute; top: 0; right: 0; bottom: 0; width: 300px;
-            background: #111; border-left: 1px solid var(--border);
-            transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 20; display: flex; flex-direction: column;
-            box-shadow: -10px 0 30px rgba(0,0,0,0.8);
-        }
-        .cp-side-panel.open { transform: translateX(0); }
-        
-        .cp-header {
-            padding: 16px; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: space-between;
-        }
-        .cp-title-group { display: flex; align-items: center; gap: 10px; }
-        .cp-dot { width: 16px; height: 16px; border-radius: 50%; background: var(--primary); box-shadow: 0 0 8px var(--primary); }
-        .cp-title { font-size: 14px; font-weight: 600; color: #fff; }
-        .cp-close {
-            width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
-            color: #666; cursor: pointer; border-radius: 4px; transition: all 0.2s;
-        }
-        .cp-close:hover { background: #222; color: #fff; }
-        
-        .cp-body { padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 20px; }
-        
-        .cp-sliders-container { display: flex; align-items: stretch; height: 200px; }
-        
-        .cp-saturation {
-            flex: 1; border-radius: 8px; position: relative; overflow: hidden;
-            cursor: crosshair; background: linear-gradient(to right, #fff, var(--primary));
-            margin-right: 15px;
-        }
-        .cp-sat-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, #000); pointer-events: none; }
-        .cp-sat-handle {
-            position: absolute; width: 18px; height: 18px; border: 3px solid #fff; border-radius: 50%;
-            transform: translate(-50%, -50%); box-shadow: 0 2px 8px rgba(0,0,0,0.4); pointer-events: none;
-        }
-        
-        .cp-hue-slider {
-            width: 24px; height: 100%; border-radius: 8px; position: relative; cursor: pointer;
-            background: linear-gradient(to bottom, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
-        }
-        .cp-hue-handle {
-            position: absolute; left: 50%; transform: translate(-50%, -50%);
-            width: 28px; height: 10px; background: #fff; border: 2px solid #fff; border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-        
-        .cp-alpha-container { display: flex; flex-direction: column; gap: 12px; }
-        .cp-alpha-slider {
-            width: 100%; height: 24px; border-radius: 8px; position: relative; cursor: pointer;
-            background-image: linear-gradient(45deg, #333 25%, transparent 25%), linear-gradient(-45deg, #333 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #333 75%), linear-gradient(-45deg, transparent 75%, #333 75%);
-            background-size: 10px 10px; background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
-        }
-        .cp-alpha-gradient { position: absolute; inset: 0; border-radius: 8px; }
-        .cp-alpha-handle {
-            position: absolute; top: 50%; transform: translateY(-50%);
-            width: 28px; height: 28px; background: #fff; border: 3px solid #fff; border-radius: 50%;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.4); margin-left: -14px;
-        }
-        
-        .cp-hex-container {
-            display: flex; align-items: center; background: #0a0a0a; border-radius: 6px;
-            padding: 10px 12px; border: 1px solid #2a2a2a;
-        }
-        .cp-hex-input {
-            flex: 1; background: transparent; border: none; color: #fff;
-            font-family: 'Courier New', monospace; font-size: 13px; font-weight: 600;
-            outline: none; text-transform: uppercase; letter-spacing: 1px;
-        }
-        .cp-copy-btn {
-            width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
-            color: #666; cursor: pointer; border-radius: 4px; transition: all 0.2s; margin-left: 8px;
-        }
-        .cp-copy-btn:hover { background: #2a2a2a; color: var(--primary); }
-
-        /* MODAL QR */
+        /* Modal QR */
         #qr-modal {
             position: fixed; inset: 0; z-index: 9999; display: none; align-items: center; justify-content: center;
             background: rgba(0,0,0,0.9); backdrop-filter: blur(8px);
@@ -344,7 +325,6 @@
             .submenu { display: none !important; }
             .content-area { flex-direction: column; }
             .live-preview-container { position: relative; top: 0; right: 0; width: 100%; height: 60vh; border-left: none; border-top: 1px solid var(--border); }
-            .cp-side-panel { width: 100%; }
             .config-panel { max-width: 100%; }
         }
     </style>
@@ -359,51 +339,6 @@
 
 <!-- CUSTOM CURSOR -->
 <div id="custom-cursor"></div>
-
-<!-- SIDE COLOR PICKER PANEL (DRAWER) -->
-<div class="cp-side-panel" id="cpPanel">
-    <div class="cp-header">
-        <div class="cp-title-group">
-            <div class="cp-dot" id="cpDot"></div>
-            <div class="cp-title" id="cpTitle">ESP Color</div>
-        </div>
-        <div class="cp-close" onclick="closeCP()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-        </div>
-    </div>
-    
-    <div class="cp-body">
-        <div class="cp-sliders-container">
-            <div class="cp-saturation" id="cpSaturation">
-                <div class="cp-sat-overlay"></div>
-                <div class="cp-sat-handle" id="cpSatHandle"></div>
-            </div>
-            <div class="cp-hue-slider" id="cpHueSlider">
-                <div class="cp-hue-handle" id="cpHueHandle"></div>
-            </div>
-        </div>
-        
-        <div class="cp-alpha-container">
-            <div class="cp-alpha-slider" id="cpAlphaSlider">
-                <div class="cp-alpha-gradient" id="cpAlphaGradient"></div>
-                <div class="cp-alpha-handle" id="cpAlphaHandle"></div>
-            </div>
-            
-            <div class="cp-hex-container">
-                <input type="text" class="cp-hex-input" id="cpHexInput" value="00FFEB" maxlength="6">
-                <div class="cp-copy-btn" onclick="copyHex()" title="Copy">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- QR MODAL -->
 <div id="qr-modal">
@@ -532,7 +467,9 @@
                             <div class="chk-container" id="tgl-box" onclick='tg(this)'>
                                 <svg class="chk-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
                             </div>
-                            <div class="color-dot" id="dot-box" style="background:#ffffff" onclick='openCP(this, "Box Color")'></div>
+                            <div class="color-dot" id="dot-box" style="background:#ffffff" onclick='openCP(this, "Box Color", "popup-tgl-box")'></div>
+                            <!-- Hidden Popup for Box -->
+                            <div class="cp-popup" id="popup-tgl-box"></div>
                         </div>
                     </div>
 
@@ -543,7 +480,8 @@
                             <div class="chk-container" id="tgl-skeleton" onclick='tg(this)'>
                                 <svg class="chk-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
                             </div>
-                            <div class="color-dot" id="dot-skeleton" style="background:#ffffff" onclick='openCP(this, "Skeleton Color")'></div>
+                            <div class="color-dot" id="dot-skeleton" style="background:#ffffff" onclick='openCP(this, "Skeleton Color", "popup-tgl-skeleton")'></div>
+                            <div class="cp-popup" id="popup-tgl-skeleton"></div>
                         </div>
                     </div>
 
@@ -554,7 +492,8 @@
                             <div class="chk-container" id="tgl-healthbar" onclick='tg(this)'>
                                 <svg class="chk-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
                             </div>
-                            <div class="color-dot" id="dot-healthbar" style="background:#00ff00" onclick='openCP(this, "Health Color")'></div>
+                            <div class="color-dot" id="dot-healthbar" style="background:#00ff00" onclick='openCP(this, "Health Color", "popup-tgl-healthbar")'></div>
+                            <div class="cp-popup" id="popup-tgl-healthbar"></div>
                         </div>
                     </div>
 
@@ -565,7 +504,8 @@
                             <div class="chk-container" id="tgl-snapline" onclick='tg(this)'>
                                 <svg class="chk-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
                             </div>
-                            <div class="color-dot" id="dot-snapline" style="background:#ffffff" onclick='openCP(this, "Snapline Color")'></div>
+                            <div class="color-dot" id="dot-snapline" style="background:#ffffff" onclick='openCP(this, "Snapline Color", "popup-tgl-snapline")'></div>
+                            <div class="cp-popup" id="popup-tgl-snapline"></div>
                         </div>
                     </div>
 
@@ -576,7 +516,8 @@
                             <div class="chk-container" id="tgl-name" onclick='tg(this)'>
                                 <svg class="chk-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
                             </div>
-                            <div class="color-dot" id="dot-name" style="background:#ffffff" onclick='openCP(this, "Name Color")'></div>
+                            <div class="color-dot" id="dot-name" style="background:#ffffff" onclick='openCP(this, "Name Color", "popup-tgl-name")'></div>
+                            <div class="cp-popup" id="popup-tgl-name"></div>
                         </div>
                     </div>
                     
@@ -587,7 +528,8 @@
                             <div class="chk-container" id="tgl-esp-color" onclick='tg(this)'>
                                 <svg class="chk-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
                             </div>
-                            <div class="color-dot" id="dot-esp-color" style="background:#00FFEB" onclick='openCP(this, "ESP Global Color")'></div>
+                            <div class="color-dot" id="dot-esp-color" style="background:#00FFEB" onclick='openCP(this, "ESP Global Color", "popup-tgl-esp-color")'></div>
+                            <div class="cp-popup" id="popup-tgl-esp-color"></div>
                         </div>
                     </div>
                 </div>
@@ -685,15 +627,14 @@ function updateValue(key, value) {
     sendState();
 }
 
-// Checkbox Toggle Function - CORRIGIDO PARA NÃO PISCAR
+// Checkbox Toggle Function
 function tg(el){ 
-    // Alterna visualmente imediatamente
     el.classList.toggle('on'); 
     scheduleRender();
     sendState(); 
 }
 
-// SUPABASE CONFIG
+// SUPABASE
 const SUPA_URL = "https://gkzxuerurfedfwuxhimf.supabase.co";
 const SUPA_KEY = "sb_publishable_JiinWFKDmAz_lU6f8KVQOQ_nNywVbb6";
 const client = supabase.createClient(SUPA_URL, SUPA_KEY);
@@ -703,7 +644,7 @@ let sessionId = null;
 let partnerId = null;
 let isGlobal = false;
 let bgImage = null;
-let isUpdatingLocally = false; // TRAVA DE SEGURANÇA PARA EVITAR BUG DE PISCAR
+let isUpdatingLocally = false; 
 
 window.onload = async function(){
     const token = new URLSearchParams(window.location.search).get('token');
@@ -768,7 +709,7 @@ async function startSync(){
 async function sendState(){
     if(!sessionId || isUpdatingLocally) return;
     
-    // Coleta cores das bolinhas
+    // Collect colors from dots
     const getDotColor = (id) => document.getElementById(id)?.style.backgroundColor || '#ffffff';
 
     const state = {
@@ -794,14 +735,14 @@ async function sendState(){
     };
     
     try {
-        isUpdatingLocally = true; // ATIVA TRAVA
+        isUpdatingLocally = true;
         await client.from('n3sk').update({ state: state }).in('id', [sessionId, partnerId]);
-        setTimeout(() => { isUpdatingLocally = false; }, 300); // SOLTA TRAVA APÓS 300MS
+        setTimeout(() => { isUpdatingLocally = false; }, 300);
     } catch(e) { console.error('Send state error:', e); isUpdatingLocally = false; }
 }
 
 function applyState(state){
-    if(isUpdatingLocally || !state) return; // SE ESTIVER ATUALIZANDO LOCALMENTE, IGNORA RECEBIMENTO
+    if(isUpdatingLocally || !state) return;
     
     const toggleMap = {
         'tgl-enable-esp': state.toggles?.esp, 'tgl-enable-aim': state.toggles?.aim,
@@ -820,7 +761,7 @@ function applyState(state){
         if(el){ el.value = state.values.thickness; document.getElementById('val-thickness').textContent = state.values.thickness; }
     }
     
-    // Aplica cores nas bolinhas
+    // Apply colors to dots
     const setDotColor = (id, color) => { const el = document.getElementById(id); if(el) el.style.background = color; };
     if(state.colors) {
         setDotColor('dot-box', state.colors.box);
@@ -834,19 +775,9 @@ function applyState(state){
     scheduleRender();
 }
 
-// COLOR PICKER LOGIC (SIDE PANEL)
+// COLOR PICKER LOGIC (FLOATING POPUP)
 var cpTarget=null, cpH=0.47, cpS=1, cpV=1, cpA=1;
-var cpPanel=document.getElementById('cpPanel');
-var cpSaturation=document.getElementById('cpSaturation');
-var cpSatHandle=document.getElementById('cpSatHandle');
-var cpHueSlider=document.getElementById('cpHueSlider');
-var cpHueHandle=document.getElementById('cpHueHandle');
-var cpAlphaSlider=document.getElementById('cpAlphaSlider');
-var cpAlphaHandle=document.getElementById('cpAlphaHandle');
-var cpAlphaGradient=document.getElementById('cpAlphaGradient');
-var cpHexInput=document.getElementById('cpHexInput');
-var cpDot=document.getElementById('cpDot');
-var cpTitle=document.getElementById('cpTitle');
+var activePopup = null;
 
 function h2r(h,s,v){
   var r,g,b,i=Math.floor(h*6),f=h*6-i,p=v*(1-s),q=v*(1-f*s),t=v*(1-(1-f)*s);
@@ -861,133 +792,147 @@ function hex2hsv(hex){
   return[h/6,s,v];
 }
 
-function updateCP(){
-  var hRgb=h2r(cpH,1,1); 
-  var hHex=r2h(hRgb[0],hRgb[1],hRgb[2]);
-  
-  cpSaturation.style.background='linear-gradient(to right,#fff,'+hHex+')';
-  
-  var rgb=h2r(cpH,cpS,cpV);
-  var hex=r2h(rgb[0],rgb[1],rgb[2]);
-  
-  cpAlphaGradient.style.background='linear-gradient(to right,transparent,'+hex+')';
-  cpDot.style.background=hex;
-  cpDot.style.boxShadow = `0 0 8px ${hex}`;
-  
-  if(cpTarget){
-    cpTarget.style.background = hex;
-    cpHexInput.value = hex.replace('#','').toUpperCase();
-    scheduleRender();
-  }
+function buildPopupHTML() {
+    return `
+        <div class="cp-saturation" id="cpSaturation">
+            <div class="cp-sat-overlay"></div>
+            <div class="cp-sat-handle" id="cpSatHandle"></div>
+        </div>
+        <div class="cp-hue-slider" id="cpHueSlider"><div class="cp-hue-handle" id="cpHueHandle"></div></div>
+        <div class="cp-alpha-slider" id="cpAlphaSlider">
+            <div class="cp-alpha-gradient" id="cpAlphaGradient"></div>
+            <div class="cp-alpha-handle" id="cpAlphaHandle"></div>
+        </div>
+    `;
 }
 
-function openCP(el, title){
-  cpTarget=el;
-  if(title) cpTitle.textContent = title;
-  
-  var currentColor = el.style.backgroundColor || '#00FFEB';
-  
-  // Converte RGB para HSV se necessário (navegadores retornam rgb())
-  // Para simplificar neste exemplo, assumimos que a cor inicial é válida ou usamos padrão
-  // Se quiser precisão total com rgb(), precisaria de uma função rgb2hsv extra.
-  // Aqui vamos tentar usar direto, se falhar usa branco.
-  let hsv;
-  if(currentColor.startsWith('#')) {
-      hsv = hex2hsv(currentColor);
-  } else {
-      // Fallback simples se for rgb() string
-      hsv = [0.5, 1, 1]; 
-  }
-  
-  cpH=hsv[0]; cpS=hsv[1]; cpV=hsv[2]; cpA=1;
-  
-  updateCP();
-  
-  // Atualiza posições dos sliders
-  var satRect = cpSaturation.getBoundingClientRect();
-  cpSatHandle.style.left = (cpS * satRect.width) + 'px';
-  cpSatHandle.style.top = ((1-cpV) * satRect.height) + 'px';
-  
-  var hueRect = cpHueSlider.getBoundingClientRect();
-  cpHueHandle.style.top = (cpH * hueRect.height) + 'px';
-  
-  var alphaRect = cpAlphaSlider.getBoundingClientRect();
-  cpAlphaHandle.style.left = (cpA * alphaRect.width) + 'px';
-  
-  cpPanel.classList.add('open');
+function updateCPUI() {
+    if(!activePopup) return;
+    
+    var hRgb=h2r(cpH,1,1); 
+    var hHex=r2h(hRgb[0],hRgb[1],hRgb[2]);
+    
+    var sat = activePopup.querySelector('#cpSaturation');
+    if(sat) sat.style.background='linear-gradient(to right,#fff,'+hHex+')';
+    
+    var rgb=h2r(cpH,cpS,cpV);
+    var hex=r2h(rgb[0],rgb[1],rgb[2]);
+    
+    var alphaGrad = activePopup.querySelector('#cpAlphaGradient');
+    if(alphaGrad) alphaGrad.style.background='linear-gradient(to right,transparent,'+hex+')';
+    
+    if(cpTarget) cpTarget.style.background = hex;
+    
+    // Update handles
+    var satRect = activePopup.querySelector('#cpSaturation')?.getBoundingClientRect();
+    var satHandle = activePopup.querySelector('#cpSatHandle');
+    if(satRect && satHandle) {
+        satHandle.style.left = (cpS * satRect.width) + 'px';
+        satHandle.style.top = ((1-cpV) * satRect.height) + 'px';
+    }
+    
+    var hueRect = activePopup.querySelector('#cpHueSlider')?.getBoundingClientRect();
+    var hueHandle = activePopup.querySelector('#cpHueHandle');
+    if(hueRect && hueHandle) hueHandle.style.left = (cpH * hueRect.width) + 'px';
+    
+    var alphaRect = activePopup.querySelector('#cpAlphaSlider')?.getBoundingClientRect();
+    var alphaHandle = activePopup.querySelector('#cpAlphaHandle');
+    if(alphaRect && alphaHandle) alphaHandle.style.left = (cpA * alphaRect.width) + 'px';
 }
 
-function closeCP(){
-    cpPanel.classList.remove('open');
+function openCP(dotEl, title, popupId){
+    // Close others
+    document.querySelectorAll('.cp-popup').forEach(p => p.classList.remove('open'));
+    
+    cpTarget = dotEl;
+    activePopup = document.getElementById(popupId);
+    
+    if(!activePopup) return;
+    
+    // Inject HTML if empty
+    if(activePopup.innerHTML.trim() === '') {
+        activePopup.innerHTML = buildPopupHTML();
+        attachCpEvents(activePopup);
+    }
+    
+    var currentColor = dotEl.style.backgroundColor || '#ffffff';
+    var hsv = hex2hsv(currentColor.startsWith('#') ? currentColor : '#ffffff');
+    cpH=hsv[0]; cpS=hsv[1]; cpV=hsv[2]; cpA=1;
+    
+    updateCPUI();
+    activePopup.classList.add('open');
+}
+
+function closeAllCP() {
+    document.querySelectorAll('.cp-popup').forEach(p => p.classList.remove('open'));
+    activePopup = null;
     sendState();
 }
 
-var dSat=false,dHue=false,dAlpha=false;
+// Event Listeners for CP inside popup
+function attachCpEvents(popup) {
+    var sat = popup.querySelector('#cpSaturation');
+    var hue = popup.querySelector('#cpHueSlider');
+    var alpha = popup.querySelector('#cpAlphaSlider');
+    
+    var dSat=false, dHue=false, dAlpha=false;
+    
+    sat.addEventListener('mousedown', function(e){ e.preventDefault(); e.stopPropagation(); dSat=true; updateSat(e, popup); });
+    hue.addEventListener('mousedown', function(e){ e.preventDefault(); e.stopPropagation(); dHue=true; updateHue(e, popup); });
+    alpha.addEventListener('mousedown', function(e){ e.preventDefault(); e.stopPropagation(); dAlpha=true; updateAlpha(e, popup); });
+    
+    popup._handlers = { dSat: ()=>dSat, dHue: ()=>dHue, dAlpha: ()=>dAlpha, updateSat: (e)=>updateSat(e, popup), updateHue: (e)=>updateHue(e, popup), updateAlpha: (e)=>updateAlpha(e, popup) };
+}
 
-cpSaturation.addEventListener('mousedown',function(e){e.preventDefault();dSat=true;updateSat(e)});
-cpHueSlider.addEventListener('mousedown',function(e){e.preventDefault();dHue=true;updateHue(e)});
-cpAlphaSlider.addEventListener('mousedown',function(e){e.preventDefault();dAlpha=true;updateAlpha(e)});
-
-document.addEventListener('mousemove',function(e){
-    if(dSat){ updateSat(e); }
-    if(dHue){ updateHue(e); }
-    if(dAlpha){ updateAlpha(e); }
+document.addEventListener('mousemove', function(e){
+    if(activePopup && activePopup._handlers) {
+        if(activePopup._handlers.dSat()) activePopup._handlers.updateSat(e);
+        if(activePopup._handlers.dHue()) activePopup._handlers.updateHue(e);
+        if(activePopup._handlers.dAlpha()) activePopup._handlers.updateAlpha(e);
+    }
 });
 
-document.addEventListener('mouseup',function(){ 
-    if(dSat||dHue||dAlpha){
-        dSat=false; dHue=false; dAlpha=false;
+document.addEventListener('mouseup', function(){ 
+    if(activePopup && activePopup._handlers && (activePopup._handlers.dSat() || activePopup._handlers.dHue() || activePopup._handlers.dAlpha())){
         sendState();
     }
 });
 
-function updateSat(e){
-    var r=cpSaturation.getBoundingClientRect();
+// Close when clicking outside
+document.addEventListener('mousedown', function(e){
+    if(activePopup && !activePopup.contains(e.target) && !cpTarget.contains(e.target)) {
+        closeAllCP();
+    }
+});
+
+function updateSat(e, popup){
+    var r=popup.querySelector('#cpSaturation').getBoundingClientRect();
     cpS=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));
     cpV=Math.max(0,Math.min(1,1-(e.clientY-r.top)/r.height));
-    cpSatHandle.style.left=(cpS*r.width)+'px';
-    cpSatHandle.style.top=((1-cpV)*r.height)+'px';
-    updateCP();
+    updateCPUI();
 }
-
-function updateHue(e){
-    var r=cpHueSlider.getBoundingClientRect();
-    cpH=Math.max(0,Math.min(1,(e.clientY-r.top)/r.height));
-    cpHueHandle.style.top=(cpH*r.height)+'px';
-    updateCP();
+function updateHue(e, popup){
+    var r=popup.querySelector('#cpHueSlider').getBoundingClientRect();
+    cpH=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));
+    updateCPUI();
 }
-
-function updateAlpha(e){
-    var r=cpAlphaSlider.getBoundingClientRect();
+function updateAlpha(e, popup){
+    var r=popup.querySelector('#cpAlphaSlider').getBoundingClientRect();
     cpA=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));
-    cpAlphaHandle.style.left=(cpA*r.width)+'px';
-    updateCP();
-}
-
-function copyHex(){
-    var hex = cpHexInput.value;
-    if(!hex.startsWith('#')) hex = '#' + hex;
-    navigator.clipboard.writeText(hex);
+    updateCPUI();
 }
 
 // QR CODE
 function showGlobalQr(){
     const targetId = isGlobal ? sessionId : partnerId; 
-    
     client.from('n3sk').select('token').eq('id', targetId).single()
     .then(({data, error}) => {
         if(data && data.token){
             const globalLink = `https://n3sk.xyz/?token=${data.token}`;
             document.getElementById('qr-modal').classList.add('active');
             document.getElementById('qrcode-global').innerHTML = ''; 
-            new QRCode(document.getElementById("qrcode-global"), {
-                text: globalLink, width: 200, height: 200,
-                colorDark: "#000000", colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-        } else {
-            alert("Erro ao gerar QR");
-        }
+            new QRCode(document.getElementById("qrcode-global"), { text: globalLink, width: 200, height: 200, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H });
+        } else { alert("Erro ao gerar QR"); }
     });
 }
 function closeGlobalQr(){ document.getElementById('qr-modal').classList.remove('active'); }
@@ -1002,14 +947,10 @@ function resizeCanvas() {
   var nw = rect.width, nh = rect.height; 
   var dpr = window.devicePixelRatio || 1;
   if (canvasWidth !== nw || canvasHeight !== nh) { 
-      canvas.width = nw * dpr; 
-      canvas.height = nh * dpr; 
-      canvas.style.width = nw + 'px'; 
-      canvas.style.height = nh + 'px';
+      canvas.width = nw * dpr; canvas.height = nh * dpr; 
+      canvas.style.width = nw + 'px'; canvas.style.height = nh + 'px';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      canvasWidth = nw; 
-      canvasHeight = nh; 
-      scheduleRender(); 
+      canvasWidth = nw; canvasHeight = nh; scheduleRender(); 
   }
 }
 window.addEventListener('resize', resizeCanvas);
@@ -1018,26 +959,16 @@ function scheduleRender() { if (!renderScheduled) { renderScheduled = true; requ
 function renderPreview() {
   renderScheduled = false;
   if (!canvasWidth || !canvasHeight) return;
-  
   ctx.save();
   ctx.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0);
-  ctx.fillStyle = '#050505'; 
-  ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-
+  ctx.fillStyle = '#050505'; ctx.fillRect(0, 0, canvasWidth, canvasHeight);
   if (bgImage && bgImage.complete && bgImage.naturalWidth > 0) {
-      var scaleX = canvasWidth / bgImage.width;
-      var scaleY = canvasHeight / bgImage.height;
+      var scaleX = canvasWidth / bgImage.width, scaleY = canvasHeight / bgImage.height;
       var s = Math.min(scaleX, scaleY) * 0.9;
-      
-      var w = bgImage.width * s;
-      var h = bgImage.height * s;
-      
-      var x = (canvasWidth - w) / 2;
-      var y = (canvasHeight - h) / 2;
-      
+      var w = bgImage.width * s, h = bgImage.height * s;
+      var x = (canvasWidth - w) / 2, y = (canvasHeight - h) / 2;
       ctx.drawImage(bgImage, x, y, w, h);
   }
-
   ctx.restore();
 }
 </script>
