@@ -49,7 +49,7 @@
             border-color: #fff;
         }
 
-        /* TELA DE CARREGAMENTO - ATUALIZADA */
+        /* TELA DE CARREGAMENTO */
         #loading-screen {
             position: fixed; inset: 0; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; gap: 30px;
         }
@@ -57,8 +57,6 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         
         .loading-text { color: var(--primary); font-size: 12px; letter-spacing: 4px; text-transform: uppercase; font-weight: 600; }
-        
-        /* NOVO TEXTO EM BAIXO */
         .loading-subtitle { 
             color: var(--muted); 
             font-size: 11px; 
@@ -90,10 +88,13 @@
         .menu-scroll { flex: 1; overflow-y: auto; padding: 10px 0; position: relative; }
         .menu-scroll::-webkit-scrollbar { width: 0px; }
 
-        /* INDICADOR ATIVO NA SIDEBAR - EFEITO SMOOTH */
+        /* INDICADOR ATIVO NA SIDEBAR - PEQUENO E SMOOTH */
         .nav-indicator {
-            position: absolute; left: 0; top: 0; width: 3px; height: 46px;
-            background: var(--primary); border-radius: 0 2px 2px 0;
+            position: absolute; left: 0; top: 0; 
+            width: 3px; /* Bem fino */
+            height: 20px; /* Pequeno, estilo pill */
+            background: var(--primary); 
+            border-radius: 0 4px 4px 0;
             /* Efeito smooth com bounce leve */
             transition: top 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             box-shadow: 0 0 10px rgba(0, 255, 235, 0.4);
@@ -101,23 +102,23 @@
             z-index: 5;
         }
 
-        /* ESTILO DO MENU - IGUAL IMAGEM 4 */
+        /* ESTILO DO MENU */
         .nav-item {
             display: flex; align-items: center; padding: 12px 20px; cursor: pointer;
             transition: all 0.2s ease; color: var(--muted); font-weight: 500; gap: 12px;
             font-size: 13px; height: 46px; position: relative;
-            /* Fundo cinza escuro sutil por padrão */
             background: transparent;
         }
         .nav-item:hover { color: white; background: rgba(255,255,255,0.02); }
         
-        /* Estado Ativo: Cor na esquerda (via indicador), texto branco/ciano */
+        /* Estado Ativo: Texto e Ícone BRANCOS */
         .nav-item.active { 
-            color: white; /* Ícone e texto ficam brancos ou ciano claro */
+            color: white; 
         }
         
+        /* Ícone segue a cor do texto (Branco quando ativo) */
         .nav-icon { width: 18px; height: 18px; fill: currentColor; opacity: 0.8; transition: 0.2s; }
-        .nav-item.active .nav-icon { opacity: 1; fill: var(--primary); }
+        .nav-item.active .nav-icon { opacity: 1; } 
         
         .nav-arrow { margin-left: auto; width: 12px; height: 12px; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); fill: currentColor; opacity: 0.5; }
         .nav-item.expanded .nav-arrow { transform: rotate(90deg); opacity: 1; }
@@ -137,10 +138,16 @@
         }
         .sub-item:hover { color: #aaa; }
         .sub-item.active { color: var(--primary); font-weight: 600; }
+        
+        /* BOLINHA DO SUBMENU COM EFEITO SMOOTH */
         .sub-item.active::before {
-            content: ''; position: absolute; left: 32px; top: 50%; transform: translateY(-50%);
+            content: ''; position: absolute; left: 32px; 
+            /* Top é controlado via JS ou CSS relativo, mas aqui usamos top fixo relativo ao item */
+            top: 50%; transform: translateY(-50%);
             width: 5px; height: 5px; background: var(--primary); border-radius: 50%;
             box-shadow: 0 0 5px var(--primary);
+            /* Transição suave para a posição vertical */
+            transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .sidebar-footer { padding: 20px; border-top: 1px solid var(--border); background: #080808; }
@@ -232,9 +239,9 @@
         }
         .chk-container.on .chk-icon { transform: scale(1); }
 
-        /* BOLINHA DE COR - QUADRADO (IGUAL IMAGEM 3) */
+        /* BOLINHA DE COR - QUADRADO */
         .color-dot {
-            width: 28px; height: 28px; border-radius: 6px; /* Quadrado arredondado */
+            width: 28px; height: 28px; border-radius: 6px;
             background: #333; 
             border: none;
             cursor: pointer; flex-shrink: 0;
@@ -242,7 +249,6 @@
             position: relative;
         }
         .color-dot:hover { transform: scale(1.05); box-shadow: 0 0 12px rgba(255,255,255,0.2); }
-        /* Indicador visual se tiver alpha < 1 */
         .color-dot.alpha-active::after {
             content: ''; position: absolute; bottom: -2px; right: -2px;
             width: 8px; height: 8px; background: #fff; border-radius: 50%;
@@ -266,11 +272,11 @@
         }
         .lp-canvas-wrap canvas { display: block; max-width: 100%; max-height: 100%; object-fit: contain; }
 
-        /* COLOR PICKER FLUTUANTE - REDESENHADA (IGUAL IMAGEM 3) */
+        /* COLOR PICKER FLUTUANTE */
         .cp-floating-panel {
             position: absolute;
             top: 0; left: 0;
-            width: 300px; /* Tamanho reduzido e bonito */
+            width: 300px;
             background: #111;
             border: 1px solid var(--border);
             border-radius: 12px;
@@ -279,13 +285,12 @@
             
             opacity: 0;
             visibility: hidden;
-            /* Animação smooth de entrada */
             transform: translateY(15px) scale(0.95);
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             
             display: flex; 
             flex-direction: column;
-            pointer-events: none; /* Evita clique quando invisível */
+            pointer-events: none;
         }
 
         .cp-floating-panel.open {
@@ -309,7 +314,6 @@
             gap: 10px; 
         }
         
-        /* Preview da cor atual no header (Quadrado) */
         .cp-dot { 
             width: 14px; 
             height: 14px; 
@@ -353,7 +357,7 @@
         .cp-main-container {
             display: flex;
             gap: 12px;
-            height: 160px; /* Altura ajustada */
+            height: 160px;
         }
         
         .cp-saturation {
@@ -363,7 +367,6 @@
             overflow: hidden;
             cursor: crosshair; 
             background: linear-gradient(to right, #fff, var(--primary));
-            /* Smooth update do background */
             transition: background 0.05s linear; 
         }
         
@@ -383,7 +386,7 @@
             transform: translate(-50%, -50%); 
             box-shadow: 0 2px 6px rgba(0,0,0,0.5); 
             pointer-events: none;
-            transition: left 0.05s linear, top 0.05s linear; /* Smooth movement */
+            transition: left 0.05s linear, top 0.05s linear;
         }
         
         .cp-hue-slider {
@@ -404,7 +407,7 @@
             background: #fff; 
             border-radius: 2px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            transition: top 0.05s linear; /* Smooth movement */
+            transition: top 0.05s linear;
         }
         
         .cp-alpha-slider {
@@ -436,7 +439,7 @@
             border-radius: 50%;
             box-shadow: 0 2px 6px rgba(0,0,0,0.4); 
             margin-left: -7px;
-            transition: left 0.05s linear; /* Smooth movement */
+            transition: left 0.05s linear;
         }
         
         .cp-hex-container {
@@ -596,7 +599,7 @@
     </div>
     
     <div class="menu-scroll">
-        <!-- Indicador que se move suavemente -->
+        <!-- Indicador que se move suavemente (Pequeno) -->
         <div class="nav-indicator" id="navIndicator"></div>
         
         <div class="nav-item" id="nav-aimbot" onclick="handleNavClick('aimbot')">
@@ -806,7 +809,7 @@
     loop();
 })();
 
-// NAV INDICATOR - EFEITO SMOOTH
+// NAV INDICATOR - EFEITO SMOOTH E PEQUENO
 function updateNavIndicator() {
     const activeNav = document.querySelector('.nav-item.active');
     const indicator = document.getElementById('navIndicator');
@@ -815,7 +818,12 @@ function updateNavIndicator() {
         const menuRect = document.querySelector('.menu-scroll').getBoundingClientRect();
         // Calcula a posição relativa dentro do scroll container
         const top = rect.top - menuRect.top;
-        indicator.style.top = top + 'px';
+        
+        // Centraliza verticalmente o indicador pequeno (20px) no botão (46px)
+        // Offset = (AlturaBotão - AlturaIndicador) / 2
+        const offset = (46 - 20) / 2; 
+        
+        indicator.style.top = (top + offset) + 'px';
     }
 }
 
@@ -859,7 +867,10 @@ function switchTab(tabId, event) {
     else if(tabId.includes('visuals-weapons')) bc.innerHTML = 'Visuals <span style="opacity:0.5">•</span> <span class="current">Weapons</span>';
     else if(tabId === 'settings') bc.innerHTML = 'System <span style="opacity:0.5">•</span> <span class="current">Settings</span>';
 
+    // Remove active de todos os sub-itens
     document.querySelectorAll('.sub-item').forEach(el => el.classList.remove('active'));
+    
+    // Adiciona active ao clicado (isso aciona a transição CSS da bolinha)
     if(event && event.target.classList.contains('sub-item')) {
         event.target.classList.add('active');
     }
@@ -1018,7 +1029,7 @@ function applyState(state){
     scheduleRender();
 }
 
-// COLOR PICKER LOGIC - REFEITA E SINCRONIZADA
+// COLOR PICKER LOGIC
 var cpTarget=null, cpH=0.47, cpS=1, cpV=1, cpA=1;
 var cpPanel=document.getElementById('cpPanel');
 var cpSaturation=document.getElementById('cpSaturation');
@@ -1062,15 +1073,11 @@ function updateCP(){
   var rgb=h2r(cpH,cpS,cpV);
   var hex=r2h(rgb[0],rgb[1],rgb[2]);
   
-  // Atualiza gradiente alpha
   cpAlphaGradient.style.background='linear-gradient(to right,transparent,'+hex+')';
-  
-  // Atualiza preview no header (quadrado)
   cpDot.style.background=hex;
   cpDot.style.boxShadow = `0 0 8px ${hex}`;
   
   if(cpTarget){
-    // Aplica cor na bolinha alvo
     cpTarget.style.background = hex;
     cpHexInput.value = hex.replace('#','').toUpperCase();
     scheduleRender();
@@ -1081,7 +1088,6 @@ function openCP(el, title){
   cpTarget=el;
   if(title) cpTitle.textContent = title;
   
-  // Posicionamento inteligente
   var rect = el.getBoundingClientRect();
   var panelLeft = rect.right + 15; 
   var panelTop = rect.top - 10;
@@ -1093,23 +1099,19 @@ function openCP(el, title){
   cpPanel.style.left = panelLeft + 'px';
   cpPanel.style.top = panelTop + 'px';
   
-  // SINCRONIZAÇÃO: Pega a cor exata da bolinha clicada
   var currentColor = el.style.backgroundColor || '#00FFEB';
   let hsv;
   if(currentColor.startsWith('#')) {
       hsv = hex2hsv(currentColor);
   } else {
-      // Converte RGB string para Hex primeiro
       const hex = rgbStringToHex(currentColor);
       hsv = hex2hsv(hex);
   }
   
-  // Atualiza valores internos
   cpH=hsv[0]; cpS=hsv[1]; cpV=hsv[2]; cpA=1;
   
   updateCP();
   
-  // Posiciona handles suavemente
   var satRect = cpSaturation.getBoundingClientRect();
   cpSatHandle.style.left = (cpS * satRect.width) + 'px';
   cpSatHandle.style.top = ((1-cpV) * satRect.height) + 'px';
@@ -1120,7 +1122,6 @@ function openCP(el, title){
   var alphaRect = cpAlphaSlider.getBoundingClientRect();
   cpAlphaHandle.style.left = (cpA * alphaRect.width) + 'px';
   
-  // Abre com animação smooth
   cpPanel.classList.add('open');
 }
 
