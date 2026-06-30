@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -55,7 +54,7 @@
         .loading-text { color: var(--primary); font-size: 12px; letter-spacing: 4px; text-transform: uppercase; font-weight: 600; }
 
         /* ============================================ */
-        /* DESKTOP - SIDEBAR ORIGINAL */
+        /* DESKTOP - SIDEBAR ORIGINAL (NÃO ALTERADO) */
         /* ============================================ */
         .sidebar {
             width: 240px; background: var(--sidebar); border-right: 1px solid var(--border);
@@ -163,12 +162,13 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* ============================================ */
-        /* MOBILE SIDEBAR OVERLAY */
+        /* MOBILE - ADAPTADO APENAS PARA CELULAR */
         /* ============================================ */
         .mobile-sidebar-overlay { 
             position: fixed; inset: 0; background: rgba(0,0,0,0.7); 
             opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 100;
             backdrop-filter: blur(4px);
+            display: none;
         }
         .mobile-sidebar-overlay.active { opacity: 1; visibility: visible; }
         
@@ -231,9 +231,6 @@
             border: 1.5px solid #333;
         }
 
-        /* ============================================ */
-        /* MOBILE HEADER */
-        /* ============================================ */
         .mobile-top-bar {
             display: none; height: 60px; background: var(--sidebar); 
             border-bottom: 1px solid var(--border); align-items: center;
@@ -288,19 +285,16 @@
         }
 
         /* ============================================ */
-        /* RESPONSIVIDADE MOBILE OTIMIZADA */
+        /* RESPONSIVIDADE - APENAS MOBILE */
         /* ============================================ */
         @media(max-width: 900px){
             body { flex-direction: column; }
             
-            /* Hide desktop sidebar */
             .sidebar { display: none; }
-            
-            /* Show mobile header */
             .mobile-top-bar { display: flex; }
             .mobile-sidebar { display: flex; }
+            .mobile-sidebar-overlay { display: block; }
             
-            /* Main wrapper takes full width */
             .main-wrapper {
                 width: 100%; 
                 flex-direction: column;
@@ -313,7 +307,6 @@
                 padding-top: 0;
             }
             
-            /* Preview vai para o RODAPÉ no mobile */
             .live-preview-container { 
                 position: relative; top: auto; right: auto; width: 100%;
                 height: 300px; border-left: none; border-top: 1px solid var(--border);
@@ -324,7 +317,6 @@
                 overflow-y: auto; flex: 1;
             }
             
-            /* Ajustes de toque para mobile */
             .chk-container { width: 32px; height: 32px; }
             .chk-icon { transform: translateY(6px); }
             .color-dot { width: 36px; height: 36px; }
@@ -349,7 +341,6 @@
                 margin-bottom: 16px;
             }
 
-            /* Color Picker responsive */
             .cp-floating-panel {
                 width: 90vw !important;
                 max-width: 320px !important;
@@ -651,7 +642,7 @@
     loop();
 })();
 
-// --- MOBILE SIDEBAR ---
+// --- MOBILE SIDEBAR FUNCTIONS ---
 window.openMobileSidebar = function() {
     document.getElementById('mobileSidebar').classList.add('active');
     document.getElementById('mobileSidebarOverlay').classList.add('active');
@@ -678,7 +669,7 @@ window.handleMobileSubClick = function(tabId) {
     closeMobileSidebar();
 }
 
-// --- LÓGICA DE MENU DESKTOP (MANTIDA) ---
+// --- LÓGICA DE MENU DESKTOP (ORIGINAL - NÃO ALTERADA) ---
 const LAYOUT = { PADDING_TOP: 10, NAV_HEIGHT: 48, SUB_ITEM_HEIGHT: 42, INDICATOR_HEIGHT: 24, SUB_ITEMS_COUNT: { 'aimbot': 1, 'visuals': 2, 'settings': 0 }, NAV_ORDER: ['aimbot', 'visuals', 'settings'] };
 
 function calculateNavPosition(targetMenuId, stateAfterClick) {
