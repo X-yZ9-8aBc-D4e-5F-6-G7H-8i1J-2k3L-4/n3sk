@@ -163,24 +163,32 @@
         /* ===== LAYOUT MOBILE (Celular) ===== */
         #app-container-mobile {
             display: none; flex-direction: column; height: 100vh; width: 100%;
+            position: relative;
         }
 
         /* Header Mobile */
         .mobile-header {
             height: 60px; background: var(--sidebar); border-bottom: 1px solid var(--border);
             display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
-            z-index: 50;
+            z-index: 50; flex-shrink: 0;
         }
 
         .mobile-menu-btn {
-            width: 40px; height: 40px; background: transparent; border: none; color: var(--primary);
+            width: 40px; height: 40px; background: transparent; border: none;
             cursor: pointer; font-size: 24px; display: flex; align-items: center; justify-content: center;
-            transition: all 0.3s ease;
+            transition: all 0.3s ease; flex-direction: column; gap: 5px;
+            padding: 0; margin-left: auto;
         }
+
+        .mobile-menu-btn span {
+            width: 24px; height: 2px; background: #ffffff; border-radius: 1px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         .mobile-menu-btn:active { transform: scale(0.9); }
 
         .mobile-profile-top {
-            display: flex; align-items: center; gap: 8px; flex: 1; margin-left: 12px;
+            display: flex; align-items: center; gap: 8px; flex: 1; margin-right: auto;
         }
 
         .mobile-profile-img {
@@ -202,30 +210,11 @@
 
         .mobile-status-icon {
             width: 10px; height: 10px; border-radius: 50%; background: #444;
-            transition: all 0.3s; margin-left: auto;
+            transition: all 0.3s; margin: 0 12px;
         }
 
         .mobile-status-icon.on {
             background: #4ade80; box-shadow: 0 0 8px #4ade80;
-        }
-
-        /* Tabs Mobile */
-        .mobile-tabs {
-            display: flex; overflow-x: auto; background: var(--card); border-bottom: 1px solid var(--border);
-            gap: 0; padding: 0;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .mobile-tab-btn {
-            padding: 12px 20px; background: transparent; border: none; color: var(--muted);
-            cursor: pointer; font-size: 12px; font-weight: 600; white-space: nowrap;
-            border-bottom: 2px solid transparent; transition: all 0.3s ease;
-            flex-shrink: 0;
-        }
-
-        .mobile-tab-btn.active {
-            color: var(--primary); border-bottom-color: var(--primary);
         }
 
         /* Sidebar Mobile (Overlay) */
@@ -239,60 +228,107 @@
         }
 
         .mobile-sidebar {
-            position: fixed; left: 0; top: 0; width: 70vw; max-width: 280px; height: 100vh;
+            position: fixed; left: 0; top: 0; width: 240px; height: 100vh;
             background: var(--sidebar); z-index: 41; transform: translateX(-100%);
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); border-right: 1px solid var(--border);
-            overflow-y: auto; display: flex; flex-direction: column;
+            overflow-y: auto; display: flex; flex-direction: column; padding-top: 0;
         }
 
         .mobile-sidebar.open {
             transform: translateX(0);
         }
 
-        .mobile-sidebar-header {
-            padding: 16px; border-bottom: 1px solid var(--border); background: #080808;
+        /* Sidebar Menu Style (igual ao PC) */
+        .mobile-menu-scroll {
+            flex: 1; overflow-y: auto; padding: 10px 0; position: relative;
         }
 
-        .mobile-sidebar-close {
-            width: 32px; height: 32px; background: transparent; border: none;
-            color: var(--primary); font-size: 24px; cursor: pointer;
+        .mobile-nav-indicator {
+            position: absolute; left: 0; top: 0; width: 3px; height: 24px; background: var(--primary);
+            border-radius: 0 4px 4px 0; transition: top 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px rgba(0, 255, 235, 0.4); pointer-events: none; z-index: 5;
         }
 
-        .mobile-sidebar-menu {
-            flex: 1; padding: 10px 0; overflow-y: auto;
+        .mobile-nav-item {
+            display: flex; align-items: center; padding: 12px 20px; cursor: pointer;
+            transition: all 0.2s ease; color: var(--muted); font-weight: 500; gap: 12px;
+            font-size: 13px; height: 48px; position: relative; background: transparent;
         }
 
-        .mobile-sidebar-item {
-            padding: 14px 20px; border: none; background: transparent; color: var(--muted);
-            width: 100%; text-align: left; cursor: pointer; font-size: 13px; font-weight: 500;
-            transition: all 0.2s ease; display: flex; align-items: center; gap: 12px;
+        .mobile-nav-item:active { background: rgba(255,255,255,0.02); }
+        .mobile-nav-item.active { color: white; }
+
+        .mobile-nav-icon {
+            width: 18px; height: 18px; fill: currentColor; opacity: 0.8; transition: 0.2s;
         }
 
-        .mobile-sidebar-item:active {
-            background: rgba(0,255,235,0.1);
+        .mobile-nav-arrow {
+            margin-left: auto; width: 12px; height: 12px;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            fill: currentColor; opacity: 0.5;
         }
 
-        .mobile-sidebar-item.active {
-            color: var(--primary); background: rgba(0,255,235,0.05);
+        .mobile-nav-item.expanded .mobile-nav-arrow {
+            transform: rotate(90deg); opacity: 1;
         }
+
+        .mobile-submenu {
+            max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(0,0,0,0.2); position: relative;
+        }
+
+        .mobile-submenu.open { max-height: 200px; }
+
+        .mobile-submenu::before {
+            content: ''; position: absolute; left: 35px; top: 21px; bottom: 21px;
+            width: 1px; background: #2a2a2a; z-index: 1;
+        }
+
+        .mobile-sub-item {
+            padding: 10px 20px 10px 50px; color: #555; cursor: pointer; transition: 0.2s;
+            font-size: 12px; position: relative; z-index: 2; height: 42px;
+            display: flex; align-items: center;
+        }
+
+        .mobile-sub-item:active { color: #aaa; }
+        .mobile-sub-item.active { color: var(--primary); font-weight: 600; }
 
         .mobile-sidebar-footer {
-            padding: 16px; border-top: 1px solid var(--border); background: #080808;
+            padding: 20px; border-top: 1px solid var(--border); background: #080808;
         }
 
         .mobile-btn-qr {
             width: 100%; padding: 12px; background: transparent; border: 1.5px solid var(--primary);
-            color: var(--primary); font-weight: bold; border-radius: 8px; cursor: pointer;
-            font-size: 11px; text-transform: uppercase; transition: all 0.3s;
-        }
-
-        .mobile-btn-qr:active {
-            background: rgba(0,255,235,0.1);
+            color: var(--primary); font-weight: bold; letter-spacing: 1px; border-radius: 8px;
+            cursor: pointer; transition: all 0.3s; font-size: 11px; text-transform: uppercase;
         }
 
         /* Content Mobile */
         .mobile-content {
+            flex: 1; display: flex; flex-direction: column; overflow: hidden;
+        }
+
+        .mobile-content-main {
             flex: 1; overflow-y: auto; padding: 16px; -webkit-overflow-scrolling: touch;
+        }
+
+        .mobile-preview-section {
+            height: 40vh; border-top: 1px solid var(--border); background: var(--card);
+            overflow: hidden; display: flex; flex-direction: column;
+        }
+
+        .mobile-preview-header {
+            padding: 10px 14px; border-bottom: 1px solid var(--border);
+            font-size: 10px; color: var(--muted); font-weight: 600; background: #0a0a0a;
+        }
+
+        .mobile-preview-canvas {
+            flex: 1; position: relative; background: #050505; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .mobile-preview-canvas canvas {
+            display: block; max-width: 100%; max-height: 100%;
         }
 
         .mobile-tab-content {
@@ -528,7 +564,6 @@
 <div id="app-container-mobile" style="display:none;">
     
     <div class="mobile-header">
-        <button class="mobile-menu-btn" onclick="toggleMobileSidebar()">☰</button>
         <div class="mobile-profile-top">
             <img src='https://i.pinimg.com/474x/ff/c1/a5/ffc1a5f503e31b814ff8953ec6f50c7c.jpg' class='mobile-profile-img' />
             <div class="mobile-profile-info">
@@ -537,128 +572,158 @@
             </div>
         </div>
         <div class="mobile-status-icon" id="mobile-conn-dot"></div>
+        <button class="mobile-menu-btn" onclick="toggleMobileSidebar()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
     </div>
 
-    <div class="mobile-tabs">
-        <button class="mobile-tab-btn active" onclick="switchMobileTab('aimbot-main')">AimBot</button>
-        <button class="mobile-tab-btn" onclick="switchMobileTab('visuals-players')">ESP Players</button>
-        <button class="mobile-tab-btn" onclick="switchMobileTab('visuals-weapons')">Weapons</button>
-        <button class="mobile-tab-btn" onclick="switchMobileTab('settings')">Settings</button>
-    </button>
-
     <div class="mobile-content">
-        <div id="mobile-content-aimbot-main" class="mobile-tab-content active">
-            <div class="feature-card">
-                <div class="feat-head">
-                    <div class="feat-title-group">
-                        <div class="feat-title">Enable AimBot</div>
+        <div class="mobile-content-main">
+            <div id="mobile-content-aimbot-main" class="mobile-tab-content active">
+                <div class="feature-card">
+                    <div class="feat-head">
+                        <div class="feat-title-group">
+                            <div class="feat-title">Enable AimBot</div>
+                        </div>
+                        <div class="chk-container" id="tgl-enable-aim-mobile" onclick="tg(this)">
+                            <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                        </div>
                     </div>
-                    <div class="chk-container" id="tgl-enable-aim-mobile" onclick="tg(this)">
-                        <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
-                    </div>
-                </div>
-                <div class="control-row">
-                    <span class="c-label">FOV</span>
-                    <div class="slider-wrap">
-                        <span class="s-val" id="val-fov-mobile">45</span>
-                        <input type="range" min="1" max="180" step="1" value="45" oninput="updateValue('fov', this.value)">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="mobile-content-visuals-players" class="mobile-tab-content">
-            <div class="feature-card">
-                <div class="feat-head">
-                    <div class="feat-title-group">
-                        <div class="feat-title">Enable ESP</div>
-                    </div>
-                    <div class="chk-container" id="tgl-enable-esp-mobile" onclick="tg(this)">
-                        <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
-                    </div>
-                </div>
-                <div class="control-row">
-                    <span class="c-label">Box Thickness</span>
-                    <div class="slider-wrap">
-                        <span class="s-val" id="val-thickness-mobile">1.5</span>
-                        <input type="range" min="0.5" max="5" step="0.1" value="1.5" oninput="updateValue('thickness', this.value)">
+                    <div class="control-row">
+                        <span class="c-label">FOV</span>
+                        <div class="slider-wrap">
+                            <span class="s-val" id="val-fov-mobile">45</span>
+                            <input type="range" min="1" max="180" step="1" value="45" oninput="updateValue('fov', this.value)">
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="feature-card">
-                <div class="control-row">
-                    <span class="c-label">Box ESP</span>
-                    <div class="control-actions">
-                        <div class="chk-container" id="tgl-box-mobile" onclick='tg(this)'>
+            <div id="mobile-content-visuals-players" class="mobile-tab-content">
+                <div class="feature-card">
+                    <div class="feat-head">
+                        <div class="feat-title-group">
+                            <div class="feat-title">Enable ESP</div>
+                        </div>
+                        <div class="chk-container" id="tgl-enable-esp-mobile" onclick="tg(this)">
                             <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
                         </div>
-                        <div class="color-dot" id="dot-box-mobile" style="background:#ffffff" onclick='openCP(this, "Box Color")'></div>
+                    </div>
+                    <div class="control-row">
+                        <span class="c-label">Box Thickness</span>
+                        <div class="slider-wrap">
+                            <span class="s-val" id="val-thickness-mobile">1.5</span>
+                            <input type="range" min="0.5" max="5" step="0.1" value="1.5" oninput="updateValue('thickness', this.value)">
+                        </div>
                     </div>
                 </div>
-                <div class="control-row">
-                    <span class="c-label">Skeleton</span>
-                    <div class="control-actions">
-                        <div class="chk-container" id="tgl-skeleton-mobile" onclick='tg(this)'>
-                            <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+
+                <div class="feature-card">
+                    <div class="control-row">
+                        <span class="c-label">Box ESP</span>
+                        <div class="control-actions">
+                            <div class="chk-container" id="tgl-box-mobile" onclick='tg(this)'>
+                                <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            </div>
+                            <div class="color-dot" id="dot-box-mobile" style="background:#ffffff" onclick='openCP(this, "Box Color")'></div>
                         </div>
-                        <div class="color-dot" id="dot-skeleton-mobile" style="background:#ffffff" onclick='openCP(this, "Skeleton Color")'></div>
                     </div>
-                </div>
-                <div class="control-row">
-                    <span class="c-label">Health Bar</span>
-                    <div class="control-actions">
-                        <div class="chk-container" id="tgl-healthbar-mobile" onclick='tg(this)'>
-                            <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                    <div class="control-row">
+                        <span class="c-label">Skeleton</span>
+                        <div class="control-actions">
+                            <div class="chk-container" id="tgl-skeleton-mobile" onclick='tg(this)'>
+                                <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            </div>
+                            <div class="color-dot" id="dot-skeleton-mobile" style="background:#ffffff" onclick='openCP(this, "Skeleton Color")'></div>
                         </div>
-                        <div class="color-dot" id="dot-healthbar-mobile" style="background:#00ff00" onclick='openCP(this, "Health Color")'></div>
                     </div>
-                </div>
-                <div class="control-row">
-                    <span class="c-label">Snapline</span>
-                    <div class="control-actions">
-                        <div class="chk-container" id="tgl-snapline-mobile" onclick='tg(this)'>
-                            <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                    <div class="control-row">
+                        <span class="c-label">Health Bar</span>
+                        <div class="control-actions">
+                            <div class="chk-container" id="tgl-healthbar-mobile" onclick='tg(this)'>
+                                <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            </div>
+                            <div class="color-dot" id="dot-healthbar-mobile" style="background:#00ff00" onclick='openCP(this, "Health Color")'></div>
                         </div>
-                        <div class="color-dot" id="dot-snapline-mobile" style="background:#ffffff" onclick='openCP(this, "Snapline Color")'></div>
                     </div>
-                </div>
-                <div class="control-row">
-                    <span class="c-label">Player Name</span>
-                    <div class="control-actions">
-                        <div class="chk-container" id="tgl-name-mobile" onclick='tg(this)'>
-                            <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                    <div class="control-row">
+                        <span class="c-label">Snapline</span>
+                        <div class="control-actions">
+                            <div class="chk-container" id="tgl-snapline-mobile" onclick='tg(this)'>
+                                <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            </div>
+                            <div class="color-dot" id="dot-snapline-mobile" style="background:#ffffff" onclick='openCP(this, "Snapline Color")'></div>
                         </div>
-                        <div class="color-dot" id="dot-name-mobile" style="background:#ffffff" onclick='openCP(this, "Name Color")'></div>
+                    </div>
+                    <div class="control-row">
+                        <span class="c-label">Player Name</span>
+                        <div class="control-actions">
+                            <div class="chk-container" id="tgl-name-mobile" onclick='tg(this)'>
+                                <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            </div>
+                            <div class="color-dot" id="dot-name-mobile" style="background:#ffffff" onclick='openCP(this, "Name Color")'></div>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <div id="mobile-content-visuals-weapons" class="mobile-tab-content">
+                <div class="feature-card"><div class="feat-title">Weapons</div><p style="color:#666; margin-top:10px;">Coming soon...</p></div>
+            </div>
+
+            <div id="mobile-content-settings" class="mobile-tab-content">
+                <div class="feature-card"><div class="feat-title">Settings</div><p style="color:#666; margin-top:10px;">Config...</p></div>
+            </div>
         </div>
 
-        <div id="mobile-content-visuals-weapons" class="mobile-tab-content">
-            <div class="feature-card"><div class="feat-title">Weapons</div><p style="color:#666; margin-top:10px;">Coming soon...</p></div>
-        </div>
-
-        <div id="mobile-content-settings" class="mobile-tab-content">
-            <div class="feature-card"><div class="feat-title">Settings</div><p style="color:#666; margin-top:10px;">Config...</p></div>
+        <!-- Preview Section -->
+        <div class="mobile-preview-section">
+            <div class="mobile-preview-header">Preview</div>
+            <div class="mobile-preview-canvas">
+                <canvas id="previewCanvasMobile"></canvas>
+            </div>
         </div>
     </div>
 
     <!-- Sidebar Mobile Overlay -->
     <div class="mobile-sidebar-overlay" id="mobileSidebarOverlay" onclick="closeMobileSidebar()"></div>
     
+    <!-- Sidebar Mobile -->
     <div class="mobile-sidebar" id="mobileSidebar">
-        <div class="mobile-sidebar-header">
-            <button class="mobile-sidebar-close" onclick="closeMobileSidebar()">✕</button>
+        <div class="mobile-menu-scroll">
+            <div class="mobile-nav-indicator" id="mobileNavIndicator"></div>
+            
+            <div class="mobile-nav-item" id="mobile-nav-aimbot" onclick="handleMobileNavClick('aimbot')">
+                <svg class="mobile-nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+                AimBot
+                <svg class="mobile-nav-arrow" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+            </div>
+            <div class="mobile-submenu" id="mobile-sub-aimbot">
+                <div class="mobile-sub-item active" onclick="switchMobileTab('aimbot-main', event)">Main</div>
+            </div>
+
+            <div class="mobile-nav-item" id="mobile-nav-visuals" onclick="handleMobileNavClick('visuals')">
+                <svg class="mobile-nav-icon" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                Visuals
+                <svg class="mobile-nav-arrow" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+            </div>
+            <div class="mobile-submenu" id="mobile-sub-visuals">
+                <div class="mobile-sub-item active" onclick="switchMobileTab('visuals-players', event)">Players</div>
+                <div class="mobile-sub-item" onclick="switchMobileTab('visuals-weapons', event)">Weapons</div>
+            </div>
+
+            <div class="mobile-nav-item" id="mobile-nav-settings" onclick="handleMobileNavClick('settings')">
+                <svg class="mobile-nav-icon" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L3.16 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.04.64.09.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                Settings
+                <svg class="mobile-nav-arrow" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+            </div>
+            <div class="mobile-submenu" id="mobile-sub-settings"></div>
         </div>
-        <div class="mobile-sidebar-menu">
-            <button class="mobile-sidebar-item" onclick="closeMobileSidebar(); switchMobileTab('aimbot-main')">AimBot</button>
-            <button class="mobile-sidebar-item" onclick="closeMobileSidebar(); switchMobileTab('visuals-players')">ESP Players</button>
-            <button class="mobile-sidebar-item" onclick="closeMobileSidebar(); switchMobileTab('visuals-weapons')">Weapons</button>
-            <button class="mobile-sidebar-item" onclick="closeMobileSidebar(); switchMobileTab('settings')">Settings</button>
-        </div>
+
         <div class="mobile-sidebar-footer">
-            <button class="mobile-btn-qr" onclick="showGlobalQr()">GERAR QR</button>
+            <button class="mobile-btn-qr" onclick="showGlobalQr()">GERAR QR GLOBAL</button>
         </div>
     </div>
 
@@ -769,18 +834,77 @@ window.closeMobileSidebar = function() {
     overlay.classList.remove('open');
 }
 
-window.switchMobileTab = function(tabId) {
-    // Tabs
-    document.querySelectorAll('.mobile-tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelectorAll('.mobile-tab-content').forEach(el => el.classList.remove('active'));
+const MOBILE_LAYOUT = { 
+    PADDING_TOP: 10, NAV_HEIGHT: 48, SUB_ITEM_HEIGHT: 42, INDICATOR_HEIGHT: 24, 
+    SUB_ITEMS_COUNT: { 'aimbot': 1, 'visuals': 2, 'settings': 0 }, 
+    NAV_ORDER: ['aimbot', 'visuals', 'settings'] 
+};
+
+function calculateMobileNavPosition(targetMenuId, stateAfterClick) {
+    const { PADDING_TOP, NAV_HEIGHT, SUB_ITEM_HEIGHT, INDICATOR_HEIGHT, NAV_ORDER, SUB_ITEMS_COUNT } = MOBILE_LAYOUT;
+    const OFFSET = (NAV_HEIGHT - INDICATOR_HEIGHT) / 2;
+    let position = PADDING_TOP;
+    for (let i = 0; i < NAV_ORDER.length; i++) {
+        const id = NAV_ORDER[i];
+        if (id === targetMenuId) return position + OFFSET;
+        position += NAV_HEIGHT;
+        if (stateAfterClick[id]) position += SUB_ITEMS_COUNT[id] * SUB_ITEM_HEIGHT;
+    }
+    return position + OFFSET;
+}
+
+function updateMobileNavIndicator() {
+    const activeNav = document.querySelector('.mobile-nav-item.active');
+    const indicator = document.getElementById('mobileNavIndicator');
+    if (activeNav && indicator) {
+        const navId = activeNav.id.replace('mobile-nav-', '');
+        const stateAfterClick = { 
+            'aimbot': document.getElementById('mobile-sub-aimbot').classList.contains('open'),
+            'visuals': document.getElementById('mobile-sub-visuals').classList.contains('open')
+        };
+        indicator.style.top = calculateMobileNavPosition(navId, stateAfterClick) + 'px';
+    }
+}
+
+window.handleMobileNavClick = function(menuId) {
+    const indicator = document.getElementById('mobileNavIndicator');
+    const stateAfterClick = { 'aimbot': (menuId === 'aimbot'), 'visuals': (menuId === 'visuals') };
+    indicator.style.top = calculateMobileNavPosition(menuId, stateAfterClick) + 'px';
     
-    // Ativa aba selecionada
-    event.target.classList.add('active');
+    document.querySelectorAll('.mobile-nav-item').forEach(item => item.classList.remove('active', 'expanded'));
+    document.querySelectorAll('.mobile-submenu').forEach(sub => sub.classList.remove('open'));
+    
+    const nav = document.getElementById('mobile-nav-' + menuId);
+    const sub = document.getElementById('mobile-sub-' + menuId);
+    if (nav) { 
+        nav.classList.add('active'); 
+        if (sub) { 
+            nav.classList.add('expanded'); 
+            sub.classList.add('open'); 
+        } 
+    }
+    
+    if (sub) {
+        const activeItem = sub.querySelector('.mobile-sub-item.active') || sub.querySelector('.mobile-sub-item');
+        if (activeItem) setTimeout(() => activeItem.click(), 50);
+    } else { 
+        window.switchMobileTab(menuId, null); 
+    }
+}
+
+window.switchMobileTab = function(tabId, event) {
+    if(event) event.stopPropagation();
+    document.querySelectorAll('.mobile-tab-content').forEach(el => el.classList.remove('active'));
     const target = document.getElementById('mobile-content-' + tabId);
     if(target) target.classList.add('active');
+
+    document.querySelectorAll('.mobile-sub-item').forEach(el => el.classList.remove('active'));
+    if(event && event.target.classList.contains('mobile-sub-item')) { 
+        event.target.classList.add('active'); 
+    }
     
-    // Sincroniza com desktop
-    window.switchTab(tabId, null);
+    closeMobileSidebar();
+    scheduleRender();
 }
 
 // --- FIREBASE ZERO DELAY ---
@@ -815,19 +939,24 @@ if (token) {
     // Mostra container apropriado
     if (window.innerWidth > 1024) {
         document.getElementById('app-container-desktop').style.display = 'flex';
-    } else {
-        document.getElementById('app-container-mobile').style.display = 'flex';
-    }
-    
-    setConn(true);
-    
-    if (window.innerWidth > 1024) {
         setTimeout(() => { 
             const visualsNav = document.getElementById('nav-visuals');
             if(visualsNav) { visualsNav.classList.add('active', 'expanded'); document.getElementById('sub-visuals').classList.add('open'); }
             updateNavIndicator(); 
         }, 100);
+    } else {
+        document.getElementById('app-container-mobile').style.display = 'flex';
+        setTimeout(() => {
+            const visualsNav = document.getElementById('mobile-nav-visuals');
+            if(visualsNav) { 
+                visualsNav.classList.add('active', 'expanded'); 
+                document.getElementById('mobile-sub-visuals').classList.add('open'); 
+            }
+            updateMobileNavIndicator();
+        }, 100);
     }
+    
+    setConn(true);
 } else { alert("Token não encontrado!"); }
 
 function setConn(c){ 
@@ -853,11 +982,13 @@ function startFirebaseSync() {
 
 window.sendState = function() {
     if (!sessionId) return;
+    
     const getDotColor = (id) => {
         let el = document.getElementById(id);
         if (!el) el = document.getElementById(id + '-mobile');
         return el?.style.backgroundColor || '#ffffff';
     };
+    
     const getToggleState = (id) => {
         let el = document.getElementById(id);
         if (!el) el = document.getElementById(id + '-mobile');
@@ -891,18 +1022,15 @@ window.sendState = function() {
 };
 
 function applyState(state) {
-    const toggleMap = [
-        ['tgl-enable-esp', state.toggles?.esp],
-        ['tgl-enable-aim', state.toggles?.aim],
-        ['tgl-box', state.toggles?.box],
-        ['tgl-skeleton', state.toggles?.skeleton],
-        ['tgl-healthbar', state.toggles?.healthbar],
-        ['tgl-snapline', state.toggles?.snapline],
-        ['tgl-name', state.toggles?.name]
+    const toggleIds = [
+        'tgl-enable-esp', 'tgl-enable-aim', 'tgl-box', 
+        'tgl-skeleton', 'tgl-healthbar', 'tgl-snapline', 'tgl-name'
     ];
     
-    toggleMap.forEach(([id, value]) => {
+    toggleIds.forEach(id => {
+        const value = state.toggles?.[id.replace('tgl-enable-', '').replace('tgl-', '')];
         if (value === undefined) return;
+        
         [id, id + '-mobile'].forEach(elId => {
             const el = document.getElementById(elId);
             if (el) {
@@ -913,18 +1041,24 @@ function applyState(state) {
     });
     
     if (state.values) {
-        document.querySelectorAll('input[type=range]').forEach(slider => {
-            if (slider.value !== state.values.thickness && state.values.thickness) {
-                slider.value = state.values.thickness;
-                document.getElementById('val-thickness').textContent = state.values.thickness;
-                document.getElementById('val-thickness-mobile').textContent = state.values.thickness;
-            }
-            if (slider.value !== state.values.fov && state.values.fov) {
-                slider.value = state.values.fov;
-                document.getElementById('val-fov').textContent = state.values.fov;
-                document.getElementById('val-fov-mobile').textContent = state.values.fov;
-            }
-        });
+        if (state.values.thickness) {
+            const thickDesktop = document.getElementById('val-thickness');
+            const thickMobile = document.getElementById('val-thickness-mobile');
+            if (thickDesktop) thickDesktop.textContent = state.values.thickness;
+            if (thickMobile) thickMobile.textContent = state.values.thickness;
+            document.querySelectorAll('#content-visuals-players input[type=range], #mobile-content-visuals-players input[type=range]').forEach(slider => {
+                if (slider.max === '5') slider.value = state.values.thickness;
+            });
+        }
+        if (state.values.fov) {
+            const fovDesktop = document.getElementById('val-fov');
+            const fovMobile = document.getElementById('val-fov-mobile');
+            if (fovDesktop) fovDesktop.textContent = state.values.fov;
+            if (fovMobile) fovMobile.textContent = state.values.fov;
+            document.querySelectorAll('#content-aimbot-main input[type=range], #mobile-content-aimbot-main input[type=range]').forEach(slider => {
+                if (slider.max === '180') slider.value = state.values.fov;
+            });
+        }
     }
     
     const setDotColor = (id, color) => {
@@ -1062,6 +1196,8 @@ window.closeGlobalQr = function(){ document.getElementById('qr-modal').classList
 
 // Preview Canvas
 var canvas = document.getElementById('previewCanvas'), ctx = canvas?.getContext('2d', { alpha: false }), canvasWidth = 0, canvasHeight = 0, renderScheduled = false;
+var canvasMobile = document.getElementById('previewCanvasMobile'), ctxMobile = canvasMobile?.getContext('2d', { alpha: false }), canvasWidthMobile = 0, canvasHeightMobile = 0;
+
 function resizeCanvas() { 
     if (!canvas) return;
     var rect = canvas.parentElement.getBoundingClientRect(); 
@@ -1074,17 +1210,43 @@ function resizeCanvas() {
         canvasWidth = nw; canvasHeight = nh; scheduleRender(); 
     } 
 }
-window.addEventListener('resize', resizeCanvas);
+
+function resizeCanvasMobile() {
+    if (!canvasMobile) return;
+    var rect = canvasMobile.parentElement.getBoundingClientRect();
+    var nw = rect.width, nh = rect.height;
+    var dpr = window.devicePixelRatio || 1;
+    if (canvasWidthMobile !== nw || canvasHeightMobile !== nh) {
+        canvasMobile.width = nw * dpr; canvasMobile.height = nh * dpr;
+        canvasMobile.style.width = nw + 'px'; canvasMobile.style.height = nh + 'px';
+        ctxMobile.setTransform(dpr, 0, 0, dpr, 0, 0);
+        canvasWidthMobile = nw; canvasHeightMobile = nh; scheduleRender();
+    }
+}
+
+window.addEventListener('resize', () => { resizeCanvas(); resizeCanvasMobile(); });
 window.scheduleRender = function() { if (!renderScheduled) { renderScheduled = true; requestAnimationFrame(renderPreview); } }
 function renderPreview() { 
     renderScheduled = false; 
-    if (!canvas || !canvasWidth || !canvasHeight) return; 
-    ctx.save(); 
-    ctx.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0); 
-    ctx.fillStyle = '#050505'; ctx.fillRect(0, 0, canvasWidth, canvasHeight); 
-    ctx.restore(); 
+    
+    // Desktop Preview
+    if (canvas && canvasWidth && canvasHeight) {
+        ctx.save(); 
+        ctx.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0); 
+        ctx.fillStyle = '#050505'; ctx.fillRect(0, 0, canvasWidth, canvasHeight); 
+        ctx.restore(); 
+    }
+    
+    // Mobile Preview
+    if (canvasMobile && canvasWidthMobile && canvasHeightMobile) {
+        ctxMobile.save();
+        ctxMobile.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0);
+        ctxMobile.fillStyle = '#050505'; ctxMobile.fillRect(0, 0, canvasWidthMobile, canvasHeightMobile);
+        ctxMobile.restore();
+    }
 }
-setTimeout(resizeCanvas, 100);
+
+setTimeout(() => { resizeCanvas(); resizeCanvasMobile(); }, 100);
 
 </script>
 </body>
