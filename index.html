@@ -2,7 +2,8 @@
 <html lang="pt-BR">
 <head>
     <meta charset='utf-8'>
-    <meta name='viewport' content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover'>
+    <!-- Viewport ajustada para prevenir zoom e garantir escala correta no mobile -->
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
     <title>N3SK Cloud Control</title>
     
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
@@ -19,15 +20,15 @@
             --muted: #71717a;
         }
 
-        /* Base Reset & Touch Optimization */
-        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; outline:none; user-select: none; touch-action: manipulation; }
+        /* Base Reset */
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; outline:none; user-select: none; }
         
-        /* CURSOR LOGIC: Only show custom cursor on devices with fine pointer (Mouse) */
+        /* LÓGICA DE CURSOR: Apenas exibe em dispositivos com mouse (PC) */
         @media (hover: hover) and (pointer: fine) {
             body { cursor: none !important; }
             #custom-cursor { display: block; }
         }
-        /* Hide custom cursor on Touch Devices */
+        /* Esconde cursor customizado em Touch/Celular */
         @media (hover: none), (pointer: coarse) {
             #custom-cursor { display: none !important; }
             * { cursor: auto !important; }
@@ -38,13 +39,12 @@
             height: 100vh; overflow: hidden; display: flex; font-size: 13px;
         }
 
-        /* Custom Cursor Element */
+        /* Cursor Element */
         #custom-cursor {
             position: fixed; top: 0; left: 0; width: 18px; height: 18px;
             border: 2px solid var(--primary); border-radius: 50%; pointer-events: none;
             z-index: 99999; transform: translate(-50%, -50%);
             transition: transform 0.1s ease, border-color 0.1s ease;
-            display: none; /* Hidden by default, shown via JS/Media Query */
         }
         #custom-cursor.clicking { transform: translate(-50%, -50%) scale(0.65); border-color: #fff; }
 
@@ -58,7 +58,7 @@
         .loading-text { color: var(--primary); font-size: 12px; letter-spacing: 4px; text-transform: uppercase; font-weight: 600; }
 
         /* ============================================ */
-        /* DESKTOP SIDEBAR (Original Style) */
+        /* DESKTOP SIDEBAR (Visível apenas no PC) */
         /* ============================================ */
         .sidebar {
             width: 240px; background: var(--sidebar); border-right: 1px solid var(--border);
@@ -97,7 +97,7 @@
         .stat-txt.on { color: #4ade80; }
         @keyframes pulse-dot { 0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(74, 222, 128, 0); } 100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); } }
 
-        /* Main Content Wrapper */
+        /* Main Wrapper */
         .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); position: relative; }
         .top-bar { height: 50px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; background: var(--bg); z-index: 5; }
         .breadcrumb { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px;}
@@ -167,24 +167,21 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* ============================================ */
-        /* MOBILE UI ELEMENTS */
+        /* MOBILE UI ELEMENTS (Hidden on PC by default) */
         /* ============================================ */
-        
-        /* Overlay for Sidebar */
         .mobile-sidebar-overlay { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.6); 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7); 
             opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 90;
-            backdrop-filter: blur(2px);
+            backdrop-filter: blur(4px);
         }
         .mobile-sidebar-overlay.active { opacity: 1; visibility: visible; }
         
-        /* Mobile Sidebar Drawer */
         .mobile-sidebar { 
             position: fixed; left: 0; top: 0; height: 100%; width: 280px;
             background: var(--sidebar); border-right: 1px solid var(--border);
             flex-direction: column; z-index: 100; 
             transform: translateX(-100%); transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            display: none; /* Flex when active via JS/Media Query */
+            display: none; /* Only shown via media query */
         }
         .mobile-sidebar.active { transform: translateX(0); }
         
@@ -275,29 +272,28 @@
         }
 
         /* ============================================ */
-        /* RESPONSIVIDADE MOBILE OTIMIZADA */
+        /* RESPONSIVIDADE (Apenas Celular/Tablet) */
         /* ============================================ */
         @media(max-width: 900px){
             body { flex-direction: column; }
             
-            /* Hide desktop sidebar */
+            /* Esconde Sidebar Desktop */
             .sidebar { display: none; }
             
-            /* Show mobile header & enable mobile sidebar structure */
+            /* Mostra Header e Sidebar Mobile */
             .mobile-top-bar { display: flex; }
             .mobile-sidebar { display: flex; }
             
-            /* Main wrapper takes full width */
             .main-wrapper { width: 100%; flex-direction: column; }
             .top-bar { display: none; }
             
             .content-area { flex-direction: column; padding-top: 0; }
             
-            /* Preview vai para o RODAPÉ no mobile */
+            /* Preview vai para BAIXO no mobile */
             .live-preview-container { 
                 position: relative; top: auto; right: auto; width: 100%;
                 height: 280px; border-left: none; border-top: 1px solid var(--border);
-                order: 2; /* Joga para baixo */
+                order: 2; 
             }
             
             .config-panel { 
@@ -305,7 +301,7 @@
                 overflow-y: auto; flex: 1; order: 1;
             }
             
-            /* Ajustes de toque para mobile (Maiores) */
+            /* Ajustes de toque (maiores) */
             .chk-container { width: 36px; height: 36px; border-radius: 8px; }
             .chk-icon { width: 18px; height: 18px; transform: translateY(7px); }
             .color-dot { width: 40px; height: 40px; border-radius: 8px; }
@@ -324,16 +320,16 @@
             .control-actions { width: 100%; justify-content: space-between; }
             .feature-card { padding: 18px; margin-bottom: 16px; }
 
-            /* Color Picker responsive */
+            /* Color Picker centralizado no mobile */
             .cp-floating-panel {
                 width: 90vw !important;
                 max-width: 320px !important;
-                left: 5vw !important;
+                left: 50% !important;
                 top: 50% !important;
-                transform: translate(0, -50%) scale(0.95) !important;
+                transform: translate(-50%, -50%) scale(0.95) !important;
             }
             .cp-floating-panel.open {
-                transform: translate(0, -50%) scale(1) !important;
+                transform: translate(-50%, -50%) scale(1) !important;
             }
         }
     </style>
@@ -350,7 +346,7 @@
 <!-- Mobile Sidebar Overlay -->
 <div class="mobile-sidebar-overlay" id="mobileSidebarOverlay" onclick="closeMobileSidebar()"></div>
 
-<!-- Mobile Sidebar -->
+<!-- Mobile Sidebar Drawer -->
 <div class="mobile-sidebar" id="mobileSidebar">
     <div class="mobile-header">
         <img src='https://i.pinimg.com/474x/ff/c1/a5/ffc1a5f503e31b814ff8953ec6f50c7c.jpg' class='mobile-profile-img' />
@@ -453,7 +449,7 @@
 
 <div id="app-container" style="display:none; width:100%; height:100%; flex:1; flex-direction:column;">
   
-  <!-- Desktop Sidebar (Hidden on Mobile) -->
+  <!-- Desktop Sidebar (Visible on PC) -->
   <div class="sidebar">
     <div class="profile-card">
       <img src='https://i.pinimg.com/474x/ff/c1/a5/ffc1a5f503e31b814ff8953ec6f50c7c.jpg' class='profile-img' />
