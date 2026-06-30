@@ -19,10 +19,8 @@
             --muted: #71717a;
         }
 
-        /* Base Reset & Cursor PC Only */
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; outline:none; user-select: none; }
         
-        /* Cursor APENAS em dispositivos com mouse (PC) */
         @media (hover: hover) and (pointer: fine) {
             body { cursor: none !important; }
             #custom-cursor { display: block; }
@@ -34,7 +32,7 @@
 
         body {
             background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif;
-            height: 100vh; overflow: hidden; display: flex; font-size: 13px;
+            overflow: hidden; font-size: 13px;
         }
 
         #custom-cursor {
@@ -53,6 +51,11 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         .loading-text { color: var(--primary); font-size: 12px; letter-spacing: 4px; text-transform: uppercase; font-weight: 600; }
 
+        /* ===== LAYOUT PC (Desktop) ===== */
+        #app-container-desktop {
+            display: flex; height: 100vh; width: 100%;
+        }
+
         /* Sidebar Desktop */
         .sidebar {
             width: 240px; background: var(--sidebar); border-right: 1px solid var(--border);
@@ -66,7 +69,6 @@
 
         .menu-scroll { flex: 1; overflow-y: auto; padding: 10px 0; position: relative; }
         .nav-indicator { position: absolute; left: 0; top: 0; width: 3px; height: 24px; background: var(--primary); border-radius: 0 4px 4px 0; transition: top 0.35s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 10px rgba(0, 255, 235, 0.4); pointer-events: none; z-index: 5; }
-        .sub-indicator { position: absolute; left: 32px; top: 0; width: 6px; height: 6px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 8px var(--primary); transform: translateY(-50%); transition: top 0.35s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; z-index: 5; }
 
         .nav-item { display: flex; align-items: center; padding: 12px 20px; cursor: pointer; transition: all 0.2s ease; color: var(--muted); font-weight: 500; gap: 12px; font-size: 13px; height: 48px; position: relative; background: transparent; }
         .nav-item:hover { color: white; background: rgba(255,255,255,0.02); }
@@ -114,7 +116,6 @@
 
         .control-actions { display: flex; align-items: center; gap: 12px; }
 
-        /* Checkbox Ultra Rápido */
         .chk-container { width: 24px; height: 24px; border-radius: 6px; background: #1a1a1a; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; position: relative; overflow: hidden; transition: background 0.1s ease; }
         .chk-container::before { content: ''; position: absolute; inset: 0; background: var(--primary); border-radius: 6px; opacity: 0; transform: scale(0.8); transition: all 0.15s cubic-bezier(0.25, 1, 0.5, 1); }
         .chk-container.on { background: #000; }
@@ -159,276 +160,158 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ============================================ */
-        /* MENU MOBILE COM HAMBURGER */
-        /* ============================================ */
+        /* ===== LAYOUT MOBILE (Celular) ===== */
+        #app-container-mobile {
+            display: none; flex-direction: column; height: 100vh; width: 100%;
+        }
+
+        /* Header Mobile */
         .mobile-header {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 60px;
-            background: var(--sidebar);
-            border-bottom: 1px solid var(--border);
-            z-index: 999;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 16px;
+            height: 60px; background: var(--sidebar); border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
+            z-index: 50;
         }
 
-        .mobile-header-profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex: 1;
+        .mobile-menu-btn {
+            width: 40px; height: 40px; background: transparent; border: none; color: var(--primary);
+            cursor: pointer; font-size: 24px; display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .mobile-menu-btn:active { transform: scale(0.9); }
+
+        .mobile-profile-top {
+            display: flex; align-items: center; gap: 8px; flex: 1; margin-left: 12px;
         }
 
-        .mobile-header-img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--primary);
-            box-shadow: 0 0 10px rgba(0,255,235,0.3);
+        .mobile-profile-img {
+            width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
+            border: 2px solid var(--primary); box-shadow: 0 0 8px rgba(0,255,235,0.3);
         }
 
-        .mobile-header-text {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
+        .mobile-profile-info {
+            display: flex; flex-direction: column; gap: 2px;
         }
 
-        .mobile-header-name {
-            font-size: 14px;
-            font-weight: 700;
-            color: #fff;
+        .mobile-profile-name {
+            font-size: 13px; font-weight: 700; color: #fff;
         }
 
-        .mobile-header-sub {
-            font-size: 10px;
-            color: var(--muted);
+        .mobile-profile-sub {
+            font-size: 9px; color: var(--muted);
         }
 
-        .mobile-menu-toggle {
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            background: transparent;
-            border: none;
-            padding: 0;
-            position: relative;
+        .mobile-status-icon {
+            width: 10px; height: 10px; border-radius: 50%; background: #444;
+            transition: all 0.3s; margin-left: auto;
         }
 
-        .hamburger {
-            width: 24px;
-            height: 18px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            position: relative;
+        .mobile-status-icon.on {
+            background: #4ade80; box-shadow: 0 0 8px #4ade80;
         }
 
-        .hamburger span {
-            width: 100%;
-            height: 2px;
-            background: var(--primary);
-            border-radius: 1px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        /* Tabs Mobile */
+        .mobile-tabs {
+            display: flex; overflow-x: auto; background: var(--card); border-bottom: 1px solid var(--border);
+            gap: 0; padding: 0;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
         }
 
-        .mobile-menu-toggle.open .hamburger span:nth-child(1) {
-            transform: rotate(45deg) translate(8px, 8px);
-        }
-
-        .mobile-menu-toggle.open .hamburger span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .mobile-menu-toggle.open .hamburger span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -7px);
-        }
-
-        .mobile-menu-overlay {
-            display: none;
-            position: fixed;
-            top: 60px;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 998;
-            backdrop-filter: blur(4px);
-            animation: fadeIn 0.3s ease;
-        }
-
-        .mobile-menu-overlay.active {
-            display: block;
-        }
-
-        .mobile-sidebar {
-            display: none;
-            position: fixed;
-            top: 60px;
-            left: 0;
-            width: 280px;
-            max-height: calc(100vh - 60px);
-            background: var(--sidebar);
-            border-right: 1px solid var(--border);
-            z-index: 999;
-            overflow-y: auto;
-            animation: slideInLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            flex-direction: column;
-        }
-
-        .mobile-sidebar.open {
-            display: flex;
-        }
-
-        @keyframes slideInLeft {
-            from {
-                transform: translateX(-100%);
-            }
-            to {
-                transform: translateX(0);
-            }
-        }
-
-        .mobile-menu-scroll {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px 0;
-        }
-
-        .mobile-nav-item {
-            padding: 16px 20px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            color: var(--muted);
-            font-weight: 500;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-left: 3px solid transparent;
-        }
-
-        .mobile-nav-item:hover {
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-        }
-
-        .mobile-nav-item.active {
-            color: white;
-            background: rgba(0, 255, 235, 0.1);
-            border-left-color: var(--primary);
-        }
-
-        .mobile-nav-icon {
-            width: 20px;
-            height: 20px;
-            fill: currentColor;
+        .mobile-tab-btn {
+            padding: 12px 20px; background: transparent; border: none; color: var(--muted);
+            cursor: pointer; font-size: 12px; font-weight: 600; white-space: nowrap;
+            border-bottom: 2px solid transparent; transition: all 0.3s ease;
             flex-shrink: 0;
         }
 
-        .mobile-menu-footer {
-            padding: 16px 20px;
-            border-top: 1px solid var(--border);
-            background: #080808;
+        .mobile-tab-btn.active {
+            color: var(--primary); border-bottom-color: var(--primary);
         }
 
-        .mobile-status-box {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px;
-            background: #111;
-            border-radius: 6px;
-            border: 1.5px solid #333;
-            margin-top: 10px;
+        /* Sidebar Mobile (Overlay) */
+        .mobile-sidebar-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 40;
+            opacity: 0; visibility: hidden; transition: all 0.3s ease; backdrop-filter: blur(4px);
         }
 
-        /* ============================================ */
-        /* RESPONSIVIDADE MOBILE OTIMIZADA */
-        /* ============================================ */
-        @media(max-width: 900px){
-            body { flex-direction: column; }
-            
-            .mobile-header { display: flex; }
-            
-            /* Esconde sidebar desktop */
-            .sidebar { display: none !important; }
-            
-            #app-container { 
-                flex-direction: column; 
-                padding-top: 60px; 
-                overflow: hidden;
-            }
-            
-            .main-wrapper { 
-                flex: 1; 
-                overflow: hidden;
-            }
-
-            .top-bar { display: none; } /* Esconde top bar no mobile */
-            
-            .content-area { 
-                flex-direction: column; 
-                overflow: hidden;
-            }
-            
-            .config-panel { 
-                flex: 1;
-                max-width: 100%; 
-                padding: 16px;
-                overflow-y: auto;
-                order: 1;
-                position: relative;
-            }
-            
-            /* Preview vai para o RODAPÉ no mobile */
-            .live-preview-container { 
-                position: relative;
-                top: 0;
-                right: 0;
-                width: 100%;
-                height: 35vh;
-                border-left: none;
-                border-top: 1px solid var(--border);
-                order: 2;
-            }
-            
-            /* Ajustes de toque para mobile */
-            .chk-container { width: 40px; height: 40px; } /* Maior área de toque */
-            .chk-icon { transform: translateY(6px); }
-            .chk-container.on .chk-icon { transform: translateY(0); }
-            
-            .color-dot { width: 40px; height: 40px; }
-            input[type=range]::-webkit-slider-thumb { width: 22px; height: 22px; }
-            
-            .control-row { 
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
-
-            .slider-wrap { width: 100%; }
-            
-            .feature-card { 
-                padding: 16px;
-                margin-bottom: 12px;
-            }
+        .mobile-sidebar-overlay.open {
+            opacity: 1; visibility: visible;
         }
 
-        @media(max-width: 600px) {
-            .mobile-sidebar { width: 100%; }
-            
-            .mobile-header-name { font-size: 13px; }
-            .mobile-header-sub { font-size: 9px; }
+        .mobile-sidebar {
+            position: fixed; left: 0; top: 0; width: 70vw; max-width: 280px; height: 100vh;
+            background: var(--sidebar); z-index: 41; transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); border-right: 1px solid var(--border);
+            overflow-y: auto; display: flex; flex-direction: column;
+        }
+
+        .mobile-sidebar.open {
+            transform: translateX(0);
+        }
+
+        .mobile-sidebar-header {
+            padding: 16px; border-bottom: 1px solid var(--border); background: #080808;
+        }
+
+        .mobile-sidebar-close {
+            width: 32px; height: 32px; background: transparent; border: none;
+            color: var(--primary); font-size: 24px; cursor: pointer;
+        }
+
+        .mobile-sidebar-menu {
+            flex: 1; padding: 10px 0; overflow-y: auto;
+        }
+
+        .mobile-sidebar-item {
+            padding: 14px 20px; border: none; background: transparent; color: var(--muted);
+            width: 100%; text-align: left; cursor: pointer; font-size: 13px; font-weight: 500;
+            transition: all 0.2s ease; display: flex; align-items: center; gap: 12px;
+        }
+
+        .mobile-sidebar-item:active {
+            background: rgba(0,255,235,0.1);
+        }
+
+        .mobile-sidebar-item.active {
+            color: var(--primary); background: rgba(0,255,235,0.05);
+        }
+
+        .mobile-sidebar-footer {
+            padding: 16px; border-top: 1px solid var(--border); background: #080808;
+        }
+
+        .mobile-btn-qr {
+            width: 100%; padding: 12px; background: transparent; border: 1.5px solid var(--primary);
+            color: var(--primary); font-weight: bold; border-radius: 8px; cursor: pointer;
+            font-size: 11px; text-transform: uppercase; transition: all 0.3s;
+        }
+
+        .mobile-btn-qr:active {
+            background: rgba(0,255,235,0.1);
+        }
+
+        /* Content Mobile */
+        .mobile-content {
+            flex: 1; overflow-y: auto; padding: 16px; -webkit-overflow-scrolling: touch;
+        }
+
+        .mobile-tab-content {
+            display: none;
+        }
+
+        .mobile-tab-content.active {
+            display: block; animation: fadeIn 0.3s ease;
+        }
+
+        /* Responsividade */
+        @media (max-width: 1024px) {
+            #app-container-desktop { display: none; }
+            #app-container-mobile { display: flex; }
+        }
+
+        @media (min-width: 1025px) {
+            #app-container-mobile { display: none; }
+            #app-container-desktop { display: flex; }
         }
     </style>
 </head>
@@ -480,54 +363,8 @@
     </div>
 </div>
 
-<!-- MOBILE HEADER COM HAMBURGER -->
-<div class="mobile-header">
-    <div class="mobile-header-profile">
-        <img src='https://i.pinimg.com/474x/ff/c1/a5/ffc1a5f503e31b814ff8953ec6f50c7c.jpg' class='mobile-header-img' />
-        <div class='mobile-header-text'>
-            <div class='mobile-header-name'>n3sk</div>
-            <div class='mobile-header-sub'>Fuck any Anti-cheat</div>
-        </div>
-    </div>
-    <button class="mobile-menu-toggle" id="mobileMenuBtn">
-        <div class="hamburger">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-    </button>
-</div>
-
-<!-- MOBILE MENU OVERLAY -->
-<div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
-
-<!-- MOBILE SIDEBAR -->
-<div class="mobile-sidebar" id="mobileSidebar">
-    <div class="mobile-menu-scroll">
-        <div class="mobile-nav-item active" data-menu="visuals" onclick="handleMobileNavClick('visuals', this)">
-            <svg class="mobile-nav-icon" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-            Visuals
-        </div>
-        <div class="mobile-nav-item" data-menu="aimbot" onclick="handleMobileNavClick('aimbot', this)">
-            <svg class="mobile-nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
-            AimBot
-        </div>
-        <div class="mobile-nav-item" data-menu="settings" onclick="handleMobileNavClick('settings', this)">
-            <svg class="mobile-nav-icon" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L3.16 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.04.64.09.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-            Settings
-        </div>
-    </div>
-    
-    <div class="mobile-menu-footer">
-        <button class="btn-global-qr" onclick="showGlobalQr()">GERAR QR</button>
-        <div class="mobile-status-box">
-            <div class="stat-dot" id="conn-dot-mobile"></div>
-            <div class="stat-txt" id="conn-txt-mobile">OFFLINE</div>
-        </div>
-    </div>
-</div>
-
-<div id="app-container" style="display:none; width:100%; height:100%; flex:1;">
+<!-- ===== LAYOUT DESKTOP ===== -->
+<div id="app-container-desktop" style="display:none;">
   
   <div class="sidebar">
     <div class="profile-card">
@@ -556,7 +393,6 @@
             <svg class="nav-arrow" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
         </div>
         <div class="submenu" id="sub-visuals">
-            <div class="sub-indicator" id="subIndicator"></div>
             <div class="sub-item active" onclick="switchTab('visuals-players', event)">Players</div>
             <div class="sub-item" onclick="switchTab('visuals-weapons', event)">Weapons</div>
         </div>
@@ -688,46 +524,147 @@
   </div>
 </div>
 
+<!-- ===== LAYOUT MOBILE ===== -->
+<div id="app-container-mobile" style="display:none;">
+    
+    <div class="mobile-header">
+        <button class="mobile-menu-btn" onclick="toggleMobileSidebar()">☰</button>
+        <div class="mobile-profile-top">
+            <img src='https://i.pinimg.com/474x/ff/c1/a5/ffc1a5f503e31b814ff8953ec6f50c7c.jpg' class='mobile-profile-img' />
+            <div class="mobile-profile-info">
+                <div class="mobile-profile-name">n3sk</div>
+                <div class="mobile-profile-sub">Fuck any Anti-cheat</div>
+            </div>
+        </div>
+        <div class="mobile-status-icon" id="mobile-conn-dot"></div>
+    </div>
+
+    <div class="mobile-tabs">
+        <button class="mobile-tab-btn active" onclick="switchMobileTab('aimbot-main')">AimBot</button>
+        <button class="mobile-tab-btn" onclick="switchMobileTab('visuals-players')">ESP Players</button>
+        <button class="mobile-tab-btn" onclick="switchMobileTab('visuals-weapons')">Weapons</button>
+        <button class="mobile-tab-btn" onclick="switchMobileTab('settings')">Settings</button>
+    </button>
+
+    <div class="mobile-content">
+        <div id="mobile-content-aimbot-main" class="mobile-tab-content active">
+            <div class="feature-card">
+                <div class="feat-head">
+                    <div class="feat-title-group">
+                        <div class="feat-title">Enable AimBot</div>
+                    </div>
+                    <div class="chk-container" id="tgl-enable-aim-mobile" onclick="tg(this)">
+                        <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                    </div>
+                </div>
+                <div class="control-row">
+                    <span class="c-label">FOV</span>
+                    <div class="slider-wrap">
+                        <span class="s-val" id="val-fov-mobile">45</span>
+                        <input type="range" min="1" max="180" step="1" value="45" oninput="updateValue('fov', this.value)">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="mobile-content-visuals-players" class="mobile-tab-content">
+            <div class="feature-card">
+                <div class="feat-head">
+                    <div class="feat-title-group">
+                        <div class="feat-title">Enable ESP</div>
+                    </div>
+                    <div class="chk-container" id="tgl-enable-esp-mobile" onclick="tg(this)">
+                        <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                    </div>
+                </div>
+                <div class="control-row">
+                    <span class="c-label">Box Thickness</span>
+                    <div class="slider-wrap">
+                        <span class="s-val" id="val-thickness-mobile">1.5</span>
+                        <input type="range" min="0.5" max="5" step="0.1" value="1.5" oninput="updateValue('thickness', this.value)">
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="control-row">
+                    <span class="c-label">Box ESP</span>
+                    <div class="control-actions">
+                        <div class="chk-container" id="tgl-box-mobile" onclick='tg(this)'>
+                            <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                        </div>
+                        <div class="color-dot" id="dot-box-mobile" style="background:#ffffff" onclick='openCP(this, "Box Color")'></div>
+                    </div>
+                </div>
+                <div class="control-row">
+                    <span class="c-label">Skeleton</span>
+                    <div class="control-actions">
+                        <div class="chk-container" id="tgl-skeleton-mobile" onclick='tg(this)'>
+                            <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                        </div>
+                        <div class="color-dot" id="dot-skeleton-mobile" style="background:#ffffff" onclick='openCP(this, "Skeleton Color")'></div>
+                    </div>
+                </div>
+                <div class="control-row">
+                    <span class="c-label">Health Bar</span>
+                    <div class="control-actions">
+                        <div class="chk-container" id="tgl-healthbar-mobile" onclick='tg(this)'>
+                            <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                        </div>
+                        <div class="color-dot" id="dot-healthbar-mobile" style="background:#00ff00" onclick='openCP(this, "Health Color")'></div>
+                    </div>
+                </div>
+                <div class="control-row">
+                    <span class="c-label">Snapline</span>
+                    <div class="control-actions">
+                        <div class="chk-container" id="tgl-snapline-mobile" onclick='tg(this)'>
+                            <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                        </div>
+                        <div class="color-dot" id="dot-snapline-mobile" style="background:#ffffff" onclick='openCP(this, "Snapline Color")'></div>
+                    </div>
+                </div>
+                <div class="control-row">
+                    <span class="c-label">Player Name</span>
+                    <div class="control-actions">
+                        <div class="chk-container" id="tgl-name-mobile" onclick='tg(this)'>
+                            <svg class="chk-icon" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                        </div>
+                        <div class="color-dot" id="dot-name-mobile" style="background:#ffffff" onclick='openCP(this, "Name Color")'></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="mobile-content-visuals-weapons" class="mobile-tab-content">
+            <div class="feature-card"><div class="feat-title">Weapons</div><p style="color:#666; margin-top:10px;">Coming soon...</p></div>
+        </div>
+
+        <div id="mobile-content-settings" class="mobile-tab-content">
+            <div class="feature-card"><div class="feat-title">Settings</div><p style="color:#666; margin-top:10px;">Config...</p></div>
+        </div>
+    </div>
+
+    <!-- Sidebar Mobile Overlay -->
+    <div class="mobile-sidebar-overlay" id="mobileSidebarOverlay" onclick="closeMobileSidebar()"></div>
+    
+    <div class="mobile-sidebar" id="mobileSidebar">
+        <div class="mobile-sidebar-header">
+            <button class="mobile-sidebar-close" onclick="closeMobileSidebar()">✕</button>
+        </div>
+        <div class="mobile-sidebar-menu">
+            <button class="mobile-sidebar-item" onclick="closeMobileSidebar(); switchMobileTab('aimbot-main')">AimBot</button>
+            <button class="mobile-sidebar-item" onclick="closeMobileSidebar(); switchMobileTab('visuals-players')">ESP Players</button>
+            <button class="mobile-sidebar-item" onclick="closeMobileSidebar(); switchMobileTab('visuals-weapons')">Weapons</button>
+            <button class="mobile-sidebar-item" onclick="closeMobileSidebar(); switchMobileTab('settings')">Settings</button>
+        </div>
+        <div class="mobile-sidebar-footer">
+            <button class="mobile-btn-qr" onclick="showGlobalQr()">GERAR QR</button>
+        </div>
+    </div>
+
+</div>
+
 <script type="module">
-// --- MOBILE MENU HANDLER ---
-const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-const mobileSidebar = document.getElementById('mobileSidebar');
-const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
-
-function closeMobileMenu() {
-    mobileMenuBtn.classList.remove('open');
-    mobileSidebar.classList.remove('open');
-    mobileMenuOverlay.classList.remove('active');
-}
-
-function toggleMobileMenu() {
-    mobileMenuBtn.classList.toggle('open');
-    mobileSidebar.classList.toggle('open');
-    mobileMenuOverlay.classList.toggle('active');
-}
-
-mobileMenuBtn.addEventListener('click', toggleMobileMenu);
-mobileMenuOverlay.addEventListener('click', closeMobileMenu);
-
-window.handleMobileNavClick = function(menuId, element) {
-    // Atualiza ativo
-    document.querySelectorAll('.mobile-nav-item').forEach(item => item.classList.remove('active'));
-    element.classList.add('active');
-    
-    // Seleciona abas corretas
-    if (menuId === 'visuals') {
-        switchTab('visuals-players', null);
-    } else if (menuId === 'aimbot') {
-        switchTab('aimbot-main', null);
-    } else if (menuId === 'settings') {
-        switchTab('settings', null);
-    }
-    
-    // Fecha menu com efeito smooth
-    closeMobileMenu();
-    scheduleRender();
-}
-
 // --- CURSOR PERSONALIZADO (APENAS PC) ---
 (function(){
     const cur = document.getElementById('custom-cursor');
@@ -746,7 +683,7 @@ window.handleMobileNavClick = function(menuId, element) {
     loop();
 })();
 
-// --- LÓGICA DE MENU ORIGINAL (MANTIDA) ---
+// --- LÓGICA DE MENU ORIGINAL (DESKTOP) ---
 const LAYOUT = { PADDING_TOP: 10, NAV_HEIGHT: 48, SUB_ITEM_HEIGHT: 42, INDICATOR_HEIGHT: 24, SUB_ITEMS_COUNT: { 'aimbot': 1, 'visuals': 2, 'settings': 0 }, NAV_ORDER: ['aimbot', 'visuals', 'settings'] };
 
 function calculateNavPosition(targetMenuId, stateAfterClick) {
@@ -817,6 +754,35 @@ window.switchTab = function(tabId, event) {
     scheduleRender();
 }
 
+// --- MOBILE FUNCTIONS ---
+window.toggleMobileSidebar = function() {
+    const sidebar = document.getElementById('mobileSidebar');
+    const overlay = document.getElementById('mobileSidebarOverlay');
+    sidebar.classList.add('open');
+    overlay.classList.add('open');
+}
+
+window.closeMobileSidebar = function() {
+    const sidebar = document.getElementById('mobileSidebar');
+    const overlay = document.getElementById('mobileSidebarOverlay');
+    sidebar.classList.remove('open');
+    overlay.classList.remove('open');
+}
+
+window.switchMobileTab = function(tabId) {
+    // Tabs
+    document.querySelectorAll('.mobile-tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.mobile-tab-content').forEach(el => el.classList.remove('active'));
+    
+    // Ativa aba selecionada
+    event.target.classList.add('active');
+    const target = document.getElementById('mobile-content-' + tabId);
+    if(target) target.classList.add('active');
+    
+    // Sincroniza com desktop
+    window.switchTab(tabId, null);
+}
+
 // --- FIREBASE ZERO DELAY ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
@@ -845,36 +811,41 @@ if (token) {
     sessionId = token;
     startFirebaseSync();
     document.getElementById('loading-screen').style.display = 'none';
-    document.getElementById('app-container').style.display = 'flex';
+    
+    // Mostra container apropriado
+    if (window.innerWidth > 1024) {
+        document.getElementById('app-container-desktop').style.display = 'flex';
+    } else {
+        document.getElementById('app-container-mobile').style.display = 'flex';
+    }
+    
     setConn(true);
     
-    setTimeout(() => { 
-        const visualsNav = document.getElementById('nav-visuals');
-        if(visualsNav) { visualsNav.classList.add('active', 'expanded'); document.getElementById('sub-visuals').classList.add('open'); }
-        updateNavIndicator(); 
-        const activeSub = document.querySelector('#sub-visuals .sub-item.active'); 
-        if(activeSub) updateSubIndicator(activeSub); 
-    }, 100);
+    if (window.innerWidth > 1024) {
+        setTimeout(() => { 
+            const visualsNav = document.getElementById('nav-visuals');
+            if(visualsNav) { visualsNav.classList.add('active', 'expanded'); document.getElementById('sub-visuals').classList.add('open'); }
+            updateNavIndicator(); 
+        }, 100);
+    }
 } else { alert("Token não encontrado!"); }
 
 function setConn(c){ 
     var d=document.getElementById('conn-dot'),t=document.getElementById('conn-txt');
-    var dm=document.getElementById('conn-dot-mobile'),tm=document.getElementById('conn-txt-mobile');
+    var dm=document.getElementById('mobile-conn-dot');
     if(c){
-        d.classList.add('on');t.classList.add('on');t.textContent='CONECTADO';
-        dm.classList.add('on');tm.classList.add('on');tm.textContent='CONECTADO';
-    } 
-    else{
-        d.classList.remove('on');t.classList.remove('on');t.textContent='OFFLINE';
-        dm.classList.remove('on');tm.classList.remove('on');tm.textContent='OFFLINE';
-    } 
+        if(d){d.classList.add('on');t.classList.add('on');t.textContent='CONECTADO';}
+        if(dm) dm.classList.add('on');
+    } else {
+        if(d){d.classList.remove('on');t.classList.remove('on');t.textContent='OFFLINE';}
+        if(dm) dm.classList.remove('on');
+    }
 }
 
 function startFirebaseSync() {
     const userRef = ref(db, 'users/' + sessionId);
     onValue(userRef, (snapshot) => {
         const data = snapshot.val();
-        // Proteção anti-loop: ignora se clicamos manualmente há menos de 300ms
         if (Date.now() - lastManualClickTime < 300) return;
         if (data) applyState(data);
     });
@@ -882,21 +853,36 @@ function startFirebaseSync() {
 
 window.sendState = function() {
     if (!sessionId) return;
-    const getDotColor = (id) => document.getElementById(id)?.style.backgroundColor || '#ffffff';
+    const getDotColor = (id) => {
+        let el = document.getElementById(id);
+        if (!el) el = document.getElementById(id + '-mobile');
+        return el?.style.backgroundColor || '#ffffff';
+    };
+    const getToggleState = (id) => {
+        let el = document.getElementById(id);
+        if (!el) el = document.getElementById(id + '-mobile');
+        return el?.classList.contains('on') || false;
+    };
+    
     const state = {
         toggles: {
-            esp: document.getElementById('tgl-enable-esp').classList.contains('on'),
-            aim: document.getElementById('tgl-enable-aim').classList.contains('on'),
-            box: document.getElementById('tgl-box').classList.contains('on'),
-            skeleton: document.getElementById('tgl-skeleton').classList.contains('on'),
-            healthbar: document.getElementById('tgl-healthbar').classList.contains('on'),
-            snapline: document.getElementById('tgl-snapline').classList.contains('on'),
-            name: document.getElementById('tgl-name').classList.contains('on')
+            esp: getToggleState('tgl-enable-esp'),
+            aim: getToggleState('tgl-enable-aim'),
+            box: getToggleState('tgl-box'),
+            skeleton: getToggleState('tgl-skeleton'),
+            healthbar: getToggleState('tgl-healthbar'),
+            snapline: getToggleState('tgl-snapline'),
+            name: getToggleState('tgl-name')
         },
-        values: { thickness: document.getElementById('val-thickness').textContent, fov: document.getElementById('val-fov').textContent },
+        values: { 
+            thickness: document.getElementById('val-thickness')?.textContent || document.getElementById('val-thickness-mobile')?.textContent || '1.5',
+            fov: document.getElementById('val-fov')?.textContent || document.getElementById('val-fov-mobile')?.textContent || '45'
+        },
         colors: {
-            box: getDotColor('dot-box'), skeleton: getDotColor('dot-skeleton'),
-            healthbar: getDotColor('dot-healthbar'), snapline: getDotColor('dot-snapline'),
+            box: getDotColor('dot-box'),
+            skeleton: getDotColor('dot-skeleton'),
+            healthbar: getDotColor('dot-healthbar'),
+            snapline: getDotColor('dot-snapline'),
             name: getDotColor('dot-name')
         },
         updatedAt: Date.now()
@@ -905,48 +891,75 @@ window.sendState = function() {
 };
 
 function applyState(state) {
-    const toggleMap = {
-        'tgl-enable-esp': state.toggles?.esp, 'tgl-enable-aim': state.toggles?.aim,
-        'tgl-box': state.toggles?.box, 'tgl-skeleton': state.toggles?.skeleton,
-        'tgl-healthbar': state.toggles?.healthbar, 'tgl-snapline': state.toggles?.snapline,
-        'tgl-name': state.toggles?.name
-    };
-    for (const [id, value] of Object.entries(toggleMap)) {
-        const el = document.getElementById(id);
-        if (el && value !== undefined) { if (value) el.classList.add('on'); else el.classList.remove('on'); }
-    }
+    const toggleMap = [
+        ['tgl-enable-esp', state.toggles?.esp],
+        ['tgl-enable-aim', state.toggles?.aim],
+        ['tgl-box', state.toggles?.box],
+        ['tgl-skeleton', state.toggles?.skeleton],
+        ['tgl-healthbar', state.toggles?.healthbar],
+        ['tgl-snapline', state.toggles?.snapline],
+        ['tgl-name', state.toggles?.name]
+    ];
+    
+    toggleMap.forEach(([id, value]) => {
+        if (value === undefined) return;
+        [id, id + '-mobile'].forEach(elId => {
+            const el = document.getElementById(elId);
+            if (el) {
+                if (value) el.classList.add('on');
+                else el.classList.remove('on');
+            }
+        });
+    });
+    
     if (state.values) {
-        const thickSlider = document.querySelector('#content-visuals-players input[type=range]');
-        if (thickSlider && state.values.thickness) { thickSlider.value = state.values.thickness; document.getElementById('val-thickness').textContent = state.values.thickness; }
-        const fovSlider = document.querySelector('#content-aimbot-main input[type=range]');
-        if (fovSlider && state.values.fov) { fovSlider.value = state.values.fov; document.getElementById('val-fov').textContent = state.values.fov; }
+        document.querySelectorAll('input[type=range]').forEach(slider => {
+            if (slider.value !== state.values.thickness && state.values.thickness) {
+                slider.value = state.values.thickness;
+                document.getElementById('val-thickness').textContent = state.values.thickness;
+                document.getElementById('val-thickness-mobile').textContent = state.values.thickness;
+            }
+            if (slider.value !== state.values.fov && state.values.fov) {
+                slider.value = state.values.fov;
+                document.getElementById('val-fov').textContent = state.values.fov;
+                document.getElementById('val-fov-mobile').textContent = state.values.fov;
+            }
+        });
     }
-    const setDotColor = (id, color) => { const el = document.getElementById(id); if (el && color) el.style.background = color; };
+    
+    const setDotColor = (id, color) => {
+        [id, id + '-mobile'].forEach(elId => {
+            const el = document.getElementById(elId);
+            if (el && color) el.style.background = color;
+        });
+    };
+    
     if (state.colors) {
-        setDotColor('dot-box', state.colors.box); setDotColor('dot-skeleton', state.colors.skeleton);
-        setDotColor('dot-healthbar', state.colors.healthbar); setDotColor('dot-snapline', state.colors.snapline);
+        setDotColor('dot-box', state.colors.box);
+        setDotColor('dot-skeleton', state.colors.skeleton);
+        setDotColor('dot-healthbar', state.colors.healthbar);
+        setDotColor('dot-snapline', state.colors.snapline);
         setDotColor('dot-name', state.colors.name);
     }
     scheduleRender();
 }
 
-// FUNÇÃO TG COM ZERO DELAY VISUAL
 window.tg = function(el) {
-    // 1. Muda visual IMEDIATAMENTE (0ms)
     el.classList.toggle('on');
-    // 2. Protege contra loop por 300ms
     lastManualClickTime = Date.now();
-    // 3. Envia pra nuvem em background
     window.sendState();
     scheduleRender();
 }
 
 window.updateValue = function(key, val) {
-    document.getElementById('val-' + key).textContent = val;
+    const desktopEl = document.getElementById('val-' + key);
+    const mobileEl = document.getElementById('val-' + key + '-mobile');
+    if (desktopEl) desktopEl.textContent = val;
+    if (mobileEl) mobileEl.textContent = val;
     window.sendState();
 }
 
-// --- COLOR PICKER (ADAPTADO PARA TOUCH) ---
+// --- COLOR PICKER ---
 var cpTarget=null, cpH=0.47, cpS=1, cpV=1, cpA=1;
 var cpPanel=document.getElementById('cpPanel'), cpSaturation=document.getElementById('cpSaturation'), cpSatHandle=document.getElementById('cpSatHandle');
 var cpHueSlider=document.getElementById('cpHueSlider'), cpHueHandle=document.getElementById('cpHueHandle');
@@ -969,9 +982,8 @@ function updateCP(){
 window.openCP = function(el, title){ 
     cpTarget=el; if(title) cpTitle.textContent = title; 
     var rect = el.getBoundingClientRect(); 
-    // Ajuste de posição para mobile
     var panelLeft = rect.right + 15; var panelTop = rect.top - 10; 
-    if (window.innerWidth <= 900 || panelLeft + 300 > window.innerWidth) {
+    if (window.innerWidth <= 1024 || panelLeft + 300 > window.innerWidth) {
         panelLeft = Math.max(10, window.innerWidth - 310);
         panelTop = Math.max(10, rect.bottom + 10);
     }
@@ -990,7 +1002,6 @@ window.openCP = function(el, title){
 
 window.closeCP = function(){ cpPanel.classList.remove('open'); window.sendState(); }
 
-// Suporte a Touch e Mouse simultâneo
 function handleDragStart(e, type) {
     e.preventDefault(); 
     if(type==='sat') dSat=true; 
@@ -1007,14 +1018,12 @@ function handleDragEnd() {
 
 var dSat=false,dHue=false,dAlpha=false;
 
-// Eventos Mouse
 cpSaturation.addEventListener('mousedown', e => handleDragStart(e, 'sat'));
 cpHueSlider.addEventListener('mousedown', e => handleDragStart(e, 'hue'));
 cpAlphaSlider.addEventListener('mousedown', e => handleDragStart(e, 'alpha'));
 document.addEventListener('mousemove', handleDragMove);
 document.addEventListener('mouseup', handleDragEnd);
 
-// Eventos Touch (para celular)
 cpSaturation.addEventListener('touchstart', e => handleDragStart(e.touches[0], 'sat'), {passive:false});
 cpHueSlider.addEventListener('touchstart', e => handleDragStart(e.touches[0], 'hue'), {passive:false});
 cpAlphaSlider.addEventListener('touchstart', e => handleDragStart(e.touches[0], 'alpha'), {passive:false});
@@ -1052,8 +1061,9 @@ window.showGlobalQr = function(){
 window.closeGlobalQr = function(){ document.getElementById('qr-modal').classList.remove('active'); }
 
 // Preview Canvas
-var canvas = document.getElementById('previewCanvas'), ctx = canvas.getContext('2d', { alpha: false }), canvasWidth = 0, canvasHeight = 0, renderScheduled = false;
+var canvas = document.getElementById('previewCanvas'), ctx = canvas?.getContext('2d', { alpha: false }), canvasWidth = 0, canvasHeight = 0, renderScheduled = false;
 function resizeCanvas() { 
+    if (!canvas) return;
     var rect = canvas.parentElement.getBoundingClientRect(); 
     var nw = rect.width, nh = rect.height; 
     var dpr = window.devicePixelRatio || 1; 
@@ -1068,7 +1078,7 @@ window.addEventListener('resize', resizeCanvas);
 window.scheduleRender = function() { if (!renderScheduled) { renderScheduled = true; requestAnimationFrame(renderPreview); } }
 function renderPreview() { 
     renderScheduled = false; 
-    if (!canvasWidth || !canvasHeight) return; 
+    if (!canvas || !canvasWidth || !canvasHeight) return; 
     ctx.save(); 
     ctx.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0); 
     ctx.fillStyle = '#050505'; ctx.fillRect(0, 0, canvasWidth, canvasHeight); 
