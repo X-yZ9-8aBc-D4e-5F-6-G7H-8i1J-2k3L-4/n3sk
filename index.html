@@ -140,12 +140,12 @@
         .cp-main-container { display: flex; gap: 12px; height: 160px; }
         .cp-saturation { flex: 1; border-radius: 8px; position: relative; overflow: hidden; cursor: crosshair; background: linear-gradient(to right, #fff, var(--primary)); }
         .cp-sat-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, #000); pointer-events: none; }
-        .cp-sat-handle { position: absolute; width: 14px; height: 14px; border: 2px solid #fff; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 2px 6px rgba(0,0,0,0.5); pointer-events: none; }
+        .cp-sat-handle { position: absolute; width: 14px; height: 14px; border: 2px solid #fff; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 2px 6px rgba(0,0,0,0.5); pointer-events: none; transition: transform 0.1s ease; }
         .cp-hue-slider { width: 18px; height: 100%; border-radius: 8px; position: relative; cursor: pointer; background: linear-gradient(to bottom, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000); }
-        .cp-hue-handle { position: absolute; left: 50%; transform: translate(-50%, -50%); width: 22px; height: 6px; background: #fff; border-radius: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .cp-hue-handle { position: absolute; left: 50%; transform: translate(-50%, -50%); width: 22px; height: 6px; background: #fff; border-radius: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); transition: transform 0.1s ease; }
         .cp-alpha-slider { width: 100%; height: 18px; border-radius: 8px; position: relative; cursor: pointer; background-image: linear-gradient(45deg, #333 25%, transparent 25%), linear-gradient(-45deg, #333 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #333 75%), linear-gradient(-45deg, transparent 75%, #333 75%); background-size: 8px 8px; background-position: 0 0, 0 4px, 4px -4px, -4px 0px; }
         .cp-alpha-gradient { position: absolute; inset: 0; border-radius: 8px; }
-        .cp-alpha-handle { position: absolute; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; background: #fff; border: 2px solid #fff; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.4); margin-left: -7px; }
+        .cp-alpha-handle { position: absolute; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; background: #fff; border: 2px solid #fff; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.4); margin-left: -7px; transition: transform 0.1s ease; }
         .cp-hex-container { display: flex; align-items: center; background: #0a0a0a; border-radius: 6px; padding: 8px 12px; border: 1px solid #2a2a2a; }
         .cp-hex-input { flex: 1; background: transparent; border: none; color: #fff; font-family: monospace; font-size: 12px; outline: none; text-transform: uppercase; }
         .cp-copy-btn { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: #666; cursor: pointer; border-radius: 4px; margin-left: 8px; }
@@ -321,33 +321,29 @@
             position: relative;
         }
 
-        /* SCROLLBAR MOBILE - SEMPRE VISÍVEL */
+        /* SCROLLBAR ELEGANTE MOBILE */
         .mobile-content-main::-webkit-scrollbar {
-            width: 10px !important;
+            width: 6px !important;
             display: block !important;
-            -webkit-appearance: none;
         }
 
         .mobile-content-main::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.05);
-            border-radius: 5px;
+            background: transparent;
         }
 
         .mobile-content-main::-webkit-scrollbar-thumb {
-            background: rgba(0,255,235,0.5);
-            border-radius: 5px;
-            border: 2px solid transparent;
-            background-clip: padding-box;
+            background: linear-gradient(180deg, rgba(0,255,235,0.3) 0%, rgba(0,255,235,0.6) 100%);
+            border-radius: 10px;
+            transition: all 0.3s ease;
         }
 
         .mobile-content-main::-webkit-scrollbar-thumb:hover {
-            background: rgba(0,255,235,0.7);
-            background-clip: padding-box;
+            background: linear-gradient(180deg, rgba(0,255,235,0.5) 0%, rgba(0,255,235,0.8) 100%);
         }
 
         .mobile-content-main::-webkit-scrollbar-thumb:active {
-            background: rgba(0,255,235,0.9);
-            background-clip: padding-box;
+            background: linear-gradient(180deg, rgba(0,255,235,0.7) 0%, rgba(0,255,235,1) 100%);
+            width: 8px;
         }
 
         .mobile-tab-content {
@@ -586,7 +582,6 @@
     <div class="mobile-content">
         <div class="mobile-content-main" id="mobileContentMain">
             
-            <!-- ABA AIMBOT -->
             <div id="mobile-content-aimbot-main" class="mobile-tab-content">
                 <div class="feature-card">
                     <div class="feat-head">
@@ -624,7 +619,6 @@
                 </div>
             </div>
 
-            <!-- ABA VISUALS PLAYERS -->
             <div id="mobile-content-visuals-players" class="mobile-tab-content active">
                 <div class="feature-card">
                     <div class="control-row">
@@ -1183,7 +1177,7 @@ document.addEventListener('mouseup', handleDragEnd);
 cpSaturation.addEventListener('touchstart', e => handleDragStart(e.touches[0], 'sat'), {passive:false});
 cpHueSlider.addEventListener('touchstart', e => handleDragStart(e.touches[0], 'hue'), {passive:false});
 cpAlphaSlider.addEventListener('touchstart', e => handleDragStart(e.touches[0], 'alpha'), {passive:false});
-document.addEventListener('touchmove', e => { if(dSat||dHue||dAlpha) handleDragMove(e.touches[0]); }, {passive:false});
+document.addEventListener('touchmove', e => { if(dSat||dHue||dAlpha) { e.preventDefault(); handleDragMove(e.touches[0]); } }, {passive:false});
 document.addEventListener('touchend', handleDragEnd);
 
 function updateDrag(e){ 
