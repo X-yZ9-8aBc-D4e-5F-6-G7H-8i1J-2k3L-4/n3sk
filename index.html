@@ -215,37 +215,38 @@
         .mobile-status-icon.on {
             background: #4ade80; box-shadow: 0 0 8px #4ade80;
         }
-.mobile-sidebar-overlay {
-    position: fixed; 
-    inset: 0; 
-    top: 60px; /* ADICIONAR */
-    background: rgba(0,0,0,0.7); 
-    z-index: 40;
-    opacity: 0; 
-    visibility: hidden; 
-    transition: all 0.3s ease; 
-    backdrop-filter: blur(4px);
-}
+        
+        .mobile-sidebar-overlay {
+            position: fixed; 
+            inset: 0; 
+            top: 60px;
+            background: rgba(0,0,0,0.7); 
+            z-index: 40;
+            opacity: 0; 
+            visibility: hidden; 
+            transition: all 0.3s ease; 
+            backdrop-filter: blur(4px);
+        }
 
         .mobile-sidebar-overlay.open {
             opacity: 1; visibility: visible;
         }
 
         .mobile-sidebar {
-    position: fixed; 
-    left: 0; 
-    top: 60px; /* MUDOU de 0 para 60px (altura do header) */
-    width: 240px; 
-    height: calc(100vh - 60px); /* MUDOU para compensar o header */
-    background: var(--sidebar); 
-    z-index: 41; 
-    transform: translateX(-100%);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-    border-right: 1px solid var(--border);
-    overflow-y: auto; 
-    display: flex; 
-    flex-direction: column;
-}
+            position: fixed; 
+            left: 0; 
+            top: 60px;
+            width: 240px; 
+            height: calc(100vh - 60px);
+            background: var(--sidebar); 
+            z-index: 41; 
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            border-right: 1px solid var(--border);
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column;
+        }
 
         .mobile-sidebar.open {
             transform: translateX(0);
@@ -336,10 +337,9 @@
             position: relative;
         }
 
-            
-                       /* SCROLLBAR BRANCA CURTA - MÉTODO PADDING (FUNCIONA NO ANDROID) */
+        /* ===== SCROLLBAR AJUSTADA ===== */
         .mobile-content-main::-webkit-scrollbar {
-            width: 3px !important;
+            width: 2px !important;
             display: block !important;
         }
 
@@ -348,21 +348,13 @@
         }
 
         .mobile-content-main::-webkit-scrollbar-thumb {
-            /* Fundo branco sólido */
             background-color: #ffffff !important;
-            
-            /* Padding gigante empurra a cor branca para o centro/topo */
-            /* Ajuste: quanto MAIOR o padding, MENOR fica a barra visível */
-            padding-top: 150px !important;
-            padding-bottom: 150px !important;
-            
-            /* Garante que o padding afete a cor de fundo */
+            border-radius: 4px !important;
+            padding-top: 100px !important;
+            padding-bottom: 100px !important;
             background-clip: padding-box !important;
-            
-            border-radius: 0 !important;
-            box-shadow: 0 0 6px rgba(255, 255, 255, 0.9) !important;
-            
-            min-height: 0 !important;
+            min-height: 40px !important;
+            box-shadow: none !important;
         }
         
         .mobile-tab-content {
@@ -566,7 +558,7 @@
                         <div style="padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 10px; color: var(--muted); font-weight: 600; background: #0a0a0a;">Preview</div>
                         <!-- AUMENTADO PARA 70VH (70% DA TELA) -->
                         <div style="width: 100%; min-height: 70vh; background: #050505; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                            <canvas id="previewCanvasMobile"></canvas>
+                            <canvas id="previewCanvasDesktop"></canvas>
                         </div>
                     </div>
                 </div>
@@ -927,8 +919,6 @@ window.handleMobileNavClick = function(menuId) {
             if (activeItem) {
                 setTimeout(() => {
                     updateMobileSubIndicator(activeItem);
-                    // AQUI REMOVEMOS O FECHAMENTO AUTOMÁTICO AO CLICAR NA CATEGORIA
-                    // O MENU SÓ FECHA QUANDO CLICA NO switchMobileTab
                 }, 50);
             }
         } else {
