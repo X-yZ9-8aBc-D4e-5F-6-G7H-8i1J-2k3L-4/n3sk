@@ -337,26 +337,39 @@
         }
 
             
-                /* SCROLLBAR ALTERNATIVA COM PSEUDO-ELEMENTO */
+         /* SCROLLBAR CURTA E SEMPRE VISÍVEL NO TOPO */
         .mobile-content-main::-webkit-scrollbar {
             width: 3px !important; 
-            display: block !important;
+            display: block !important; /* Força exibição */
         }
 
         .mobile-content-main::-webkit-scrollbar-track {
             background: transparent !important;
+            border: none !important;
         }
 
         .mobile-content-main::-webkit-scrollbar-thumb {
-            background: #ffffff !important;
-            border-radius: 0 !important;
+            /* O TRUQUE: Fundo branco cortado pelas bordas transparentes */
+            background-clip: content-box !important;
+            background-color: #ffffff !important;
+            
+            /* BORDA GIGANTE EM CIMA E EM BAIXO PARA ENCOLHER A BARRA VISUALMENTE */
+            /* Ajuste: 45vh em cima + 45vh em baixo = sobra 10% de barra branca no meio/topo */
+            border-top: 45vh solid transparent !important; 
+            border-bottom: 45vh solid transparent !important; 
+            
+            border-radius: 0 !important; 
+            
+            /* BRILHO */
             box-shadow: 0 0 6px rgba(255, 255, 255, 0.9) !important;
+            
+            min-height: 0 !important;
         }
-
-        /* Limita visualmente o tamanho */
+        
+        /* FORÇA A SCROLLBAR A FICAR VISÍVEL SEMPRE (TRUQUE EXTRA) */
         .mobile-content-main {
-            scrollbar-width: thin !important;
-            scrollbar-color: #ffffff transparent !important;
+            overflow-y: scroll !important;
+            scrollbar-gutter: stable !important; /* Reserva espaço */
         }
         
         .mobile-tab-content {
