@@ -336,8 +336,7 @@
             position: relative;
         }
 
-          /* SCROLLBAR MINÚSCULA E BRANCA (ESTILO IMAGEM) */
-         /* SCROLLBAR CURTA E FINA */
+          /* SCROLLBAR CURTA E FINA (TRUQUE PARA CELULAR) */
         .mobile-content-main::-webkit-scrollbar {
             width: 2px !important; 
             display: block !important;
@@ -348,10 +347,13 @@
         }
 
         .mobile-content-main::-webkit-scrollbar-thumb {
-            background: #ffffff !important; 
+            /* Usamos padding transparente nas pontas para "encolher" a barra visualmente */
+            background-clip: content-box !important;
+            background-color: #ffffff !important;
+            border: 40px solid transparent !important; /* Isso corta 40px de cima e de baixo */
             border-radius: 0 !important; 
-            box-shadow: 0 0 5px rgba(255, 255, 255, 0.8) !important;
-            min-height: 5px; /* <--- ISSO DEFINE O TAMANHO MÁXIMO DELA (BEM CURTINHA) */
+            box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.8) !important; /* Borda interna para dar brilho */
+            min-height: 0 !important; /* Reseta o mínimo do navegador */
         }
         
         .mobile-tab-content {
