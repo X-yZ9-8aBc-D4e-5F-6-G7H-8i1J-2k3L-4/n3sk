@@ -336,41 +336,29 @@
             position: relative;
         }
 
+        /* SCROLLBAR SIMPLES COM SMOOTH */
         .mobile-content-main::-webkit-scrollbar {
-            width: 6px !important;
+            width: 4px !important;
             display: block !important;
         }
 
         .mobile-content-main::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.3);
-            border-radius: 10px;
+            background: transparent;
         }
 
         .mobile-content-main::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, 
-                rgba(0,255,235,0.4) 0%, 
-                rgba(0,255,235,0.8) 50%, 
-                rgba(0,255,235,0.4) 100%);
+            background: rgba(0,255,235,0.3);
             border-radius: 10px;
-            box-shadow: 0 0 6px rgba(0,255,235,0.3);
+            transition: background 0.3s ease;
         }
 
         .mobile-content-main::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, 
-                rgba(0,255,235,0.6) 0%, 
-                rgba(0,255,235,1) 50%, 
-                rgba(0,255,235,0.6) 100%);
-            box-shadow: 0 0 10px rgba(0,255,235,0.5);
+            background: rgba(0,255,235,0.6);
         }
 
         .mobile-content-main::-webkit-scrollbar-thumb:active {
-            background: linear-gradient(180deg, 
-                rgba(0,255,235,0.8) 0%, 
-                rgba(0,255,235,1) 50%, 
-                rgba(0,255,235,0.8) 100%);
-            box-shadow: 0 0 14px rgba(0,255,235,0.7);
+            background: var(--primary);
         }
-
         .mobile-tab-content {
             display: none;
             padding-bottom: 100px;
@@ -567,11 +555,11 @@
                     </div>
                 </div>
 
-                <div class="feature-card" style="padding: 0; border: none; background: transparent; margin-bottom: 0;">
+                    <div class="feature-card" style="padding: 0; border: none; background: transparent; margin-bottom: 0;">
                     <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden;">
                         <div style="padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 10px; color: var(--muted); font-weight: 600; background: #0a0a0a;">Preview</div>
-                        <div style="width: 100%; height: 300px; background: #050505; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                            <canvas id="previewCanvasDesktop"></canvas>
+                        <div style="width: 100%; height: 400px; background: #050505; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                            <canvas id="previewCanvasMobile"></canvas>
                         </div>
                     </div>
                 </div>
