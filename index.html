@@ -140,15 +140,15 @@
         .cp-main-container { display: flex; gap: 12px; height: 160px; }
         .cp-saturation { flex: 1; border-radius: 8px; position: relative; overflow: hidden; cursor: crosshair; background: linear-gradient(to right, #fff, var(--primary)); }
         .cp-sat-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, #000); pointer-events: none; }
+        /* CORRIGIDO: Removido transition do handle para resposta instantânea ao arrastar */
         .cp-sat-handle { position: absolute; width: 14px; height: 14px; border: 2px solid #fff; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 2px 6px rgba(0,0,0,0.5); pointer-events: none; }
-        .cp-sat-handle.dragging { transition: none !important; }
         .cp-hue-slider { width: 18px; height: 100%; border-radius: 8px; position: relative; cursor: pointer; background: linear-gradient(to bottom, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000); }
+        /* CORRIGIDO: Removido transition do handle para resposta instantânea ao arrastar */
         .cp-hue-handle { position: absolute; left: 50%; transform: translate(-50%, -50%); width: 22px; height: 6px; background: #fff; border-radius: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-        .cp-hue-handle.dragging { transition: none !important; }
         .cp-alpha-slider { width: 100%; height: 18px; border-radius: 8px; position: relative; cursor: pointer; background-image: linear-gradient(45deg, #333 25%, transparent 25%), linear-gradient(-45deg, #333 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #333 75%), linear-gradient(-45deg, transparent 75%, #333 75%); background-size: 8px 8px; background-position: 0 0, 0 4px, 4px -4px, -4px 0px; }
         .cp-alpha-gradient { position: absolute; inset: 0; border-radius: 8px; }
+        /* CORRIGIDO: Removido transition do handle para resposta instantânea ao arrastar */
         .cp-alpha-handle { position: absolute; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; background: #fff; border: 2px solid #fff; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.4); margin-left: -7px; }
-        .cp-alpha-handle.dragging { transition: none !important; }
         .cp-hex-container { display: flex; align-items: center; background: #0a0a0a; border-radius: 6px; padding: 8px 12px; border: 1px solid #2a2a2a; }
         .cp-hex-input { flex: 1; background: transparent; border: none; color: #fff; font-family: monospace; font-size: 12px; outline: none; text-transform: uppercase; }
         .cp-copy-btn { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: #666; cursor: pointer; border-radius: 4px; margin-left: 8px; }
@@ -243,33 +243,6 @@
             flex: 1; overflow-y: auto; padding: 10px 0; position: relative;
         }
 
-        /* SCROLLBAR ELEGANTE E SUAVE */
-        .mobile-menu-scroll::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .mobile-menu-scroll::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.02);
-            border-radius: 10px;
-        }
-
-        .mobile-menu-scroll::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, 
-                rgba(0,255,235,0.2) 0%, 
-                rgba(0,255,235,0.5) 50%, 
-                rgba(0,255,235,0.2) 100%);
-            border-radius: 10px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .mobile-menu-scroll::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, 
-                rgba(0,255,235,0.4) 0%, 
-                rgba(0,255,235,0.8) 50%, 
-                rgba(0,255,235,0.4) 100%);
-            box-shadow: 0 0 8px rgba(0,255,235,0.3);
-        }
-
         .mobile-nav-indicator {
             position: absolute; left: 0; top: 0; width: 3px; height: 24px; background: var(--primary);
             border-radius: 0 4px 4px 0; transition: top 0.35s cubic-bezier(0.4, 0, 0.2, 1);
@@ -351,44 +324,40 @@
             position: relative;
         }
 
-        /* SCROLLBAR ELEGANTE MOBILE - CONTEÚDO PRINCIPAL */
+        /* CORRIGIDO: Scrollbar mais bonita com efeito smooth */
         .mobile-content-main::-webkit-scrollbar {
-            width: 5px;
+            width: 6px !important;
             display: block !important;
         }
 
         .mobile-content-main::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.01);
+            background: rgba(0,0,0,0.3);
             border-radius: 10px;
-            margin: 10px 0;
         }
 
         .mobile-content-main::-webkit-scrollbar-thumb {
             background: linear-gradient(180deg, 
-                rgba(0,255,235,0.15) 0%, 
-                rgba(0,255,235,0.4) 50%, 
-                rgba(0,255,235,0.15) 100%);
+                rgba(0,255,235,0.4) 0%, 
+                rgba(0,255,235,0.8) 50%, 
+                rgba(0,255,235,0.4) 100%);
             border-radius: 10px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid rgba(0,255,235,0.1);
+            box-shadow: 0 0 6px rgba(0,255,235,0.3);
         }
 
         .mobile-content-main::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(180deg, 
-                rgba(0,255,235,0.3) 0%, 
-                rgba(0,255,235,0.7) 50%, 
-                rgba(0,255,235,0.3) 100%);
-            box-shadow: 0 0 12px rgba(0,255,235,0.4), inset 0 0 6px rgba(255,255,255,0.2);
-            border: 1px solid rgba(0,255,235,0.3);
+                rgba(0,255,235,0.6) 0%, 
+                rgba(0,255,235,1) 50%, 
+                rgba(0,255,235,0.6) 100%);
+            box-shadow: 0 0 10px rgba(0,255,235,0.5);
         }
 
         .mobile-content-main::-webkit-scrollbar-thumb:active {
             background: linear-gradient(180deg, 
-                rgba(0,255,235,0.5) 0%, 
+                rgba(0,255,235,0.8) 0%, 
                 rgba(0,255,235,1) 50%, 
-                rgba(0,255,235,0.5) 100%);
-            box-shadow: 0 0 16px rgba(0,255,235,0.6), inset 0 0 8px rgba(255,255,255,0.3);
-            width: 6px;
+                rgba(0,255,235,0.8) 100%);
+            box-shadow: 0 0 14px rgba(0,255,235,0.7);
         }
 
         .mobile-tab-content {
@@ -913,15 +882,18 @@ function updateMobileNavIndicator() {
 }
 
 function updateMobileSubIndicator(activeItem) {
-    const indicator = document.getElementById('mobileSubIndicatorVisuals') || document.getElementById('mobileSubIndicatorAimbot');
-    if (activeItem && indicator) {
-        const submenu = activeItem.closest('.mobile-submenu');
-        if (submenu) {
-            const submenuRect = submenu.getBoundingClientRect();
-            const itemRect = activeItem.getBoundingClientRect();
-            const topPosition = (itemRect.top - submenuRect.top) + (itemRect.height / 2);
-            indicator.style.top = topPosition + 'px';
-        }
+    if (!activeItem) activeItem = document.querySelector('.mobile-sub-item.active');
+    if (!activeItem) return;
+    
+    const submenu = activeItem.closest('.mobile-submenu');
+    if (!submenu) return;
+    
+    const indicator = submenu.querySelector('.mobile-sub-indicator');
+    if (indicator) {
+        const submenuRect = submenu.getBoundingClientRect();
+        const itemRect = activeItem.getBoundingClientRect();
+        const topPosition = (itemRect.top - submenuRect.top) + (itemRect.height / 2);
+        indicator.style.top = topPosition + 'px';
     }
 }
 
@@ -937,21 +909,16 @@ window.handleMobileNavClick = function(menuId) {
     const sub = document.getElementById('mobile-sub-' + menuId);
     if (nav) { 
         nav.classList.add('active'); 
-        if (sub && sub.children.length > 1) { 
+        if (sub && sub.querySelectorAll('.mobile-sub-item').length > 0) { 
             nav.classList.add('expanded'); 
             sub.classList.add('open');
             
             const activeItem = sub.querySelector('.mobile-sub-item.active') || sub.querySelector('.mobile-sub-item');
             if (activeItem) {
                 setTimeout(() => {
-                    const indicatorId = menuId === 'aimbot' ? 'mobileSubIndicatorAimbot' : 'mobileSubIndicatorVisuals';
-                    const subIndicator = document.getElementById(indicatorId);
-                    if (subIndicator) {
-                        const submenuRect = sub.getBoundingClientRect();
-                        const itemRect = activeItem.getBoundingClientRect();
-                        const topPosition = (itemRect.top - submenuRect.top) + (itemRect.height / 2);
-                        subIndicator.style.top = topPosition + 'px';
-                    }
+                    updateMobileSubIndicator(activeItem);
+                    switchMobileTab(activeItem.textContent.toLowerCase().includes('main') ? 'aimbot-main' : 
+                                   activeItem.textContent.toLowerCase().includes('player') ? 'visuals-players' : 'visuals-weapons', null);
                 }, 50);
             }
         } else {
@@ -969,17 +936,7 @@ window.switchMobileTab = function(tabId, event) {
     document.querySelectorAll('.mobile-sub-item').forEach(el => el.classList.remove('active'));
     if(event && event.target.classList.contains('mobile-sub-item')) { 
         event.target.classList.add('active');
-        
-        const submenu = event.target.closest('.mobile-submenu');
-        if (submenu) {
-            const indicator = submenu.querySelector('.mobile-sub-indicator');
-            if (indicator) {
-                const submenuRect = submenu.getBoundingClientRect();
-                const itemRect = event.target.getBoundingClientRect();
-                const topPosition = (itemRect.top - submenuRect.top) + (itemRect.height / 2);
-                indicator.style.top = topPosition + 'px';
-            }
-        }
+        updateMobileSubIndicator(event.target);
     }
     
     closeMobileSidebar();
@@ -1038,18 +995,8 @@ if (token) {
                 document.getElementById('mobile-sub-visuals').classList.add('open'); 
             }
             updateMobileNavIndicator();
-            
             const activeSub = document.querySelector('#mobile-sub-visuals .mobile-sub-item.active');
-            if (activeSub) {
-                const indicator = document.getElementById('mobileSubIndicatorVisuals');
-                if (indicator) {
-                    const submenu = document.getElementById('mobile-sub-visuals');
-                    const submenuRect = submenu.getBoundingClientRect();
-                    const itemRect = activeSub.getBoundingClientRect();
-                    const topPosition = (itemRect.top - submenuRect.top) + (itemRect.height / 2);
-                    indicator.style.top = topPosition + 'px';
-                }
-            }
+            if(activeSub) updateMobileSubIndicator(activeSub);
         }, 100);
     }
     
@@ -1235,22 +1182,16 @@ window.closeCP = function(){ cpPanel.classList.remove('open'); window.sendState(
 
 function handleDragStart(e, type) {
     e.preventDefault(); 
-    if(type==='sat') { dSat=true; cpSatHandle.classList.add('dragging'); }
-    if(type==='hue') { dHue=true; cpHueHandle.classList.add('dragging'); }
-    if(type==='alpha') { dAlpha=true; cpAlphaHandle.classList.add('dragging'); }
+    if(type==='sat') dSat=true; 
+    if(type==='hue') dHue=true; 
+    if(type==='alpha') dAlpha=true; 
     updateDrag(e);
 }
 function handleDragMove(e) { 
     if(dSat||dHue||dAlpha) updateDrag(e); 
 }
 function handleDragEnd() { 
-    if(dSat||dHue||dAlpha){ 
-        dSat=false; dHue=false; dAlpha=false; 
-        cpSatHandle.classList.remove('dragging');
-        cpHueHandle.classList.remove('dragging');
-        cpAlphaHandle.classList.remove('dragging');
-        window.sendState(); 
-    } 
+    if(dSat||dHue||dAlpha){ dSat=false; dHue=false; dAlpha=false; window.sendState(); } 
 }
 
 var dSat=false,dHue=false,dAlpha=false;
