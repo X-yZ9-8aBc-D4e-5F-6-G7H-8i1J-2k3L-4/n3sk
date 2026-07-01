@@ -104,7 +104,6 @@
         .top-bar { height: 50px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; background: var(--bg); z-index: 5; }
         .breadcrumb { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px;}
         .breadcrumb span.current { color: white; font-weight: 600; }
-        .version { font-size: 11px; color: #444; font-family: monospace; }
 
         .content-area { flex: 1; display: flex; overflow: hidden; position: relative; }
         .config-panel { flex: 1; padding: 24px; overflow-y: auto; max-width: 600px; position: relative; z-index: 2; }
@@ -230,7 +229,7 @@
             position: fixed; left: 0; top: 0; width: 240px; height: 100vh;
             background: var(--sidebar); z-index: 41; transform: translateX(-100%);
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); border-right: 1px solid var(--border);
-            overflow-y: auto; display: flex; flex-direction: column; padding-top: 0;
+            overflow-y: auto; display: flex; flex-direction: column;
         }
 
         .mobile-sidebar.open {
@@ -310,50 +309,50 @@
 
         .mobile-content {
             flex: 1; display: flex; flex-direction: column; overflow: hidden;
-            position: relative;
         }
 
         .mobile-content-main {
             flex: 1; 
-            overflow-y: auto !important; 
+            overflow-y: scroll !important; 
             overflow-x: hidden !important;
             padding: 16px; 
             -webkit-overflow-scrolling: touch;
             scroll-behavior: smooth;
             position: relative;
-            z-index: 1;
         }
 
-        /* SCROLLBAR MOBILE - VISÍVEL E FUNCIONAL */
+        /* SCROLLBAR MOBILE - SEMPRE VISÍVEL */
         .mobile-content-main::-webkit-scrollbar {
-            width: 8px !important;
+            width: 10px !important;
             display: block !important;
+            -webkit-appearance: none;
         }
 
         .mobile-content-main::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.03);
-            border-radius: 4px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 5px;
         }
 
         .mobile-content-main::-webkit-scrollbar-thumb {
-            background: rgba(0,255,235,0.4);
-            border-radius: 4px;
-            border: 1px solid rgba(0,0,0,0.2);
+            background: rgba(0,255,235,0.5);
+            border-radius: 5px;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+        }
+
+        .mobile-content-main::-webkit-scrollbar-thumb:hover {
+            background: rgba(0,255,235,0.7);
+            background-clip: padding-box;
         }
 
         .mobile-content-main::-webkit-scrollbar-thumb:active {
-            background: rgba(0,255,235,0.7);
-        }
-
-        /* Firefox */
-        .mobile-content-main {
-            scrollbar-width: thin;
-            scrollbar-color: rgba(0,255,235,0.4) rgba(255,255,255,0.03);
+            background: rgba(0,255,235,0.9);
+            background-clip: padding-box;
         }
 
         .mobile-tab-content {
             display: none;
-            padding-bottom: 50px;
+            padding-bottom: 100px;
         }
 
         .mobile-tab-content.active {
@@ -586,6 +585,8 @@
 
     <div class="mobile-content">
         <div class="mobile-content-main" id="mobileContentMain">
+            
+            <!-- ABA AIMBOT -->
             <div id="mobile-content-aimbot-main" class="mobile-tab-content">
                 <div class="feature-card">
                     <div class="feat-head">
@@ -603,9 +604,27 @@
                             <input type="range" min="1" max="180" step="1" value="45" oninput="updateValue('fov', this.value)">
                         </div>
                     </div>
+                    <div class="control-row">
+                        <span class="c-label">Smooth</span>
+                        <div class="slider-wrap">
+                            <span class="s-val" id="val-smooth-mobile">5</span>
+                            <input type="range" min="1" max="20" step="1" value="5" oninput="updateValue('smooth', this.value)">
+                        </div>
+                    </div>
+                    <div class="control-row">
+                        <span class="c-label">Bone</span>
+                        <div class="control-actions">
+                            <select style="background:#1a1a1a;color:#fff;border:1px solid #333;padding:8px;border-radius:6px;">
+                                <option>Head</option>
+                                <option>Body</option>
+                                <option>Nearest</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
 
+            <!-- ABA VISUALS PLAYERS -->
             <div id="mobile-content-visuals-players" class="mobile-tab-content active">
                 <div class="feature-card">
                     <div class="control-row">
@@ -885,9 +904,6 @@ window.handleMobileNavClick = function(menuId) {
             sub.classList.add('open'); 
         } 
     }
-    
-    // NÃO FECHA A SIDEBAR AQUI - apenas expande o submenu
-    // A sidebar só fecha quando clicar em um sub-item (Main, Players, Weapons)
 }
 
 window.switchMobileTab = function(tabId, event) {
@@ -902,10 +918,8 @@ window.switchMobileTab = function(tabId, event) {
         updateMobileSubIndicator();
     }
     
-    // FECHA A SIDEBAR APENAS AQUI - quando clica em uma feature
     closeMobileSidebar();
     
-    // Scroll para o topo após trocar de aba
     const contentMain = document.getElementById('mobileContentMain');
     if(contentMain) {
         contentMain.scrollTop = 0;
@@ -1015,7 +1029,8 @@ window.sendState = function() {
         },
         values: { 
             thickness: document.getElementById('val-thickness')?.textContent || document.getElementById('val-thickness-mobile')?.textContent || '1.5',
-            fov: document.getElementById('val-fov')?.textContent || document.getElementById('val-fov-mobile')?.textContent || '45'
+            fov: document.getElementById('val-fov')?.textContent || document.getElementById('val-fov-mobile')?.textContent || '45',
+            smooth: document.getElementById('val-smooth')?.textContent || document.getElementById('val-smooth-mobile')?.textContent || '5'
         },
         colors: {
             box: getDotColor('dot-box'),
@@ -1054,18 +1069,18 @@ function applyState(state) {
             const thickMobile = document.getElementById('val-thickness-mobile');
             if (thickDesktop) thickDesktop.textContent = state.values.thickness;
             if (thickMobile) thickMobile.textContent = state.values.thickness;
-            document.querySelectorAll('#content-visuals-players input[type=range], #mobile-content-visuals-players input[type=range]').forEach(slider => {
-                if (slider.max === '5') slider.value = state.values.thickness;
-            });
         }
         if (state.values.fov) {
             const fovDesktop = document.getElementById('val-fov');
             const fovMobile = document.getElementById('val-fov-mobile');
             if (fovDesktop) fovDesktop.textContent = state.values.fov;
             if (fovMobile) fovMobile.textContent = state.values.fov;
-            document.querySelectorAll('#content-aimbot-main input[type=range], #mobile-content-aimbot-main input[type=range]').forEach(slider => {
-                if (slider.max === '180') slider.value = state.values.fov;
-            });
+        }
+        if (state.values.smooth) {
+            const smoothDesktop = document.getElementById('val-smooth');
+            const smoothMobile = document.getElementById('val-smooth-mobile');
+            if (smoothDesktop) smoothDesktop.textContent = state.values.smooth;
+            if (smoothMobile) smoothMobile.textContent = state.values.smooth;
         }
     }
     
