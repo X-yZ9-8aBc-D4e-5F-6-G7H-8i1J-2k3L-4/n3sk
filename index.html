@@ -41,7 +41,7 @@
             border: 2px solid var(--primary); border-radius: 50%; pointer-events: none;
             z-index: 99999; transform: translate(-50%, -50%);
             transition: transform 0.1s ease, border-color 0.1s ease;
-            display: none; /* PADRÃO: desligado no mobile */
+            display: none;
         }
         #custom-cursor.clicking { transform: translate(-50%, -50%) scale(0.65); border-color: #fff; }
 
@@ -86,7 +86,6 @@
         .sub-item:hover { color: #aaa; }
         .sub-item.active { color: var(--primary); font-weight: 600; }
 
-        /* BOLINHA INDICADORA - Alinhada corretamente */
         .sub-indicator { 
             position: absolute; left: 32px; top: 0; width: 6px; height: 6px; 
             background: var(--primary); border-radius: 50%; box-shadow: 0 0 8px var(--primary); 
@@ -171,7 +170,6 @@
             position: relative;
         }
 
-        /* Header Mobile */
         .mobile-header {
             height: 60px; background: var(--sidebar); border-bottom: 1px solid var(--border);
             display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
@@ -222,7 +220,6 @@
             background: #4ade80; box-shadow: 0 0 8px #4ade80;
         }
 
-        /* Sidebar Mobile (Overlay) */
         .mobile-sidebar-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 40;
             opacity: 0; visibility: hidden; transition: all 0.3s ease; backdrop-filter: blur(4px);
@@ -243,7 +240,6 @@
             transform: translateX(0);
         }
 
-        /* Sidebar Menu Style (igual ao PC) */
         .mobile-menu-scroll {
             flex: 1; overflow-y: auto; padding: 10px 0; position: relative;
         }
@@ -315,7 +311,6 @@
             cursor: pointer; transition: all 0.3s; font-size: 11px; text-transform: uppercase;
         }
 
-        /* Content Mobile */
         .mobile-content {
             flex: 1; display: flex; flex-direction: column; overflow: hidden;
         }
@@ -332,7 +327,6 @@
             display: block; animation: fadeIn 0.3s ease;
         }
 
-        /* Responsividade */
         @media (max-width: 1024px) {
             #app-container-desktop { display: none; }
             #app-container-mobile { display: flex; }
@@ -407,6 +401,7 @@
     <div class="menu-scroll">
         <div class="nav-indicator" id="navIndicator"></div>
         
+        <!-- AIMBOT ADICIONADO ACIMA DE VISUALS -->
         <div class="nav-item" id="nav-aimbot" onclick="handleNavClick('aimbot')">
             <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
             AimBot
@@ -520,7 +515,7 @@
                     </div>
                 </div>
 
-                <!-- Preview dentro do conteúdo -->
+                <!-- Preview dentro do conteúdo com scroll -->
                 <div class="feature-card" style="padding: 0; border: none; background: transparent; margin-bottom: 0;">
                     <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden;">
                         <div style="padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 10px; color: var(--muted); font-weight: 600; background: #0a0a0a;">Preview</div>
@@ -668,6 +663,7 @@
         <div class="mobile-menu-scroll">
             <div class="mobile-nav-indicator" id="mobileNavIndicator"></div>
             
+            <!-- AIMBOT ADICIONADO NO MOBILE TAMBÉM -->
             <div class="mobile-nav-item" id="mobile-nav-aimbot" onclick="handleMobileNavClick('aimbot')">
                 <svg class="mobile-nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
                 AimBot
@@ -704,10 +700,9 @@
 </div>
 
 <script type="module">
-// --- CURSOR PERSONALIZADO (APENAS PC - Removido 100% do Mobile) ---
+// --- CURSOR PERSONALIZADO (APENAS PC) ---
 (function(){
     const cur = document.getElementById('custom-cursor');
-    // Verifica se é touch/mobile - se sim, não faz nada
     if(!cur || window.matchMedia('(hover: none) and (pointer: coarse)').matches) return; 
     
     let mx = window.innerWidth/2, my = window.innerHeight/2;
@@ -749,35 +744,45 @@ function updateNavIndicator() {
     }
 }
 
-/* FUNÇÃO CORRIGIDA - Bolinha Alinhada */
 function updateSubIndicator(activeItem) {
     const indicator = document.getElementById('subIndicator');
     if (activeItem && indicator) {
         const subMenu = activeItem.parentElement;
         const subRect = subMenu.getBoundingClientRect();
         const itemRect = activeItem.getBoundingClientRect();
-        // Calcula a posição vertical do item com relação ao submenu
         const topPosition = (itemRect.top - subRect.top) + (itemRect.height / 2);
         indicator.style.top = topPosition + 'px';
     }
 }
 
+// SIDEBAR NÃO FECHA AO CLICAR NOS ITENS PRINCIPAIS - SÓ NAS FEATURES
 window.handleNavClick = function(menuId) {
     const indicator = document.getElementById('navIndicator');
     const stateAfterClick = { 'aimbot': (menuId === 'aimbot'), 'visuals': (menuId === 'visuals') };
     if(window.innerWidth > 900) indicator.style.top = calculateNavPosition(menuId, stateAfterClick) + 'px';
     
+    // Remove active/expandido de todos
     document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active', 'expanded'));
     document.querySelectorAll('.submenu').forEach(sub => sub.classList.remove('open'));
     
+    // Ativa o menu clicado
     const nav = document.getElementById('nav-' + menuId);
     const sub = document.getElementById('sub-' + menuId);
-    if (nav) { nav.classList.add('active'); if (sub) { nav.classList.add('expanded'); sub.classList.add('open'); } }
+    if (nav) { 
+        nav.classList.add('active'); 
+        if (sub) { 
+            nav.classList.add('expanded'); 
+            sub.classList.add('open'); 
+        } 
+    }
     
+    // Se tem submenu, clica no primeiro item ativo ou no primeiro disponível
     if (sub) {
         const activeItem = sub.querySelector('.sub-item.active') || sub.querySelector('.sub-item');
         if (activeItem) setTimeout(() => activeItem.click(), 50);
-    } else { window.switchTab(menuId, null); }
+    } else { 
+        window.switchTab(menuId, null); 
+    }
 }
     
 window.switchTab = function(tabId, event) {
@@ -795,7 +800,7 @@ window.switchTab = function(tabId, event) {
     document.querySelectorAll('.sub-item').forEach(el => el.classList.remove('active'));
     if(event && event.target.classList.contains('sub-item')) { 
         event.target.classList.add('active'); 
-        updateSubIndicator(event.target); // Atualiza a bolinha
+        updateSubIndicator(event.target);
     }
     scheduleRender();
 }
@@ -847,7 +852,6 @@ function updateMobileNavIndicator() {
     }
 }
 
-/* FUNÇÃO CORRIGIDA MOBILE - Bolinha Alinhada */
 function updateMobileSubIndicator() {
     const activeItem = document.querySelector('.mobile-sub-item.active');
     const indicator = document.getElementById('mobileSubIndicator');
@@ -862,6 +866,7 @@ function updateMobileSubIndicator() {
     }
 }
 
+// SIDEBAR MOBILE TAMBÉM NÃO FECHA AO CLICAR NOS ITENS PRINCIPAIS
 window.handleMobileNavClick = function(menuId) {
     const indicator = document.getElementById('mobileNavIndicator');
     const stateAfterClick = { 'aimbot': (menuId === 'aimbot'), 'visuals': (menuId === 'visuals') };
@@ -886,6 +891,7 @@ window.handleMobileNavClick = function(menuId) {
     } else { 
         window.switchMobileTab(menuId, null); 
     }
+    // NOTA: Não fecha a sidebar aqui - só fecha quando clica nas features
 }
 
 window.switchMobileTab = function(tabId, event) {
@@ -897,9 +903,10 @@ window.switchMobileTab = function(tabId, event) {
     document.querySelectorAll('.mobile-sub-item').forEach(el => el.classList.remove('active'));
     if(event && event.target.classList.contains('mobile-sub-item')) { 
         event.target.classList.add('active');
-        updateMobileSubIndicator(); // Atualiza a bolinha mobile
+        updateMobileSubIndicator();
     }
     
+    // Fecha a sidebar SÓ quando clica nas features/sub-itens
     closeMobileSidebar();
     scheduleRender();
 }
@@ -933,7 +940,6 @@ if (token) {
     startFirebaseSync();
     document.getElementById('loading-screen').style.display = 'none';
     
-    // Mostra container apropriado
     if (window.innerWidth > 1024) {
         document.getElementById('app-container-desktop').style.display = 'flex';
         setTimeout(() => { 
@@ -1229,7 +1235,6 @@ window.scheduleRender = function() { if (!renderScheduled) { renderScheduled = t
 function renderPreview() { 
     renderScheduled = false; 
     
-    // Desktop Preview
     if (canvas && canvasWidth && canvasHeight) {
         ctx.save(); 
         ctx.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0); 
@@ -1237,7 +1242,6 @@ function renderPreview() {
         ctx.restore(); 
     }
     
-    // Mobile Preview
     if (canvasMobile && canvasWidthMobile && canvasHeightMobile) {
         ctxMobile.save();
         ctxMobile.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0);
