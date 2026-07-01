@@ -916,13 +916,8 @@ window.handleMobileNavClick = function(menuId) {
             if (activeItem) {
                 setTimeout(() => {
                     updateMobileSubIndicator(activeItem);
-                    if (menuId === 'aimbot') {
-                        switchMobileTab('aimbot-main', null);
-                    } else if (menuId === 'visuals') {
-                        const itemName = activeItem.textContent.toLowerCase();
-                        if (itemName.includes('player')) switchMobileTab('visuals-players', null);
-                        else if (itemName.includes('weapon')) switchMobileTab('visuals-weapons', null);
-                    }
+                    // AQUI REMOVEMOS O FECHAMENTO AUTOMÁTICO AO CLICAR NA CATEGORIA
+                    // O MENU SÓ FECHA QUANDO CLICA NO switchMobileTab
                 }, 50);
             }
         } else {
