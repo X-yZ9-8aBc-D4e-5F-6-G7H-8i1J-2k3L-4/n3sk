@@ -336,7 +336,7 @@
             position: relative;
         }
 
-           /* SCROLLBAR ESTILO IMAGEM (LINHA BRANCA MÉDIA) */
+        /* SCROLLBAR BRANCA NO TOPO (ESTILO IMAGEM) */
         .mobile-content-main::-webkit-scrollbar {
             width: 3px !important; 
             display: block !important;
@@ -344,21 +344,24 @@
 
         .mobile-content-main::-webkit-scrollbar-track {
             background: transparent !important;
+            border: none !important;
         }
 
         .mobile-content-main::-webkit-scrollbar-thumb {
-            background-clip: content-box !important;
             background-color: #ffffff !important;
-            
-            /* AQUI DEFINE O TAMANHO: 15% de cima e 15% de baixo = barra com 70% do tamanho */
-            border-top: 15vh solid transparent !important; 
-            border-bottom: 15vh solid transparent !important; 
-            
             border-radius: 0 !important; 
-            box-shadow: 0 0 4px rgba(255, 255, 255, 0.8) !important; /* Brilho externo suave */
-            min-height: 0 !important;
+            
+            /* TAMANHO DO TRAÇO: Ajuste esse valor se quiser maior ou menor */
+            min-height: 80px !important; 
+            max-height: 80px !important;
+            
+            /* BRILHO BRANCO SUAVE */
+            box-shadow: 0 0 6px rgba(255, 255, 255, 0.9) !important;
+            
+            /* GARANTE QUE FIQUE COLADO NO TOPO SEM ESPAÇOS */
+            border-top: 0 solid transparent !important;
+            border-bottom: 0 solid transparent !important;
         }
-        
         .mobile-tab-content {
             display: none;
             padding-bottom: 100px;
