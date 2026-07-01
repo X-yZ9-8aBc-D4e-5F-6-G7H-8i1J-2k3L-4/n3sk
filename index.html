@@ -337,7 +337,7 @@
         }
 
             
-                     /* SCROLLBAR BRANCA CURTA NO TOPO - VERSÃO FINAL */
+                       /* SCROLLBAR BRANCA CURTA - MÉTODO PADDING (FUNCIONA NO ANDROID) */
         .mobile-content-main::-webkit-scrollbar {
             width: 3px !important;
             display: block !important;
@@ -345,30 +345,24 @@
 
         .mobile-content-main::-webkit-scrollbar-track {
             background: transparent !important;
-            border: none !important;
         }
 
         .mobile-content-main::-webkit-scrollbar-thumb {
-            /* Garante que a cor branca só apareça na área de conteúdo, não nas bordas */
-            background-clip: content-box !important;
+            /* Fundo branco sólido */
             background-color: #ffffff !important;
             
-            /* COLADA NO TOPO: Sem espaço transparente acima */
-            border-top: 0 solid transparent !important;
+            /* Padding gigante empurra a cor branca para o centro/topo */
+            /* Ajuste: quanto MAIOR o padding, MENOR fica a barra visível */
+            padding-top: 150px !important;
+            padding-bottom: 150px !important;
             
-            /* LIMITA O TAMANHO: Ajuste esse valor para mudar o comprimento */
-            /* 80vh significa que 80% da tela será transparente embaixo, sobrando ~20% de barra branca no topo */
-            border-bottom: 80vh solid transparent !important;
+            /* Garante que o padding afete a cor de fundo */
+            background-clip: padding-box !important;
             
-            /* Remove arredondamento para ficar reta igual à imagem */
             border-radius: 0 !important;
+            box-shadow: 0 0 6px rgba(255, 255, 255, 0.9) !important;
             
-            /* Brilho externo suave */
-            box-shadow: 0 0 5px rgba(255, 255, 255, 0.8) !important;
-            
-            /* Reseta alturas mínimas/máximas que o navegador tenta impor */
             min-height: 0 !important;
-            max-height: none !important;
         }
         
         .mobile-tab-content {
