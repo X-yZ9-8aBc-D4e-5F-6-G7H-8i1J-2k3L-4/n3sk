@@ -337,32 +337,38 @@
         }
 
             
-                /* SCROLLBAR CURTA FIXA - FUNCIONA NO ANDROID */
+                     /* SCROLLBAR BRANCA CURTA NO TOPO - VERSÃO FINAL */
         .mobile-content-main::-webkit-scrollbar {
-            width: 4px !important;
+            width: 3px !important;
             display: block !important;
         }
 
         .mobile-content-main::-webkit-scrollbar-track {
             background: transparent !important;
+            border: none !important;
         }
 
         .mobile-content-main::-webkit-scrollbar-thumb {
+            /* Garante que a cor branca só apareça na área de conteúdo, não nas bordas */
             background-clip: content-box !important;
             background-color: #ffffff !important;
             
-            /* Bordas laterais transparentes afinam a barra visualmente */
-            border-left: 1px solid transparent !important;
-            border-right: 1px solid transparent !important;
+            /* COLADA NO TOPO: Sem espaço transparente acima */
+            border-top: 0 solid transparent !important;
             
-            /* Bordas superior/inferior definem o comprimento VISUAL */
-            /* 35vh + 35vh = 70% transparente, sobra 30% branco (~200px em tela normal) */
-            border-top: 35vh solid transparent !important;
-            border-bottom: 35vh solid transparent !important;
+            /* LIMITA O TAMANHO: Ajuste esse valor para mudar o comprimento */
+            /* 80vh significa que 80% da tela será transparente embaixo, sobrando ~20% de barra branca no topo */
+            border-bottom: 80vh solid transparent !important;
             
+            /* Remove arredondamento para ficar reta igual à imagem */
             border-radius: 0 !important;
-            box-shadow: 0 0 6px rgba(255, 255, 255, 0.9) !important;
+            
+            /* Brilho externo suave */
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.8) !important;
+            
+            /* Reseta alturas mínimas/máximas que o navegador tenta impor */
             min-height: 0 !important;
+            max-height: none !important;
         }
         
         .mobile-tab-content {
