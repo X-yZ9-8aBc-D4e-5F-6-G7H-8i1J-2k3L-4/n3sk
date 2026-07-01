@@ -140,14 +140,11 @@
         .cp-main-container { display: flex; gap: 12px; height: 160px; }
         .cp-saturation { flex: 1; border-radius: 8px; position: relative; overflow: hidden; cursor: crosshair; background: linear-gradient(to right, #fff, var(--primary)); }
         .cp-sat-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, #000); pointer-events: none; }
-        /* CORRIGIDO: Removido transition do handle para resposta instantânea ao arrastar */
         .cp-sat-handle { position: absolute; width: 14px; height: 14px; border: 2px solid #fff; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 2px 6px rgba(0,0,0,0.5); pointer-events: none; }
         .cp-hue-slider { width: 18px; height: 100%; border-radius: 8px; position: relative; cursor: pointer; background: linear-gradient(to bottom, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000); }
-        /* CORRIGIDO: Removido transition do handle para resposta instantânea ao arrastar */
         .cp-hue-handle { position: absolute; left: 50%; transform: translate(-50%, -50%); width: 22px; height: 6px; background: #fff; border-radius: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
         .cp-alpha-slider { width: 100%; height: 18px; border-radius: 8px; position: relative; cursor: pointer; background-image: linear-gradient(45deg, #333 25%, transparent 25%), linear-gradient(-45deg, #333 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #333 75%), linear-gradient(-45deg, transparent 75%, #333 75%); background-size: 8px 8px; background-position: 0 0, 0 4px, 4px -4px, -4px 0px; }
         .cp-alpha-gradient { position: absolute; inset: 0; border-radius: 8px; }
-        /* CORRIGIDO: Removido transition do handle para resposta instantânea ao arrastar */
         .cp-alpha-handle { position: absolute; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; background: #fff; border: 2px solid #fff; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.4); margin-left: -7px; }
         .cp-hex-container { display: flex; align-items: center; background: #0a0a0a; border-radius: 6px; padding: 8px 12px; border: 1px solid #2a2a2a; }
         .cp-hex-input { flex: 1; background: transparent; border: none; color: #fff; font-family: monospace; font-size: 12px; outline: none; text-transform: uppercase; }
@@ -324,7 +321,6 @@
             position: relative;
         }
 
-        /* CORRIGIDO: Scrollbar mais bonita com efeito smooth */
         .mobile-content-main::-webkit-scrollbar {
             width: 6px !important;
             display: block !important;
@@ -708,6 +704,7 @@
         <div class="mobile-menu-scroll">
             <div class="mobile-nav-indicator" id="mobileNavIndicator"></div>
             
+            <!-- AIMBOT - ADICIONADO CORRETAMENTE -->
             <div class="mobile-nav-item" id="mobile-nav-aimbot" onclick="handleMobileNavClick('aimbot')">
                 <svg class="mobile-nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
                 AimBot
@@ -917,8 +914,13 @@ window.handleMobileNavClick = function(menuId) {
             if (activeItem) {
                 setTimeout(() => {
                     updateMobileSubIndicator(activeItem);
-                    switchMobileTab(activeItem.textContent.toLowerCase().includes('main') ? 'aimbot-main' : 
-                                   activeItem.textContent.toLowerCase().includes('player') ? 'visuals-players' : 'visuals-weapons', null);
+                    if (menuId === 'aimbot') {
+                        switchMobileTab('aimbot-main', null);
+                    } else if (menuId === 'visuals') {
+                        const itemName = activeItem.textContent.toLowerCase();
+                        if (itemName.includes('player')) switchMobileTab('visuals-players', null);
+                        else if (itemName.includes('weapon')) switchMobileTab('visuals-weapons', null);
+                    }
                 }, 50);
             }
         } else {
