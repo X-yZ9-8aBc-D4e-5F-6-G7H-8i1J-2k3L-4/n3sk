@@ -337,9 +337,9 @@
         }
 
             
-               /* SCROLLBAR BRANCA CURTA - JEITO SIMPLES */
+                /* SCROLLBAR CURTA FIXA - FUNCIONA NO ANDROID */
         .mobile-content-main::-webkit-scrollbar {
-            width: 2px !important;
+            width: 4px !important;
             display: block !important;
         }
 
@@ -348,11 +348,21 @@
         }
 
         .mobile-content-main::-webkit-scrollbar-thumb {
-            background: #ffffff !important;
+            background-clip: content-box !important;
+            background-color: #ffffff !important;
+            
+            /* Bordas laterais transparentes afinam a barra visualmente */
+            border-left: 1px solid transparent !important;
+            border-right: 1px solid transparent !important;
+            
+            /* Bordas superior/inferior definem o comprimento VISUAL */
+            /* 35vh + 35vh = 70% transparente, sobra 30% branco (~200px em tela normal) */
+            border-top: 35vh solid transparent !important;
+            border-bottom: 35vh solid transparent !important;
+            
             border-radius: 0 !important;
-            min-height: 10px !important;
-            max-height: 10px !important;
-            box-shadow: 0 0 4px rgba(255, 255, 255, 0.8) !important;
+            box-shadow: 0 0 6px rgba(255, 255, 255, 0.9) !important;
+            min-height: 0 !important;
         }
         
         .mobile-tab-content {
