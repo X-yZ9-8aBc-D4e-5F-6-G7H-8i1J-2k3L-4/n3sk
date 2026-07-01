@@ -23,7 +23,7 @@
         
         @media (hover: hover) and (pointer: fine) {
             body { cursor: none !important; }
-            #custom-cursor { display: block; }
+            #custom-cursor { display: block !important; }
         }
         @media (hover: none) and (pointer: coarse) {
             #custom-cursor { display: none !important; }
@@ -41,6 +41,7 @@
             border: 2px solid var(--primary); border-radius: 50%; pointer-events: none;
             z-index: 99999; transform: translate(-50%, -50%);
             transition: transform 0.1s ease, border-color 0.1s ease;
+            display: none; /* PADRÃO: desligado no mobile */
         }
         #custom-cursor.clicking { transform: translate(-50%, -50%) scale(0.65); border-color: #fff; }
 
@@ -84,6 +85,14 @@
         .sub-item { padding: 10px 20px 10px 50px; color: #555; cursor: pointer; transition: 0.2s; font-size: 12px; position: relative; z-index: 2; height: 42px; display: flex; align-items: center; }
         .sub-item:hover { color: #aaa; }
         .sub-item.active { color: var(--primary); font-weight: 600; }
+
+        /* BOLINHA INDICADORA - Alinhada corretamente */
+        .sub-indicator { 
+            position: absolute; left: 32px; top: 0; width: 6px; height: 6px; 
+            background: var(--primary); border-radius: 50%; box-shadow: 0 0 8px var(--primary); 
+            transition: top 0.35s cubic-bezier(0.4, 0, 0.2, 1); 
+            pointer-events: none; z-index: 5; 
+        }
 
         .sidebar-footer { padding: 20px; border-top: 1px solid var(--border); background: #080808; }
         .btn-global-qr { width: 100%; padding: 12px; background: transparent; border: 1.5px solid var(--primary); color: var(--primary); font-weight: bold; letter-spacing: 1px; border-radius: 8px; cursor: pointer; transition: all 0.3s; font-size: 11px; text-transform: uppercase; margin-top: 10px; }
@@ -290,7 +299,7 @@
         .mobile-sub-item.active { color: var(--primary); font-weight: 600; }
 
         .mobile-sub-indicator {
-            position: absolute; left: 22px; width: 8px; height: 8px;
+            position: absolute; left: 32px; top: 0; width: 6px; height: 6px;
             background: var(--primary); border-radius: 50%; box-shadow: 0 0 8px var(--primary);
             transition: top 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             pointer-events: none; z-index: 5;
@@ -413,6 +422,7 @@
             <svg class="nav-arrow" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
         </div>
         <div class="submenu" id="sub-visuals">
+            <div class="sub-indicator" id="subIndicator"></div>
             <div class="sub-item active" onclick="switchTab('visuals-players', event)">Players</div>
             <div class="sub-item" onclick="switchTab('visuals-weapons', event)">Weapons</div>
         </div>
@@ -694,10 +704,10 @@
 </div>
 
 <script type="module">
-// --- CURSOR PERSONALIZADO (APENAS PC - Removido do Mobile) ---
+// --- CURSOR PERSONALIZADO (APENAS PC - Removido 100% do Mobile) ---
 (function(){
     const cur = document.getElementById('custom-cursor');
-    // Verifica se está em device mobile/touch
+    // Verifica se é touch/mobile - se sim, não faz nada
     if(!cur || window.matchMedia('(hover: none) and (pointer: coarse)').matches) return; 
     
     let mx = window.innerWidth/2, my = window.innerHeight/2;
@@ -739,6 +749,19 @@ function updateNavIndicator() {
     }
 }
 
+/* FUNÇÃO CORRIGIDA - Bolinha Alinhada */
+function updateSubIndicator(activeItem) {
+    const indicator = document.getElementById('subIndicator');
+    if (activeItem && indicator) {
+        const subMenu = activeItem.parentElement;
+        const subRect = subMenu.getBoundingClientRect();
+        const itemRect = activeItem.getBoundingClientRect();
+        // Calcula a posição vertical do item com relação ao submenu
+        const topPosition = (itemRect.top - subRect.top) + (itemRect.height / 2);
+        indicator.style.top = topPosition + 'px';
+    }
+}
+
 window.handleNavClick = function(menuId) {
     const indicator = document.getElementById('navIndicator');
     const stateAfterClick = { 'aimbot': (menuId === 'aimbot'), 'visuals': (menuId === 'visuals') };
@@ -770,7 +793,10 @@ window.switchTab = function(tabId, event) {
     else if(tabId === 'settings') bc.innerHTML = 'System <span style="opacity:0.5">•</span> <span class="current">Settings</span>';
 
     document.querySelectorAll('.sub-item').forEach(el => el.classList.remove('active'));
-    if(event && event.target.classList.contains('sub-item')) { event.target.classList.add('active'); }
+    if(event && event.target.classList.contains('sub-item')) { 
+        event.target.classList.add('active'); 
+        updateSubIndicator(event.target); // Atualiza a bolinha
+    }
     scheduleRender();
 }
 
@@ -821,15 +847,17 @@ function updateMobileNavIndicator() {
     }
 }
 
+/* FUNÇÃO CORRIGIDA MOBILE - Bolinha Alinhada */
 function updateMobileSubIndicator() {
     const activeItem = document.querySelector('.mobile-sub-item.active');
     const indicator = document.getElementById('mobileSubIndicator');
     if (activeItem && indicator) {
         const submenu = activeItem.closest('.mobile-submenu');
         if (submenu) {
-            const itemIndex = Array.from(submenu.querySelectorAll('.mobile-sub-item')).indexOf(activeItem);
-            const targetTop = 10 + (itemIndex * 42) + 21; // 10 = padding top, 42 = item height, 21 = center
-            indicator.style.top = targetTop + 'px';
+            const submenuRect = submenu.getBoundingClientRect();
+            const itemRect = activeItem.getBoundingClientRect();
+            const topPosition = (itemRect.top - submenuRect.top) + (itemRect.height / 2);
+            indicator.style.top = topPosition + 'px';
         }
     }
 }
@@ -869,7 +897,7 @@ window.switchMobileTab = function(tabId, event) {
     document.querySelectorAll('.mobile-sub-item').forEach(el => el.classList.remove('active'));
     if(event && event.target.classList.contains('mobile-sub-item')) { 
         event.target.classList.add('active');
-        updateMobileSubIndicator();
+        updateMobileSubIndicator(); // Atualiza a bolinha mobile
     }
     
     closeMobileSidebar();
@@ -912,6 +940,8 @@ if (token) {
             const visualsNav = document.getElementById('nav-visuals');
             if(visualsNav) { visualsNav.classList.add('active', 'expanded'); document.getElementById('sub-visuals').classList.add('open'); }
             updateNavIndicator(); 
+            const activeSub = document.querySelector('#sub-visuals .sub-item.active'); 
+            if(activeSub) updateSubIndicator(activeSub); 
         }, 100);
     } else {
         document.getElementById('app-container-mobile').style.display = 'flex';
