@@ -336,7 +336,7 @@
             position: relative;
         }
 
-        /* SCROLLBAR BRANCA NO TOPO (ESTILO IMAGEM) */
+             /* SCROLLBAR BRANCA CURTA NO TOPO (FUNCIONANDO NO CELULAR) */
         .mobile-content-main::-webkit-scrollbar {
             width: 3px !important; 
             display: block !important;
@@ -348,20 +348,23 @@
         }
 
         .mobile-content-main::-webkit-scrollbar-thumb {
+            background-clip: content-box !important;
             background-color: #ffffff !important;
+            
+            /* AJUSTE AQUI O TAMANHO: Quanto MAIOR o valor, MENOR fica a barra branca */
+            /* Para uma barra de aprox 80px em telas normais, use 15vh */
+            border-top: 15vh solid transparent !important; 
+            border-bottom: 15vh solid transparent !important; 
+            
             border-radius: 0 !important; 
             
-            /* TAMANHO DO TRAÇO: Ajuste esse valor se quiser maior ou menor */
-            min-height: 20px !important; 
-            max-height: 20px !important;
+            /* BRILHO EXTERNO PARA DAR EFEITO NEON */
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.8) !important;
             
-            /* BRILHO BRANCO SUAVE */
-            box-shadow: 0 0 6px rgba(255, 255, 255, 0.9) !important;
-            
-            /* GARANTE QUE FIQUE COLADO NO TOPO SEM ESPAÇOS */
-            border-top: 0 solid transparent !important;
-            border-bottom: 0 solid transparent !important;
+            min-height: 0 !important;
+            max-height: none !important;
         }
+        
         .mobile-tab-content {
             display: none;
             padding-bottom: 100px;
