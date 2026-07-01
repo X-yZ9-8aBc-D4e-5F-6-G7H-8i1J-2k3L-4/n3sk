@@ -336,7 +336,8 @@
             position: relative;
         }
 
-              /* SCROLLBAR BRANCA CURTA COLADA NO TOPO */
+            
+                /* SCROLLBAR ALTERNATIVA COM PSEUDO-ELEMENTO */
         .mobile-content-main::-webkit-scrollbar {
             width: 3px !important; 
             display: block !important;
@@ -344,25 +345,18 @@
 
         .mobile-content-main::-webkit-scrollbar-track {
             background: transparent !important;
-            border: none !important;
         }
 
         .mobile-content-main::-webkit-scrollbar-thumb {
-            background-clip: content-box !important;
-            background-color: #ffffff !important;
-            
-            /* APENAS A BORDA DE BAIXO LIMITA O TAMANHO */
-            /* Ajuste esse valor: quanto MAIOR, MENOR fica a barra */
-            border-top: 0 solid transparent !important; /* GARANTE QUE COMECE NO TOPO */
-            border-bottom: 85vh solid transparent !important; /* LIMITA O COMPRIMENTO */
-            
-            border-radius: 0 !important; 
-            
-            /* BRILHO EXTERNO */
-            box-shadow: 0 0 5px rgba(255, 255, 255, 0.8) !important;
-            
-            min-height: 0 !important;
-            max-height: none !important;
+            background: #ffffff !important;
+            border-radius: 0 !important;
+            box-shadow: 0 0 6px rgba(255, 255, 255, 0.9) !important;
+        }
+
+        /* Limita visualmente o tamanho */
+        .mobile-content-main {
+            scrollbar-width: thin !important;
+            scrollbar-color: #ffffff transparent !important;
         }
         
         .mobile-tab-content {
