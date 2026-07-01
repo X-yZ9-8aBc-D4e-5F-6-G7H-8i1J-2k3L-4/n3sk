@@ -337,21 +337,21 @@
         }
 
           /* SCROLLBAR MINÚSCULA E BRANCA (ESTILO IMAGEM) */
+         /* SCROLLBAR CURTA E FINA */
         .mobile-content-main::-webkit-scrollbar {
-            width: 2px !important; /* Força a ser bem fininha */
-            display: block !important; /* Garante que apareça no mobile */
+            width: 2px !important; 
+            display: block !important;
         }
 
         .mobile-content-main::-webkit-scrollbar-track {
             background: transparent !important;
-            border: none !important;
         }
 
         .mobile-content-main::-webkit-scrollbar-thumb {
-            background: #ffffff !important; /* Branco puro */
-            border-radius: 0 !important; /* Reta, sem borda arredondada */
-            box-shadow: 0 0 5px rgba(255, 255, 255, 0.8) !important; /* Brilho neon */
-            min-height: 15px; /* Tamanho mínimo do "puxador" */
+            background: #ffffff !important; 
+            border-radius: 0 !important; 
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.8) !important;
+            min-height: 15px; /* <--- ISSO DEFINE O TAMANHO MÁXIMO DELA (BEM CURTINHA) */
         }
         
         .mobile-tab-content {
