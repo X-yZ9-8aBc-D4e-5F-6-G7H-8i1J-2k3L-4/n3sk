@@ -336,9 +336,9 @@
             position: relative;
         }
 
-        /* SCROLLBAR CURTA E FINA (FUNCIONANDO NO CELULAR) */
+           /* SCROLLBAR ESTILO IMAGEM (LINHA BRANCA MÉDIA) */
         .mobile-content-main::-webkit-scrollbar {
-            width: 3px !important; /* Aumentei um pouquinho para não sumir */
+            width: 3px !important; 
             display: block !important;
         }
 
@@ -349,10 +349,13 @@
         .mobile-content-main::-webkit-scrollbar-thumb {
             background-clip: content-box !important;
             background-color: #ffffff !important;
-            border-top: 50px solid transparent !important; /* Encurta por cima */
-            border-bottom: 50px solid transparent !important; /* Encurta por baixo */
+            
+            /* AQUI DEFINE O TAMANHO: 15% de cima e 15% de baixo = barra com 70% do tamanho */
+            border-top: 15vh solid transparent !important; 
+            border-bottom: 15vh solid transparent !important; 
+            
             border-radius: 0 !important; 
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.9) !important; /* Brilho interno */
+            box-shadow: 0 0 4px rgba(255, 255, 255, 0.8) !important; /* Brilho externo suave */
             min-height: 0 !important;
         }
         
