@@ -53,7 +53,6 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         .loading-text { color: var(--primary); font-size: 12px; letter-spacing: 4px; text-transform: uppercase; font-weight: 600; }
 
-        /* ===== LAYOUT PC (Desktop) ===== */
         #app-container-desktop {
             display: flex; height: 100vh; width: 100%;
         }
@@ -162,7 +161,7 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ===== LAYOUT MOBILE (Celular) ===== */
+        /* ===== LAYOUT MOBILE ===== */
         #app-container-mobile {
             display: none; flex-direction: column; height: 100vh; width: 100%;
             position: relative;
@@ -176,7 +175,7 @@
 
         .mobile-menu-btn {
             width: 40px; height: 40px; background: transparent; border: none;
-            cursor: pointer; font-size: 24px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
             transition: all 0.3s ease; flex-direction: column; gap: 5px;
             padding: 0; margin-left: auto;
         }
@@ -311,44 +310,55 @@
 
         .mobile-content {
             flex: 1; display: flex; flex-direction: column; overflow: hidden;
+            position: relative;
         }
 
         .mobile-content-main {
-            flex: 1; overflow-y: auto; padding: 16px; -webkit-overflow-scrolling: touch;
+            flex: 1; 
+            overflow-y: auto !important; 
+            overflow-x: hidden !important;
+            padding: 16px; 
+            -webkit-overflow-scrolling: touch;
             scroll-behavior: smooth;
+            position: relative;
+            z-index: 1;
         }
 
-        /* SCROLLBAR ESTILIZADA PARA MOBILE */
+        /* SCROLLBAR MOBILE - VISÍVEL E FUNCIONAL */
         .mobile-content-main::-webkit-scrollbar {
-            width: 6px;
+            width: 8px !important;
+            display: block !important;
         }
 
         .mobile-content-main::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.02);
-            border-radius: 3px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 4px;
         }
 
         .mobile-content-main::-webkit-scrollbar-thumb {
-            background: rgba(0,255,235,0.3);
-            border-radius: 3px;
-            transition: background 0.3s;
-        }
-
-        .mobile-content-main::-webkit-scrollbar-thumb:hover {
-            background: rgba(0,255,235,0.5);
+            background: rgba(0,255,235,0.4);
+            border-radius: 4px;
+            border: 1px solid rgba(0,0,0,0.2);
         }
 
         .mobile-content-main::-webkit-scrollbar-thumb:active {
             background: rgba(0,255,235,0.7);
         }
 
+        /* Firefox */
+        .mobile-content-main {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0,255,235,0.4) rgba(255,255,255,0.03);
+        }
+
         .mobile-tab-content {
             display: none;
-            padding-bottom: 30px;
+            padding-bottom: 50px;
         }
 
         .mobile-tab-content.active {
-            display: block; animation: fadeIn 0.3s ease;
+            display: block; 
+            animation: fadeIn 0.3s ease;
         }
 
         @media (max-width: 1024px) {
@@ -575,7 +585,7 @@
     </div>
 
     <div class="mobile-content">
-        <div class="mobile-content-main">
+        <div class="mobile-content-main" id="mobileContentMain">
             <div id="mobile-content-aimbot-main" class="mobile-tab-content">
                 <div class="feature-card">
                     <div class="feat-head">
@@ -876,9 +886,8 @@ window.handleMobileNavClick = function(menuId) {
         } 
     }
     
-    // REMOVIDO: Clique automático no primeiro sub-item
-    // Agora o usuário pode ver o submenu antes de escolher a feature
-    // A sidebar só fecha quando clicar em uma feature (sub-item)
+    // NÃO FECHA A SIDEBAR AQUI - apenas expande o submenu
+    // A sidebar só fecha quando clicar em um sub-item (Main, Players, Weapons)
 }
 
 window.switchMobileTab = function(tabId, event) {
@@ -893,8 +902,15 @@ window.switchMobileTab = function(tabId, event) {
         updateMobileSubIndicator();
     }
     
-    // Sidebar só fecha quando clicar em uma feature (sub-item)
+    // FECHA A SIDEBAR APENAS AQUI - quando clica em uma feature
     closeMobileSidebar();
+    
+    // Scroll para o topo após trocar de aba
+    const contentMain = document.getElementById('mobileContentMain');
+    if(contentMain) {
+        contentMain.scrollTop = 0;
+    }
+    
     scheduleRender();
 }
 
