@@ -140,12 +140,15 @@
         .cp-main-container { display: flex; gap: 12px; height: 160px; }
         .cp-saturation { flex: 1; border-radius: 8px; position: relative; overflow: hidden; cursor: crosshair; background: linear-gradient(to right, #fff, var(--primary)); }
         .cp-sat-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, #000); pointer-events: none; }
-        .cp-sat-handle { position: absolute; width: 14px; height: 14px; border: 2px solid #fff; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 2px 6px rgba(0,0,0,0.5); pointer-events: none; transition: transform 0.1s ease; }
+        .cp-sat-handle { position: absolute; width: 14px; height: 14px; border: 2px solid #fff; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 2px 6px rgba(0,0,0,0.5); pointer-events: none; }
+        .cp-sat-handle.dragging { transition: none !important; }
         .cp-hue-slider { width: 18px; height: 100%; border-radius: 8px; position: relative; cursor: pointer; background: linear-gradient(to bottom, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000); }
-        .cp-hue-handle { position: absolute; left: 50%; transform: translate(-50%, -50%); width: 22px; height: 6px; background: #fff; border-radius: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); transition: transform 0.1s ease; }
+        .cp-hue-handle { position: absolute; left: 50%; transform: translate(-50%, -50%); width: 22px; height: 6px; background: #fff; border-radius: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .cp-hue-handle.dragging { transition: none !important; }
         .cp-alpha-slider { width: 100%; height: 18px; border-radius: 8px; position: relative; cursor: pointer; background-image: linear-gradient(45deg, #333 25%, transparent 25%), linear-gradient(-45deg, #333 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #333 75%), linear-gradient(-45deg, transparent 75%, #333 75%); background-size: 8px 8px; background-position: 0 0, 0 4px, 4px -4px, -4px 0px; }
         .cp-alpha-gradient { position: absolute; inset: 0; border-radius: 8px; }
-        .cp-alpha-handle { position: absolute; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; background: #fff; border: 2px solid #fff; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.4); margin-left: -7px; transition: transform 0.1s ease; }
+        .cp-alpha-handle { position: absolute; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; background: #fff; border: 2px solid #fff; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.4); margin-left: -7px; }
+        .cp-alpha-handle.dragging { transition: none !important; }
         .cp-hex-container { display: flex; align-items: center; background: #0a0a0a; border-radius: 6px; padding: 8px 12px; border: 1px solid #2a2a2a; }
         .cp-hex-input { flex: 1; background: transparent; border: none; color: #fff; font-family: monospace; font-size: 12px; outline: none; text-transform: uppercase; }
         .cp-copy-btn { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: #666; cursor: pointer; border-radius: 4px; margin-left: 8px; }
@@ -240,6 +243,33 @@
             flex: 1; overflow-y: auto; padding: 10px 0; position: relative;
         }
 
+        /* SCROLLBAR ELEGANTE E SUAVE */
+        .mobile-menu-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .mobile-menu-scroll::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.02);
+            border-radius: 10px;
+        }
+
+        .mobile-menu-scroll::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, 
+                rgba(0,255,235,0.2) 0%, 
+                rgba(0,255,235,0.5) 50%, 
+                rgba(0,255,235,0.2) 100%);
+            border-radius: 10px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .mobile-menu-scroll::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, 
+                rgba(0,255,235,0.4) 0%, 
+                rgba(0,255,235,0.8) 50%, 
+                rgba(0,255,235,0.4) 100%);
+            box-shadow: 0 0 8px rgba(0,255,235,0.3);
+        }
+
         .mobile-nav-indicator {
             position: absolute; left: 0; top: 0; width: 3px; height: 24px; background: var(--primary);
             border-radius: 0 4px 4px 0; transition: top 0.35s cubic-bezier(0.4, 0, 0.2, 1);
@@ -321,29 +351,44 @@
             position: relative;
         }
 
-        /* SCROLLBAR ELEGANTE MOBILE */
+        /* SCROLLBAR ELEGANTE MOBILE - CONTEÚDO PRINCIPAL */
         .mobile-content-main::-webkit-scrollbar {
-            width: 6px !important;
+            width: 5px;
             display: block !important;
         }
 
         .mobile-content-main::-webkit-scrollbar-track {
-            background: transparent;
+            background: rgba(255,255,255,0.01);
+            border-radius: 10px;
+            margin: 10px 0;
         }
 
         .mobile-content-main::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, rgba(0,255,235,0.3) 0%, rgba(0,255,235,0.6) 100%);
+            background: linear-gradient(180deg, 
+                rgba(0,255,235,0.15) 0%, 
+                rgba(0,255,235,0.4) 50%, 
+                rgba(0,255,235,0.15) 100%);
             border-radius: 10px;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(0,255,235,0.1);
         }
 
         .mobile-content-main::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, rgba(0,255,235,0.5) 0%, rgba(0,255,235,0.8) 100%);
+            background: linear-gradient(180deg, 
+                rgba(0,255,235,0.3) 0%, 
+                rgba(0,255,235,0.7) 50%, 
+                rgba(0,255,235,0.3) 100%);
+            box-shadow: 0 0 12px rgba(0,255,235,0.4), inset 0 0 6px rgba(255,255,255,0.2);
+            border: 1px solid rgba(0,255,235,0.3);
         }
 
         .mobile-content-main::-webkit-scrollbar-thumb:active {
-            background: linear-gradient(180deg, rgba(0,255,235,0.7) 0%, rgba(0,255,235,1) 100%);
-            width: 8px;
+            background: linear-gradient(180deg, 
+                rgba(0,255,235,0.5) 0%, 
+                rgba(0,255,235,1) 50%, 
+                rgba(0,255,235,0.5) 100%);
+            box-shadow: 0 0 16px rgba(0,255,235,0.6), inset 0 0 8px rgba(255,255,255,0.3);
+            width: 6px;
         }
 
         .mobile-tab-content {
@@ -700,6 +745,7 @@
                 <svg class="mobile-nav-arrow" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
             </div>
             <div class="mobile-submenu" id="mobile-sub-aimbot">
+                <div class="mobile-sub-indicator" id="mobileSubIndicatorAimbot"></div>
                 <div class="mobile-sub-item active" onclick="switchMobileTab('aimbot-main', event)">Main</div>
             </div>
 
@@ -709,7 +755,7 @@
                 <svg class="mobile-nav-arrow" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
             </div>
             <div class="mobile-submenu" id="mobile-sub-visuals">
-                <div class="mobile-sub-indicator" id="mobileSubIndicator"></div>
+                <div class="mobile-sub-indicator" id="mobileSubIndicatorVisuals"></div>
                 <div class="mobile-sub-item active" onclick="switchMobileTab('visuals-players', event)">Players</div>
                 <div class="mobile-sub-item" onclick="switchMobileTab('visuals-weapons', event)">Weapons</div>
             </div>
@@ -717,9 +763,7 @@
             <div class="mobile-nav-item" id="mobile-nav-settings" onclick="handleMobileNavClick('settings')">
                 <svg class="mobile-nav-icon" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L3.16 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.04.64.09.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
                 Settings
-                <svg class="mobile-nav-arrow" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
             </div>
-            <div class="mobile-submenu" id="mobile-sub-settings"></div>
         </div>
 
         <div class="mobile-sidebar-footer">
@@ -861,15 +905,15 @@ function updateMobileNavIndicator() {
         const navId = activeNav.id.replace('mobile-nav-', '');
         const stateAfterClick = { 
             'aimbot': document.getElementById('mobile-sub-aimbot').classList.contains('open'),
-            'visuals': document.getElementById('mobile-sub-visuals').classList.contains('open')
+            'visuals': document.getElementById('mobile-sub-visuals').classList.contains('open'),
+            'settings': false
         };
         indicator.style.top = calculateMobileNavPosition(navId, stateAfterClick) + 'px';
     }
 }
 
-function updateMobileSubIndicator() {
-    const activeItem = document.querySelector('.mobile-sub-item.active');
-    const indicator = document.getElementById('mobileSubIndicator');
+function updateMobileSubIndicator(activeItem) {
+    const indicator = document.getElementById('mobileSubIndicatorVisuals') || document.getElementById('mobileSubIndicatorAimbot');
     if (activeItem && indicator) {
         const submenu = activeItem.closest('.mobile-submenu');
         if (submenu) {
@@ -883,7 +927,7 @@ function updateMobileSubIndicator() {
 
 window.handleMobileNavClick = function(menuId) {
     const indicator = document.getElementById('mobileNavIndicator');
-    const stateAfterClick = { 'aimbot': (menuId === 'aimbot'), 'visuals': (menuId === 'visuals') };
+    const stateAfterClick = { 'aimbot': (menuId === 'aimbot'), 'visuals': (menuId === 'visuals'), 'settings': false };
     indicator.style.top = calculateMobileNavPosition(menuId, stateAfterClick) + 'px';
     
     document.querySelectorAll('.mobile-nav-item').forEach(item => item.classList.remove('active', 'expanded'));
@@ -893,10 +937,26 @@ window.handleMobileNavClick = function(menuId) {
     const sub = document.getElementById('mobile-sub-' + menuId);
     if (nav) { 
         nav.classList.add('active'); 
-        if (sub) { 
+        if (sub && sub.children.length > 1) { 
             nav.classList.add('expanded'); 
-            sub.classList.add('open'); 
-        } 
+            sub.classList.add('open');
+            
+            const activeItem = sub.querySelector('.mobile-sub-item.active') || sub.querySelector('.mobile-sub-item');
+            if (activeItem) {
+                setTimeout(() => {
+                    const indicatorId = menuId === 'aimbot' ? 'mobileSubIndicatorAimbot' : 'mobileSubIndicatorVisuals';
+                    const subIndicator = document.getElementById(indicatorId);
+                    if (subIndicator) {
+                        const submenuRect = sub.getBoundingClientRect();
+                        const itemRect = activeItem.getBoundingClientRect();
+                        const topPosition = (itemRect.top - submenuRect.top) + (itemRect.height / 2);
+                        subIndicator.style.top = topPosition + 'px';
+                    }
+                }, 50);
+            }
+        } else {
+            window.switchMobileTab(menuId, null);
+        }
     }
 }
 
@@ -909,7 +969,17 @@ window.switchMobileTab = function(tabId, event) {
     document.querySelectorAll('.mobile-sub-item').forEach(el => el.classList.remove('active'));
     if(event && event.target.classList.contains('mobile-sub-item')) { 
         event.target.classList.add('active');
-        updateMobileSubIndicator();
+        
+        const submenu = event.target.closest('.mobile-submenu');
+        if (submenu) {
+            const indicator = submenu.querySelector('.mobile-sub-indicator');
+            if (indicator) {
+                const submenuRect = submenu.getBoundingClientRect();
+                const itemRect = event.target.getBoundingClientRect();
+                const topPosition = (itemRect.top - submenuRect.top) + (itemRect.height / 2);
+                indicator.style.top = topPosition + 'px';
+            }
+        }
     }
     
     closeMobileSidebar();
@@ -968,7 +1038,18 @@ if (token) {
                 document.getElementById('mobile-sub-visuals').classList.add('open'); 
             }
             updateMobileNavIndicator();
-            updateMobileSubIndicator();
+            
+            const activeSub = document.querySelector('#mobile-sub-visuals .mobile-sub-item.active');
+            if (activeSub) {
+                const indicator = document.getElementById('mobileSubIndicatorVisuals');
+                if (indicator) {
+                    const submenu = document.getElementById('mobile-sub-visuals');
+                    const submenuRect = submenu.getBoundingClientRect();
+                    const itemRect = activeSub.getBoundingClientRect();
+                    const topPosition = (itemRect.top - submenuRect.top) + (itemRect.height / 2);
+                    indicator.style.top = topPosition + 'px';
+                }
+            }
         }, 100);
     }
     
@@ -1154,16 +1235,22 @@ window.closeCP = function(){ cpPanel.classList.remove('open'); window.sendState(
 
 function handleDragStart(e, type) {
     e.preventDefault(); 
-    if(type==='sat') dSat=true; 
-    if(type==='hue') dHue=true; 
-    if(type==='alpha') dAlpha=true; 
+    if(type==='sat') { dSat=true; cpSatHandle.classList.add('dragging'); }
+    if(type==='hue') { dHue=true; cpHueHandle.classList.add('dragging'); }
+    if(type==='alpha') { dAlpha=true; cpAlphaHandle.classList.add('dragging'); }
     updateDrag(e);
 }
 function handleDragMove(e) { 
     if(dSat||dHue||dAlpha) updateDrag(e); 
 }
 function handleDragEnd() { 
-    if(dSat||dHue||dAlpha){ dSat=false; dHue=false; dAlpha=false; window.sendState(); } 
+    if(dSat||dHue||dAlpha){ 
+        dSat=false; dHue=false; dAlpha=false; 
+        cpSatHandle.classList.remove('dragging');
+        cpHueHandle.classList.remove('dragging');
+        cpAlphaHandle.classList.remove('dragging');
+        window.sendState(); 
+    } 
 }
 
 var dSat=false,dHue=false,dAlpha=false;
