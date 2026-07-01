@@ -58,7 +58,6 @@
             display: flex; height: 100vh; width: 100%;
         }
 
-        /* Sidebar Desktop */
         .sidebar {
             width: 240px; background: var(--sidebar); border-right: 1px solid var(--border);
             display: flex; flex-direction: column; flex-shrink: 0; z-index: 10; position: relative;
@@ -137,7 +136,6 @@
         .color-dot { width: 28px; height: 28px; border-radius: 6px; background: #333; cursor: pointer; flex-shrink: 0; transition: transform 0.2s; }
         .color-dot:hover { transform: scale(1.05); }
 
-        /* Color Picker */
         .cp-floating-panel { position: absolute; top: 0; left: 0; width: 300px; background: #111; border: 1px solid var(--border); border-radius: 12px; z-index: 1000; box-shadow: 0 20px 60px rgba(0,0,0,0.9); opacity: 0; visibility: hidden; transform: translateY(15px) scale(0.95); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); display: flex; flex-direction: column; pointer-events: none; }
         .cp-floating-panel.open { opacity: 1; visibility: visible; transform: translateY(0) scale(1); pointer-events: auto; }
         .cp-body { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
@@ -317,10 +315,36 @@
 
         .mobile-content-main {
             flex: 1; overflow-y: auto; padding: 16px; -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+        }
+
+        /* SCROLLBAR ESTILIZADA PARA MOBILE */
+        .mobile-content-main::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .mobile-content-main::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.02);
+            border-radius: 3px;
+        }
+
+        .mobile-content-main::-webkit-scrollbar-thumb {
+            background: rgba(0,255,235,0.3);
+            border-radius: 3px;
+            transition: background 0.3s;
+        }
+
+        .mobile-content-main::-webkit-scrollbar-thumb:hover {
+            background: rgba(0,255,235,0.5);
+        }
+
+        .mobile-content-main::-webkit-scrollbar-thumb:active {
+            background: rgba(0,255,235,0.7);
         }
 
         .mobile-tab-content {
             display: none;
+            padding-bottom: 30px;
         }
 
         .mobile-tab-content.active {
@@ -347,7 +371,6 @@
 
 <div id="custom-cursor"></div>
 
-<!-- Color Picker Panel -->
 <div class="cp-floating-panel" id="cpPanel">
     <div style="padding: 14px 16px; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: space-between;">
         <div style="display: flex; align-items: center; gap: 10px;">
@@ -401,7 +424,6 @@
     <div class="menu-scroll">
         <div class="nav-indicator" id="navIndicator"></div>
         
-        <!-- AIMBOT ADICIONADO ACIMA DE VISUALS -->
         <div class="nav-item" id="nav-aimbot" onclick="handleNavClick('aimbot')">
             <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
             AimBot
@@ -515,7 +537,6 @@
                     </div>
                 </div>
 
-                <!-- Preview dentro do conteúdo com scroll -->
                 <div class="feature-card" style="padding: 0; border: none; background: transparent; margin-bottom: 0;">
                     <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden;">
                         <div style="padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 10px; color: var(--muted); font-weight: 600; background: #0a0a0a;">Preview</div>
@@ -573,19 +594,9 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Preview Mobile -->
-                <div class="feature-card" style="padding: 0; border: none; background: transparent; margin-bottom: 0;">
-                    <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden;">
-                        <div style="padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 10px; color: var(--muted); font-weight: 600; background: #0a0a0a;">Preview</div>
-                        <div style="width: 100%; height: 250px; background: #050505; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                            <canvas id="previewCanvasMobile"></canvas>
-                        </div>
-                    </div>
-                </div>
             </div>
 
-            <div id="mobile-content-visuals-players" class="mobile-tab-content">
+            <div id="mobile-content-visuals-players" class="mobile-tab-content active">
                 <div class="feature-card">
                     <div class="control-row">
                         <span class="c-label">Box ESP</span>
@@ -634,7 +645,6 @@
                     </div>
                 </div>
 
-                <!-- Preview Mobile -->
                 <div class="feature-card" style="padding: 0; border: none; background: transparent; margin-bottom: 0;">
                     <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden;">
                         <div style="padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 10px; color: var(--muted); font-weight: 600; background: #0a0a0a;">Preview</div>
@@ -655,15 +665,12 @@
         </div>
     </div>
 
-    <!-- Sidebar Mobile Overlay -->
     <div class="mobile-sidebar-overlay" id="mobileSidebarOverlay" onclick="closeMobileSidebar()"></div>
     
-    <!-- Sidebar Mobile -->
     <div class="mobile-sidebar" id="mobileSidebar">
         <div class="mobile-menu-scroll">
             <div class="mobile-nav-indicator" id="mobileNavIndicator"></div>
             
-            <!-- AIMBOT ADICIONADO NO MOBILE TAMBÉM -->
             <div class="mobile-nav-item" id="mobile-nav-aimbot" onclick="handleMobileNavClick('aimbot')">
                 <svg class="mobile-nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
                 AimBot
@@ -700,7 +707,6 @@
 </div>
 
 <script type="module">
-// --- CURSOR PERSONALIZADO (APENAS PC) ---
 (function(){
     const cur = document.getElementById('custom-cursor');
     if(!cur || window.matchMedia('(hover: none) and (pointer: coarse)').matches) return; 
@@ -718,7 +724,6 @@
     loop();
 })();
 
-// --- LÓGICA DE MENU ORIGINAL (DESKTOP) ---
 const LAYOUT = { PADDING_TOP: 10, NAV_HEIGHT: 48, SUB_ITEM_HEIGHT: 42, INDICATOR_HEIGHT: 24, SUB_ITEMS_COUNT: { 'aimbot': 1, 'visuals': 2, 'settings': 0 }, NAV_ORDER: ['aimbot', 'visuals', 'settings'] };
 
 function calculateNavPosition(targetMenuId, stateAfterClick) {
@@ -755,34 +760,22 @@ function updateSubIndicator(activeItem) {
     }
 }
 
-// SIDEBAR NÃO FECHA AO CLICAR NOS ITENS PRINCIPAIS - SÓ NAS FEATURES
 window.handleNavClick = function(menuId) {
     const indicator = document.getElementById('navIndicator');
     const stateAfterClick = { 'aimbot': (menuId === 'aimbot'), 'visuals': (menuId === 'visuals') };
     if(window.innerWidth > 900) indicator.style.top = calculateNavPosition(menuId, stateAfterClick) + 'px';
     
-    // Remove active/expandido de todos
     document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active', 'expanded'));
     document.querySelectorAll('.submenu').forEach(sub => sub.classList.remove('open'));
     
-    // Ativa o menu clicado
     const nav = document.getElementById('nav-' + menuId);
     const sub = document.getElementById('sub-' + menuId);
-    if (nav) { 
-        nav.classList.add('active'); 
-        if (sub) { 
-            nav.classList.add('expanded'); 
-            sub.classList.add('open'); 
-        } 
-    }
+    if (nav) { nav.classList.add('active'); if (sub) { nav.classList.add('expanded'); sub.classList.add('open'); } }
     
-    // Se tem submenu, clica no primeiro item ativo ou no primeiro disponível
     if (sub) {
         const activeItem = sub.querySelector('.sub-item.active') || sub.querySelector('.sub-item');
         if (activeItem) setTimeout(() => activeItem.click(), 50);
-    } else { 
-        window.switchTab(menuId, null); 
-    }
+    } else { window.switchTab(menuId, null); }
 }
     
 window.switchTab = function(tabId, event) {
@@ -805,7 +798,6 @@ window.switchTab = function(tabId, event) {
     scheduleRender();
 }
 
-// --- MOBILE FUNCTIONS ---
 window.toggleMobileSidebar = function() {
     const sidebar = document.getElementById('mobileSidebar');
     const overlay = document.getElementById('mobileSidebarOverlay');
@@ -866,7 +858,6 @@ function updateMobileSubIndicator() {
     }
 }
 
-// SIDEBAR MOBILE TAMBÉM NÃO FECHA AO CLICAR NOS ITENS PRINCIPAIS
 window.handleMobileNavClick = function(menuId) {
     const indicator = document.getElementById('mobileNavIndicator');
     const stateAfterClick = { 'aimbot': (menuId === 'aimbot'), 'visuals': (menuId === 'visuals') };
@@ -885,13 +876,9 @@ window.handleMobileNavClick = function(menuId) {
         } 
     }
     
-    if (sub) {
-        const activeItem = sub.querySelector('.mobile-sub-item.active') || sub.querySelector('.mobile-sub-item');
-        if (activeItem) setTimeout(() => activeItem.click(), 50);
-    } else { 
-        window.switchMobileTab(menuId, null); 
-    }
-    // NOTA: Não fecha a sidebar aqui - só fecha quando clica nas features
+    // REMOVIDO: Clique automático no primeiro sub-item
+    // Agora o usuário pode ver o submenu antes de escolher a feature
+    // A sidebar só fecha quando clicar em uma feature (sub-item)
 }
 
 window.switchMobileTab = function(tabId, event) {
@@ -906,12 +893,11 @@ window.switchMobileTab = function(tabId, event) {
         updateMobileSubIndicator();
     }
     
-    // Fecha a sidebar SÓ quando clica nas features/sub-itens
+    // Sidebar só fecha quando clicar em uma feature (sub-item)
     closeMobileSidebar();
     scheduleRender();
 }
 
-// --- FIREBASE ZERO DELAY ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
@@ -1099,7 +1085,6 @@ window.updateValue = function(key, val) {
     window.sendState();
 }
 
-// --- COLOR PICKER ---
 var cpTarget=null, cpH=0.47, cpS=1, cpV=1, cpA=1;
 var cpPanel=document.getElementById('cpPanel'), cpSaturation=document.getElementById('cpSaturation'), cpSatHandle=document.getElementById('cpSatHandle');
 var cpHueSlider=document.getElementById('cpHueSlider'), cpHueHandle=document.getElementById('cpHueHandle');
@@ -1200,7 +1185,6 @@ window.showGlobalQr = function(){
 }
 window.closeGlobalQr = function(){ document.getElementById('qr-modal').classList.remove('active'); }
 
-// Preview Canvas
 var canvas = document.getElementById('previewCanvasDesktop'), ctx = canvas?.getContext('2d', { alpha: false }), canvasWidth = 0, canvasHeight = 0, renderScheduled = false;
 var canvasMobile = document.getElementById('previewCanvasMobile'), ctxMobile = canvasMobile?.getContext('2d', { alpha: false }), canvasWidthMobile = 0, canvasHeightMobile = 0;
 
