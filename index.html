@@ -21,7 +21,7 @@
 
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; outline:none; user-select: none; }
         
-        /* ===== CURSOR PERSONALIZADO CORRIGIDO ===== */
+        /* ===== CURSOR PERSONALIZADO ===== */
         * { cursor: none !important; }
         body { cursor: none !important; }
         button { cursor: none !important; }
@@ -40,10 +40,12 @@
         .mobile-sub-item { cursor: none !important; }
         .mobile-btn-qr { cursor: none !important; }
 
+        /* Esconde cursor nativo em touch devices */
         @media (hover: none) and (pointer: coarse) {
             #custom-cursor { display: none !important; }
         }
 
+        /* Mostra cursor apenas em dispositivos com mouse fino */
         @media (hover: hover) and (pointer: fine) {
             #custom-cursor { display: block !important; }
         }
@@ -57,13 +59,16 @@
             position: fixed; top: 0; left: 0; width: 18px; height: 18px;
             border: 2px solid var(--primary); border-radius: 50%; pointer-events: none;
             z-index: 99999; transform: translate(-50%, -50%);
-            transition: transform 0.1s ease, border-color 0.1s ease;
+            transition: transform 0.1s ease, border-color 0.1s ease, opacity 0.2s ease;
             display: none;
         }
         #custom-cursor.clicking { transform: translate(-50%, -50%) scale(0.65); border-color: #fff; }
         
-        /* ===== HIDE CURSOR NA COLOR PICKER ===== */
-        #custom-cursor.hidden-in-picker { display: none !important; }
+        /* Classe para esconder o cursor durante o uso do Color Picker */
+        #custom-cursor.hidden-in-picker { 
+            opacity: 0 !important; 
+            pointer-events: none;
+        }
 
         #loading-screen {
             position: fixed; inset: 0; z-index: 10000; display: flex; flex-direction: column;
@@ -88,6 +93,11 @@
         .profile-sub { font-size: 10px; color: var(--muted); letter-spacing: 0.5px; }
 
         .menu-scroll { flex: 1; overflow-y: auto; padding: 10px 0; position: relative; }
+        
+        /* Remove scrollbar da sidebar no PC */
+        .menu-scroll::-webkit-scrollbar { display: none; }
+        .menu-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
         .nav-indicator { position: absolute; left: 0; top: 0; width: 3px; height: 24px; background: var(--primary); border-radius: 0 4px 4px 0; transition: top 0.35s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 10px rgba(0, 255, 235, 0.4); pointer-events: none; z-index: 5; }
 
         .nav-item { display: flex; align-items: center; padding: 12px 20px; cursor: pointer; transition: all 0.2s ease; color: var(--muted); font-weight: 500; gap: 12px; font-size: 13px; height: 48px; position: relative; background: transparent; }
@@ -128,7 +138,7 @@
         .content-area { flex: 1; display: flex; overflow: hidden; position: relative; }
         .config-panel { flex: 1; padding: 24px; overflow-y: auto; max-width: 600px; position: relative; z-index: 2; }
         
-        /* ===== REMOVE SCROLLBAR DO PC ===== */
+        /* ===== REMOVE SCROLLBAR DO PC NA CONFIG PANEL ===== */
         .config-panel::-webkit-scrollbar { display: none !important; }
         .config-panel { -ms-overflow-style: none; scrollbar-width: none; }
         
@@ -159,7 +169,7 @@
         .color-dot { width: 28px; height: 28px; border-radius: 6px; background: #333; cursor: pointer; flex-shrink: 0; transition: transform 0.2s; }
         .color-dot:hover { transform: scale(1.05); }
 
-        /* ===== COLOR PICKER CORRIGIDA PARA MOBILE ===== */
+        /* ===== COLOR PICKER ===== */
         .cp-floating-panel { 
             position: fixed; 
             top: 0; 
@@ -416,7 +426,7 @@
             position: relative;
         }
 
-        /* ===== SCROLLBAR AJUSTADA ===== */
+        /* ===== SCROLLBAR AJUSTADA MOBILE ===== */
         .mobile-content-main::-webkit-scrollbar {
             width: 2px !important;
             display: block !important;
@@ -1278,14 +1288,17 @@ window.openCP = function(el, title){
 
 window.closeCP = function(){ 
     cpPanel.classList.remove('open');
+    // Garante que o cursor volte ao fechar
     if(cur) cur.classList.remove('hidden-in-picker');
     window.sendState();
 }
 
-/* ===== DRAG HANDLERS COM SMOOTH ANIMATION ===== */
+/* ===== DRAG HANDLERS COM SMOOTH ANIMATION E OCULTAÇÃO DE CURSOR ===== */
 function handleDragStart(e, type) {
     e.preventDefault();
+    // Se for PC (tem cursor), esconde ele
     if(window.innerWidth > 1024 && cur) cur.classList.add('hidden-in-picker');
+    
     if(type === 'sat') dSat = true; 
     if(type === 'hue') dHue = true; 
     if(type === 'alpha') dAlpha = true; 
@@ -1303,6 +1316,7 @@ function handleDragEnd() {
         dSat = false; 
         dHue = false; 
         dAlpha = false;
+        // Quando solta o mouse, o cursor volta
         if(cur) cur.classList.remove('hidden-in-picker');
         window.sendState(); 
     }
