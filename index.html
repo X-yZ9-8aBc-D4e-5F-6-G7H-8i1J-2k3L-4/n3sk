@@ -181,17 +181,15 @@
             position: absolute; width: 14px; height: 14px; border: 2px solid #fff; 
             border-radius: 50%; transform: translate(-50%, -50%); 
             box-shadow: 0 2px 6px rgba(0,0,0,0.5); pointer-events: none; 
-            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.15s ease-out;
         }
-        .cp-sat-handle.dragging { transition: none; }
         
         .cp-hue-slider { width: 18px; height: 100%; border-radius: 8px; position: relative; cursor: pointer; background: linear-gradient(to bottom, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000); }
         .cp-hue-handle { 
             position: absolute; left: 50%; transform: translate(-50%, -50%); width: 22px; height: 6px; 
             background: #fff; border-radius: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            transition: top 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: top 0.15s ease-out;
         }
-        .cp-hue-handle.dragging { transition: none; }
         
         .cp-alpha-slider { width: 100%; height: 18px; border-radius: 8px; position: relative; cursor: pointer; background-image: linear-gradient(45deg, #333 25%, transparent 25%), linear-gradient(-45deg, #333 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #333 75%), linear-gradient(-45deg, transparent 75%, #333 75%); background-size: 8px 8px; background-position: 0 0, 0 4px, 4px -4px, -4px 0px; }
         .cp-alpha-gradient { position: absolute; inset: 0; border-radius: 8px; }
@@ -199,9 +197,8 @@
             position: absolute; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; 
             background: #fff; border: 2px solid #fff; border-radius: 50%; 
             box-shadow: 0 2px 6px rgba(0,0,0,0.4); margin-left: -7px;
-            transition: left 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: left 0.15s ease-out;
         }
-        .cp-alpha-handle.dragging { transition: none; }
         .cp-hex-container { display: flex; align-items: center; background: #0a0a0a; border-radius: 6px; padding: 8px 12px; border: 1px solid #2a2a2a; }
         .cp-hex-input { flex: 1; background: transparent; border: none; color: #fff; font-family: monospace; font-size: 12px; outline: none; text-transform: uppercase; }
         .cp-copy-btn { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: #666; cursor: pointer; border-radius: 4px; margin-left: 8px; }
@@ -1275,21 +1272,12 @@ window.closeCP = function(){
     window.sendState();
 }
 
-/* ===== DRAG HANDLERS CORRIGIDOS COM SMOOTH ===== */
+/* ===== DRAG HANDLERS COM SMOOTH ANIMATION ===== */
 function handleDragStart(e, type) {
     e.preventDefault(); 
-    if(type === 'sat') { 
-        dSat = true; 
-        cpSatHandle.classList.add('dragging');
-    } 
-    if(type === 'hue') { 
-        dHue = true;
-        cpHueHandle.classList.add('dragging');
-    } 
-    if(type === 'alpha') { 
-        dAlpha = true;
-        cpAlphaHandle.classList.add('dragging');
-    } 
+    if(type === 'sat') dSat = true; 
+    if(type === 'hue') dHue = true; 
+    if(type === 'alpha') dAlpha = true; 
     updateDrag(e);
 }
 
@@ -1301,9 +1289,6 @@ function handleDragMove(e) {
 
 function handleDragEnd() { 
     if(dSat || dHue || dAlpha) {
-        cpSatHandle.classList.remove('dragging');
-        cpHueHandle.classList.remove('dragging');
-        cpAlphaHandle.classList.remove('dragging');
         dSat = false; 
         dHue = false; 
         dAlpha = false; 
@@ -1334,7 +1319,6 @@ cpSaturation.addEventListener('touchstart', (e) => {
     if(e.touches && e.touches[0]) {
         e.preventDefault();
         dSat = true;
-        cpSatHandle.classList.add('dragging');
         updateDrag(touchToMouse(e.touches[0]));
     }
 }, {passive: false});
@@ -1348,7 +1332,6 @@ cpSaturation.addEventListener('touchmove', (e) => {
 
 cpSaturation.addEventListener('touchend', (e) => {
     if(dSat) {
-        cpSatHandle.classList.remove('dragging');
         dSat = false;
         window.sendState();
     }
@@ -1359,7 +1342,6 @@ cpHueSlider.addEventListener('touchstart', (e) => {
     if(e.touches && e.touches[0]) {
         e.preventDefault();
         dHue = true;
-        cpHueHandle.classList.add('dragging');
         updateDrag(touchToMouse(e.touches[0]));
     }
 }, {passive: false});
@@ -1373,7 +1355,6 @@ cpHueSlider.addEventListener('touchmove', (e) => {
 
 cpHueSlider.addEventListener('touchend', (e) => {
     if(dHue) {
-        cpHueHandle.classList.remove('dragging');
         dHue = false;
         window.sendState();
     }
@@ -1384,7 +1365,6 @@ cpAlphaSlider.addEventListener('touchstart', (e) => {
     if(e.touches && e.touches[0]) {
         e.preventDefault();
         dAlpha = true;
-        cpAlphaHandle.classList.add('dragging');
         updateDrag(touchToMouse(e.touches[0]));
     }
 }, {passive: false});
@@ -1398,7 +1378,6 @@ cpAlphaSlider.addEventListener('touchmove', (e) => {
 
 cpAlphaSlider.addEventListener('touchend', (e) => {
     if(dAlpha) {
-        cpAlphaHandle.classList.remove('dragging');
         dAlpha = false;
         window.sendState();
     }
