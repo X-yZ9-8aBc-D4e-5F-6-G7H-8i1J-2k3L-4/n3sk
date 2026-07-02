@@ -1282,34 +1282,90 @@ function handleDragEnd() {
 
 var dSat = false, dHue = false, dAlpha = false;
 
-// LISTENERS PARA MOUSE
+// ===== LISTENERS PARA MOUSE =====
 cpSaturation.addEventListener('mousedown', e => handleDragStart(e, 'sat'));
 cpHueSlider.addEventListener('mousedown', e => handleDragStart(e, 'hue'));
 cpAlphaSlider.addEventListener('mousedown', e => handleDragStart(e, 'alpha'));
 document.addEventListener('mousemove', handleDragMove);
 document.addEventListener('mouseup', handleDragEnd);
 
-// LISTENERS PARA TOUCH (MOBILE)
-cpSaturation.addEventListener('touchstart', e => {
-    if(e.touches[0]) handleDragStart(e.touches[0], 'sat');
+// ===== LISTENERS PARA TOUCH (MOBILE) - CORRIGIDO =====
+function touchToMouse(touch) {
+    return {
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+        preventDefault: () => {}
+    };
+}
+
+// SATURATION TOUCH
+cpSaturation.addEventListener('touchstart', (e) => {
+    if(e.touches && e.touches[0]) {
+        e.preventDefault();
+        dSat = true;
+        updateDrag(touchToMouse(e.touches[0]));
+    }
 }, {passive: false});
 
-cpHueSlider.addEventListener('touchstart', e => {
-    if(e.touches[0]) handleDragStart(e.touches[0], 'hue');
+cpSaturation.addEventListener('touchmove', (e) => {
+    if(dSat && e.touches && e.touches[0]) {
+        e.preventDefault();
+        updateDrag(touchToMouse(e.touches[0]));
+    }
 }, {passive: false});
 
-cpAlphaSlider.addEventListener('touchstart', e => {
-    if(e.touches[0]) handleDragStart(e.touches[0], 'alpha');
+cpSaturation.addEventListener('touchend', (e) => {
+    if(dSat) {
+        dSat = false;
+        window.sendState();
+    }
 }, {passive: false});
 
-document.addEventListener('touchmove', e => { 
-    if((dSat || dHue || dAlpha) && e.touches[0]) { 
-        e.preventDefault(); 
-        handleDragMove(e.touches[0]); 
-    } 
+// HUE SLIDER TOUCH
+cpHueSlider.addEventListener('touchstart', (e) => {
+    if(e.touches && e.touches[0]) {
+        e.preventDefault();
+        dHue = true;
+        updateDrag(touchToMouse(e.touches[0]));
+    }
 }, {passive: false});
 
-document.addEventListener('touchend', handleDragEnd);
+cpHueSlider.addEventListener('touchmove', (e) => {
+    if(dHue && e.touches && e.touches[0]) {
+        e.preventDefault();
+        updateDrag(touchToMouse(e.touches[0]));
+    }
+}, {passive: false});
+
+cpHueSlider.addEventListener('touchend', (e) => {
+    if(dHue) {
+        dHue = false;
+        window.sendState();
+    }
+}, {passive: false});
+
+// ALPHA SLIDER TOUCH
+cpAlphaSlider.addEventListener('touchstart', (e) => {
+    if(e.touches && e.touches[0]) {
+        e.preventDefault();
+        dAlpha = true;
+        updateDrag(touchToMouse(e.touches[0]));
+    }
+}, {passive: false});
+
+cpAlphaSlider.addEventListener('touchmove', (e) => {
+    if(dAlpha && e.touches && e.touches[0]) {
+        e.preventDefault();
+        updateDrag(touchToMouse(e.touches[0]));
+    }
+}, {passive: false});
+
+cpAlphaSlider.addEventListener('touchend', (e) => {
+    if(dAlpha) {
+        dAlpha = false;
+        window.sendState();
+    }
+}, {passive: false});
 
 function updateDrag(e) { 
     if(dSat) { 
