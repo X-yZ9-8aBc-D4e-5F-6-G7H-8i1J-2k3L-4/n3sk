@@ -21,14 +21,31 @@
 
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; outline:none; user-select: none; }
         
-        @media (hover: hover) and (pointer: fine) {
-            body { cursor: none !important; }
-            #custom-cursor { display: block !important; }
-        }
+        /* ===== CURSOR PERSONALIZADO CORRIGIDO ===== */
+        * { cursor: none !important; }
+        body { cursor: none !important; }
+        button { cursor: none !important; }
+        input { cursor: none !important; }
+        select { cursor: none !important; }
+        textarea { cursor: none !important; }
+        a { cursor: none !important; }
+        [role="button"] { cursor: none !important; }
+        .nav-item { cursor: none !important; }
+        .sub-item { cursor: none !important; }
+        .chk-container { cursor: none !important; }
+        .color-dot { cursor: none !important; }
+        .btn-global-qr { cursor: none !important; }
+        .qr-close-btn { cursor: none !important; }
+        .mobile-nav-item { cursor: none !important; }
+        .mobile-sub-item { cursor: none !important; }
+        .mobile-btn-qr { cursor: none !important; }
+
         @media (hover: none) and (pointer: coarse) {
             #custom-cursor { display: none !important; }
-            * { cursor: default !important; }
-            body { cursor: default !important; }
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            #custom-cursor { display: block !important; }
         }
 
         body {
@@ -134,7 +151,27 @@
         .color-dot { width: 28px; height: 28px; border-radius: 6px; background: #333; cursor: pointer; flex-shrink: 0; transition: transform 0.2s; }
         .color-dot:hover { transform: scale(1.05); }
 
-        .cp-floating-panel { position: absolute; top: 0; left: 0; width: 300px; background: #111; border: 1px solid var(--border); border-radius: 12px; z-index: 1000; box-shadow: 0 20px 60px rgba(0,0,0,0.9); opacity: 0; visibility: hidden; transform: translateY(15px) scale(0.95); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); display: flex; flex-direction: column; pointer-events: none; }
+        /* ===== COLOR PICKER CORRIGIDA PARA MOBILE ===== */
+        .cp-floating-panel { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 300px; 
+            background: #111; 
+            border: 1px solid var(--border); 
+            border-radius: 12px; 
+            z-index: 10000; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.9); 
+            opacity: 0; 
+            visibility: hidden; 
+            transform: translateY(15px) scale(0.95); 
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); 
+            display: flex; 
+            flex-direction: column; 
+            pointer-events: none;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
         .cp-floating-panel.open { opacity: 1; visibility: visible; transform: translateY(0) scale(1); pointer-events: auto; }
         .cp-body { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
         .cp-main-container { display: flex; gap: 12px; height: 160px; }
@@ -149,6 +186,24 @@
         .cp-hex-container { display: flex; align-items: center; background: #0a0a0a; border-radius: 6px; padding: 8px 12px; border: 1px solid #2a2a2a; }
         .cp-hex-input { flex: 1; background: transparent; border: none; color: #fff; font-family: monospace; font-size: 12px; outline: none; text-transform: uppercase; }
         .cp-copy-btn { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: #666; cursor: pointer; border-radius: 4px; margin-left: 8px; }
+
+        @media (max-width: 1024px) {
+            .cp-floating-panel {
+                width: 90vw !important;
+                max-width: 350px;
+                left: 50% !important;
+                top: 50% !important;
+                transform: translateX(-50%) translateY(-50%) scale(0.95) !important;
+            }
+            
+            .cp-floating-panel.open {
+                transform: translateX(-50%) translateY(-50%) scale(1) !important;
+            }
+            
+            .cp-main-container {
+                height: 180px;
+            }
+        }
 
         #qr-modal { position: fixed; inset: 0; z-index: 9999; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); }
         #qr-modal.active { display: flex; }
@@ -553,10 +608,9 @@
                     </div>
                 </div>
 
-                                <div class="feature-card" style="padding: 0; border: none; background: transparent; margin-bottom: 20px;">
+                <div class="feature-card" style="padding: 0; border: none; background: transparent; margin-bottom: 20px;">
                     <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden;">
                         <div style="padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 10px; color: var(--muted); font-weight: 600; background: #0a0a0a;">Preview</div>
-                        <!-- AUMENTADO PARA 70VH (70% DA TELA) -->
                         <div style="width: 100%; min-height: 70vh; background: #050505; display: flex; align-items: center; justify-content: center; overflow: hidden;">
                             <canvas id="previewCanvasDesktop"></canvas>
                         </div>
@@ -680,15 +734,12 @@
                     </div>
                 </div>
 
-                           <div class="feature-card" style="padding: 0; border: none; background: transparent; margin-bottom: 0;">
+                <div class="feature-card" style="padding: 0; border: none; background: transparent; margin-bottom: 0;">
                     <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden;">
                         <div style="padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 10px; color: var(--muted); font-weight: 600; background: #0a0a0a;">Preview</div>
-                        
-                        <!-- TROQUE A LINHA ABAIXO PELA NOVA -->
                         <div style="width: 100%; height: 65vh; background: #050505; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
                             <canvas id="previewCanvasMobile" style="width: 100%; height: 100%;"></canvas>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -709,7 +760,6 @@
         <div class="mobile-menu-scroll">
             <div class="mobile-nav-indicator" id="mobileNavIndicator"></div>
             
-            <!-- AIMBOT - ADICIONADO CORRETAMENTE -->
             <div class="mobile-nav-item" id="mobile-nav-aimbot" onclick="handleMobileNavClick('aimbot')">
                 <svg class="mobile-nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
                 AimBot
@@ -1157,73 +1207,127 @@ function updateCP(){
     if(cpTarget){ cpTarget.style.background = hex; cpHexInput.value = hex.replace('#','').toUpperCase(); scheduleRender(); } 
 }
 
+/* ===== COLOR PICKER CORRIGIDA PARA MOBILE ===== */
 window.openCP = function(el, title){ 
-    cpTarget=el; if(title) cpTitle.textContent = title; 
+    cpTarget = el; 
+    if(title) cpTitle.textContent = title; 
+    
     var rect = el.getBoundingClientRect(); 
-    var panelLeft = rect.right + 15; var panelTop = rect.top - 10; 
-    if (window.innerWidth <= 1024 || panelLeft + 300 > window.innerWidth) {
-        panelLeft = Math.max(10, window.innerWidth - 310);
-        panelTop = Math.max(10, rect.bottom + 10);
+    var panelLeft = rect.right + 15; 
+    var panelTop = rect.top - 10; 
+    
+    // MELHORADO PARA MOBILE
+    if (window.innerWidth <= 1024) {
+        panelLeft = Math.max(10, (window.innerWidth - 300) / 2);
+        panelTop = Math.max(60, window.innerHeight / 2 - 200);
+    } else {
+        if (panelLeft + 300 > window.innerWidth) {
+            panelLeft = Math.max(10, window.innerWidth - 310);
+            panelTop = Math.max(10, rect.bottom + 10);
+        }
     }
-    cpPanel.style.left = panelLeft + 'px'; cpPanel.style.top = panelTop + 'px'; 
+    
+    cpPanel.style.left = panelLeft + 'px'; 
+    cpPanel.style.top = panelTop + 'px'; 
+    
     var currentColor = el.style.backgroundColor || '#00FFEB'; 
     let hsv = hex2hsv(currentColor.startsWith('#') ? currentColor : '#00FFEB'); 
-    cpH=hsv[0]; cpS=hsv[1]; cpV=hsv[2]; cpA=1; updateCP(); 
+    cpH = hsv[0]; 
+    cpS = hsv[1]; 
+    cpV = hsv[2]; 
+    cpA = 1; 
+    updateCP(); 
+    
     var satRect = cpSaturation.getBoundingClientRect(); 
-    cpSatHandle.style.left = (cpS * satRect.width) + 'px'; cpSatHandle.style.top = ((1-cpV) * satRect.height) + 'px'; 
+    cpSatHandle.style.left = (cpS * satRect.width) + 'px'; 
+    cpSatHandle.style.top = ((1 - cpV) * satRect.height) + 'px'; 
+    
     var hueRect = cpHueSlider.getBoundingClientRect(); 
     cpHueHandle.style.top = (cpH * hueRect.height) + 'px'; 
+    
     var alphaRect = cpAlphaSlider.getBoundingClientRect(); 
     cpAlphaHandle.style.left = (cpA * alphaRect.width) + 'px'; 
+    
     cpPanel.classList.add('open'); 
 }
 
-window.closeCP = function(){ cpPanel.classList.remove('open'); window.sendState(); }
+window.closeCP = function(){ 
+    cpPanel.classList.remove('open'); 
+    window.sendState();
+}
 
+/* ===== DRAG HANDLERS CORRIGIDOS ===== */
 function handleDragStart(e, type) {
     e.preventDefault(); 
-    if(type==='sat') dSat=true; 
-    if(type==='hue') dHue=true; 
-    if(type==='alpha') dAlpha=true; 
+    if(type === 'sat') dSat = true; 
+    if(type === 'hue') dHue = true; 
+    if(type === 'alpha') dAlpha = true; 
     updateDrag(e);
 }
+
 function handleDragMove(e) { 
-    if(dSat||dHue||dAlpha) updateDrag(e); 
+    if(dSat || dHue || dAlpha) {
+        updateDrag(e); 
+    }
 }
+
 function handleDragEnd() { 
-    if(dSat||dHue||dAlpha){ dSat=false; dHue=false; dAlpha=false; window.sendState(); } 
+    if(dSat || dHue || dAlpha) {
+        dSat = false; 
+        dHue = false; 
+        dAlpha = false; 
+        window.sendState(); 
+    }
 }
 
-var dSat=false,dHue=false,dAlpha=false;
+var dSat = false, dHue = false, dAlpha = false;
 
+// LISTENERS PARA MOUSE
 cpSaturation.addEventListener('mousedown', e => handleDragStart(e, 'sat'));
 cpHueSlider.addEventListener('mousedown', e => handleDragStart(e, 'hue'));
 cpAlphaSlider.addEventListener('mousedown', e => handleDragStart(e, 'alpha'));
 document.addEventListener('mousemove', handleDragMove);
 document.addEventListener('mouseup', handleDragEnd);
 
-cpSaturation.addEventListener('touchstart', e => handleDragStart(e.touches[0], 'sat'), {passive:false});
-cpHueSlider.addEventListener('touchstart', e => handleDragStart(e.touches[0], 'hue'), {passive:false});
-cpAlphaSlider.addEventListener('touchstart', e => handleDragStart(e.touches[0], 'alpha'), {passive:false});
-document.addEventListener('touchmove', e => { if(dSat||dHue||dAlpha) { e.preventDefault(); handleDragMove(e.touches[0]); } }, {passive:false});
+// LISTENERS PARA TOUCH (MOBILE)
+cpSaturation.addEventListener('touchstart', e => {
+    if(e.touches[0]) handleDragStart(e.touches[0], 'sat');
+}, {passive: false});
+
+cpHueSlider.addEventListener('touchstart', e => {
+    if(e.touches[0]) handleDragStart(e.touches[0], 'hue');
+}, {passive: false});
+
+cpAlphaSlider.addEventListener('touchstart', e => {
+    if(e.touches[0]) handleDragStart(e.touches[0], 'alpha');
+}, {passive: false});
+
+document.addEventListener('touchmove', e => { 
+    if((dSat || dHue || dAlpha) && e.touches[0]) { 
+        e.preventDefault(); 
+        handleDragMove(e.touches[0]); 
+    } 
+}, {passive: false});
+
 document.addEventListener('touchend', handleDragEnd);
 
-function updateDrag(e){ 
-    if(dSat){ 
-        var r=cpSaturation.getBoundingClientRect(); 
-        cpS=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)); 
-        cpV=Math.max(0,Math.min(1,1-(e.clientY-r.top)/r.height)); 
-        cpSatHandle.style.left=(cpS*r.width)+'px'; cpSatHandle.style.top=((1-cpV)*r.height)+'px'; 
+function updateDrag(e) { 
+    if(dSat) { 
+        var r = cpSaturation.getBoundingClientRect(); 
+        cpS = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)); 
+        cpV = Math.max(0, Math.min(1, 1 - (e.clientY - r.top) / r.height)); 
+        cpSatHandle.style.left = (cpS * r.width) + 'px'; 
+        cpSatHandle.style.top = ((1 - cpV) * r.height) + 'px'; 
     }
-    if(dHue){ 
-        var r=cpHueSlider.getBoundingClientRect(); 
-        cpH=Math.max(0,Math.min(1,(e.clientY-r.top)/r.height)); 
-        cpHueHandle.style.top=(cpH*r.height)+'px'; 
+    if(dHue) { 
+        var r = cpHueSlider.getBoundingClientRect(); 
+        cpH = Math.max(0, Math.min(1, (e.clientY - r.top) / r.height)); 
+        cpHueHandle.style.top = (cpH * r.height) + 'px'; 
     }
-    if(dAlpha){ 
-        var r=cpAlphaSlider.getBoundingClientRect(); 
-        cpA=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)); 
-        cpAlphaHandle.style.left=(cpA*r.width)+'px'; 
+    if(dAlpha) { 
+        var r = cpAlphaSlider.getBoundingClientRect(); 
+        cpA = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)); 
+        cpAlphaHandle.style.left = (cpA * r.width) + 'px'; 
     }
     updateCP(); 
 }
@@ -1288,32 +1392,6 @@ function renderPreview() {
 }
 
 setTimeout(() => { resizeCanvas(); resizeCanvasMobile(); }, 100);
-
-    window.addEventListener('load', function() {
-    // Verifica se o AimBot está no menu mobile
-    const aimbotNav = document.getElementById('mobile-nav-aimbot');
-    const aimbotSub = document.getElementById('mobile-sub-aimbot');
-    
-    if (!aimbotNav || !aimbotSub) {
-        console.error('AimBot não encontrado no menu mobile!');
-        // Recria o elemento se não existir
-        const navIndicator = document.getElementById('mobileNavIndicator');
-        if (navIndicator && !aimbotNav) {
-            const aimbotHTML = `
-                <div class="mobile-nav-item" id="mobile-nav-aimbot" onclick="handleMobileNavClick('aimbot')">
-                    <svg class="mobile-nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
-                    AimBot
-                    <svg class="mobile-nav-arrow" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
-                </div>
-                <div class="mobile-submenu" id="mobile-sub-aimbot">
-                    <div class="mobile-sub-indicator" id="mobileSubIndicatorAimbot"></div>
-                    <div class="mobile-sub-item active" onclick="switchMobileTab('aimbot-main', event)">Main</div>
-                </div>
-            `;
-            navIndicator.insertAdjacentHTML('afterend', aimbotHTML);
-        }
-    }
-});
 
 </script>
 </body>
