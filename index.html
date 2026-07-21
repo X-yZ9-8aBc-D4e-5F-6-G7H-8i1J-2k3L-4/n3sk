@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>NEXUS</title>
+<title>NEXUS - Grid & Snake Hover</title>
 <style>
   :root{
     --bg:#0a0a0a;
@@ -328,15 +328,15 @@
   .config-item{position:relative;z-index:1;display:flex;align-items:center;gap:14px;background:transparent;border:1px solid transparent;border-radius:13px;padding:13px 16px;cursor:pointer;transition:transform .25s var(--ease);animation:popIn .4s var(--ease);}
   @keyframes popIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
   .cfg-icon{width:40px;height:40px;flex-shrink:0;border-radius:11px;background:linear-gradient(180deg,#ffffff12,#ffffff06);border:1px solid var(--border-2);display:flex;align-items:center;justify-content:center;color:var(--text-mute);transition:background .3s var(--ease), color .3s var(--ease), transform .3s var(--ease);}
-  .config-item.hovered .cfg-icon{color:#fff;transform:scale(1.05);}
+  /* o realce (ícone/texto branco) acompanha o box do seletor */
+  .config-item.hovered .cfg-icon{background:#fff;color:#0a0a0a;border-color:transparent;}
   .cfg-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.9;}
   .config-item .info{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0;}
   .config-item .info .title{font-weight:600;font-size:14.5px;display:flex;align-items:center;gap:8px;color:var(--text-dim);transition:color .3s var(--ease);}
   .config-item.hovered .info .title{color:#fff;}
   .config-item .info .sub{font-size:12px;color:var(--text-mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .cfg-badge{font-size:9px;letter-spacing:.5px;text-transform:uppercase;font-weight:700;color:#0a0a0a;background:#fff;border-radius:5px;padding:2px 7px;opacity:0;transform:scale(.7);transition:opacity .3s ease, transform .3s var(--bounce);}
-  .config-item.selected .info .title{color:#fff;}
-  .config-item.selected .cfg-icon{background:#fff;color:#0a0a0a;}
+  /* apenas o badge ATIVO fica fixo no selecionado */
   .config-item.selected .cfg-badge{opacity:1;transform:scale(1);}
   .config-item.selected .load-btn{opacity:.45;pointer-events:none;}
 
@@ -1065,6 +1065,28 @@
 <div class="toast" id="toast">Config carregada</div>
 
 <script>
+  // ---------- Proteção contra inspeção (deterrente) ----------
+  (function protect(){
+    // bloqueia menu de contexto (botão direito)
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    // bloqueia arrastar imagens/textos
+    document.addEventListener('dragstart', e => e.preventDefault());
+    // bloqueia atalhos de devtools / ver código-fonte
+    document.addEventListener('keydown', e => {
+      const k = (e.key || '').toLowerCase();
+      if(
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && ['i','j','c'].includes(k)) ||   // Ctrl+Shift+I/J/C
+        (e.ctrlKey && k === 'u') ||                                  // Ctrl+U (ver fonte)
+        (e.metaKey && e.altKey && ['i','j','c'].includes(k))         // Cmd+Alt+I/J/C (mac)
+      ){
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+    });
+  })();
+
   // ---------- Elements ----------
   const nav = document.querySelector('.nav');
   const indicator = document.getElementById('navIndicator');
