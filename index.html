@@ -1,1864 +1,342 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>NEXUS - Grid & Snake Hover</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS</title>
 <style>
-
-  body{margin:0;background:#0a0a0a;overflow:hidden;font-family:sans-serif;}
-  #loader{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;z-index:9999;background:#0a0a0a;}
-  .spinner{width:40px;height:40px;border:3px solid #333;border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;}
-  @keyframes spin{to{transform:rotate(360deg);}}
- 
-  #root-container{display:none;}
+body{margin:0;background:#0a0a0a;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;color:#f5f5f5}
+#loader{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:9999;background:#0a0a0a;transition:opacity .5s}
+.spinner{width:40px;height:40px;border:3px solid #333;border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#app{display:none;opacity:0;transition:opacity .5s}
 </style>
 </head>
 <body>
-
-
 <div id="loader"><div class="spinner"></div></div>
-
-
-<div id="root-container"></div>
-
+<div id="app"></div>
 <script>
+(function(){
+var _0x4e=['\x63\x72\x65\x61\x74\x65\x45\x6c\x65\x6d\x65\x6e\x74','\x61\x70\x70\x65\x6e\x64\x43\x68\x69\x6c\x64','\x73\x65\x74\x41\x74\x74\x72\x69\x62\x75\x74\x65','\x69\x6e\x6e\x65\x72\x48\x54\x4d\x4c','\x63\x6c\x61\x73\x73\x4e\x61\x6d\x65','\x61\x64\x64\x45\x76\x65\x6e\x74\x4c\x69\x73\x74\x65\x6e\x65\x72','\x63\x6c\x69\x63\x6b','\x70\x72\x65\x76\x65\x6e\x74\x44\x65\x66\x61\x75\x6c\x74','\x6b\x65\x79\x64\x6f\x77\x6e','\x6b\x65\x79','\x63\x74\x72\x6c\x4b\x65\x79','\x73\x68\x69\x66\x74\x4b\x65\x79','\x6d\x65\x74\x61\x4b\x65\x79','\x61\x6c\x74\x4b\x65\x79','\x6f\x75\x74\x65\x72\x48\x65\x69\x67\x68\x74','\x69\x6e\x6e\x65\x72\x48\x65\x69\x67\x68\x74','\x6f\x75\x74\x65\x72\x57\x69\x64\x74\x68','\x69\x6e\x6e\x65\x72\x57\x69\x64\x74\x68','\x62\x6f\x64\x79','\x69\x6e\x6e\x65\x72\x48\x54\x4d\x4c','\x6c\x6f\x61\x64','\x73\x74\x79\x6c\x65','\x64\x69\x73\x70\x6c\x61\x79','\x6e\x6f\x6e\x65','\x6f\x70\x61\x63\x69\x74\x79','\x31','\x67\x65\x74\x45\x6c\x65\x6d\x65\x6e\x74\x42\x79\x49\x64','\x61\x70\x70','\x6c\x6f\x61\x64\x65\x72'];
+var _0x1a=function(_0x2d,_0x3e){return _0x2d^_0x3e;};
+var _0x5b=function(_0x4f){
+    var _0x5c='';
+    for(var _0x6d=0;_0x6d<_0x4f.length;_0x6d++){
+        _0x5c+=String.fromCharCode(_0x1a(_0x4f.charCodeAt(_0x6d),123));
+    }
+    return _0x5c;
+};
+var _0x7e=document[_0x5b('\x78\x7c\x7e\x7b\x61\x7f\x7e\x78\x7d\x7e\x79\x7f\x7c')](document,'div');
+var _0x8f=document[_0x5b('\x78\x7c\x7e\x7b\x61\x7f\x7e\x78\x7d\x7e\x79\x7f\x7c')](document,'div');
+var _0x9g=document[_0x5b('\x78\x7c\x7e\x7b\x61\x7f\x7e\x78\x7d\x7e\x79\x7f\x7c')](document,'style');
+_0x9g.innerHTML=_0x5b('\x3a\x72\x6f\x6f\x74\x7b\x2d\x2d\x62\x67\x3a\x23\x30\x61\x30\x61\x30\x61\x3b\x2d\x2d\x62\x67\x2d\x32\x3a\x23\x31\x31\x31\x31\x31\x31\x3b\x2d\x2d\x70\x61\x6e\x65\x6c\x3a\x23\x31\x35\x31\x35\x31\x35\x3b\x2d\x2d\x70\x61\x6e\x65\x6c\x2d\x32\x3a\x23\x31\x63\x31\x63\x31\x63\x3b\x2d\x2d\x62\x6f\x72\x64\x65\x72\x3a\x23\x32\x36\x32\x36\x32\x36\x3b\x2d\x2d\x62\x6f\x72\x64\x65\x72\x2d\x32\x3a\x23\x33\x33\x33\x33\x33\x33\x3b\x2d\x2d\x74\x65\x78\x74\x3a\x23\x66\x35\x66\x35\x66\x35\x3b\x2d\x2d\x74\x65\x78\x74\x2d\x64\x69\x6d\x3a\x23\x38\x61\x38\x61\x38\x61\x3b\x2d\x2d\x74\x65\x78\x74\x2d\x6d\x75\x74\x65\x3a\x23\x35\x61\x35\x61\x35\x61\x3b\x2d\x2d\x61\x63\x63\x65\x6e\x74\x3a\x23\x66\x66\x66\x66\x66\x66\x3b\x2d\x2d\x74\x72\x61\x63\x6b\x3a\x23\x32\x61\x32\x61\x32\x61\x3b\x2d\x2d\x66\x69\x6c\x6c\x3a\x23\x66\x35\x66\x35\x66\x35\x3b\x2d\x2d\x72\x61\x64\x69\x75\x73\x3a\x31\x30\x70\x78\x3b\x2d\x2d\x65\x61\x73\x65\x3a\x63\x75\x62\x69\x63\x2d\x62\x65\x7a\x69\x65\x72\x28\x2e\x32\x32\x2c\x2e\x39\x2c\x2e\x33\x2c\x31\x29\x3b\x2d\x2d\x62\x6f\x75\x6e\x63\x65\x3a\x63\x75\x62\x69\x63\x2d\x62\x65\x7a\x69\x65\x72\x28\x2e\x33\x34\x2c\x31\x2e\x35\x36\x2c\x2e\x36\x34\x2c\x31\x29\x3b\x7d\x2a\x7b\x62\x6f\x78\x2d\x73\x69\x7a\x69\x6e\x67\x3a\x62\x6f\x72\x64\x65\x72\x2d\x62\x6f\x78\x3b\x6d\x61\x72\x67\x69\x6e\x3a\x30\x3b\x70\x61\x64\x64\x69\x6e\x67\x3a\x30\x3b\x7d\x68\x74\x6d\x6c\x2c\x62\x6f\x64\x79\x7b\x68\x65\x69\x67\x68\x74\x3a\x31\x30\x30\x25\x3b\x7d\x62\x6f\x64\x79\x7b\x66\x6f\x6e\x74\x2d\x66\x61\x6d\x69\x6c\x79\x3a\x27\x53\x65\x67\x6f\x65\x20\x55\x49\x27\x2c\x73\x79\x73\x74\x65\x6d\x2d\x75\x69\x2c\x2d\x61\x70\x70\x6c\x65\x2d\x73\x79\x73\x74\x65\x6d\x2c\x73\x61\x6e\x73\x2d\x73\x65\x72\x69\x66\x3b\x62\x61\x63\x6b\x67\x72\x6f\x75\x6e\x64\x3a\x76\x61\x72\x28\x2d\x2d\x62\x67\x29\x3b\x63\x6f\x6c\x6f\x72\x3a\x76\x61\x72\x28\x2d\x2d\x74\x65\x78\x74\x29\x3b\x6f\x76\x65\x72\x66\x6c\x6f\x77\x3a\x68\x69\x64\x64\x65\x6e\x3b\x2d\x77\x65\x62\x6b\x69\x74\x2d\x66\x6f\x6e\x74\x2d\x73\x6d\x6f\x6f\x74\x68\x69\x6e\x67\x3a\x61\x6e\x74\x69\x61\x6c\x69\x61\x73\x65\x64\x3b\x2d\x77\x65\x62\x6b\x69\x74\x2d\x74\x61\x70\x2d\x68\x69\x67\x68\x6c\x69\x67\x68\x74\x2d\x63\x6f\x6c\x6f\x72\x3a\x74\x72\x61\x6e\x73\x70\x61\x72\x65\x6e\x74\x3b\x7d');
+document.head.appendChild(_0x9g);
 
-(function(_0x1a2b3c){
-    'use strict';
-
-
-    const _DEBUG_TRAP = true; 
-    
-    // --- FUNÇÕES DE UTILIDADE OFUSCADA ---
-    const _xor = (_0xstr, _0xkey) => {
-        let _0xres = '';
-        for(let i=0; i<_0xstr.length; i++) {
-            _0xres += String.fromCharCode(_0xstr.charCodeAt(i) ^ _0xkey.charCodeAt(i % _0xkey.length));
+var _0xa1=function(_0xb2,_0xc3){
+    var _0xd4=document.createElement(_0xb2);
+    if(_0xc3){
+        for(var _0xe5 in _0xc3){
+            if(_0xe5==='class')_0xd4.className=_0xc3[_0xe5];
+            else if(_0xe5==='html')_0xd4.innerHTML=_0xc3[_0xe5];
+            else if(_0xe5==='text')_0xd4.textContent=_0xc3[_0xe5];
+            else if(_0xe5.startsWith('on'))_0xd4.addEventListener(_0xe5.substring(2),_0xc3[_0xe5]);
+            else _0xd4.setAttribute(_0xe5,_0xc3[_0xe5]);
         }
-        return _0xres;
-    };
+    }
+    return _0xd4;
+};
 
-    const _decode = (_0xblob) => {
-        try {
-            return decodeURIComponent(escape(window.atob(_0xblob)));
-        } catch(e) { return null; }
-    };
+var _0xf6=_0xa1('div',{class:'app'});
+var _0x107=_0xa1('aside',{class:'sidebar'});
+_0x107.appendChild(_0xa1('div',{class:'logo',text:'NEXUS'}));
+var _0x118=_0xa1('nav',{class:'nav'});
+var _0x129=_0xa1('div',{class:'nav-indicator no-anim',id:'navIndicator'});
+_0x118.appendChild(_0x129);
 
-  
-    const _protect = () => {
-        if(!_DEBUG_TRAP) return;
-        
-    
-        document.addEventListener('keydown', (e) => {
-            if(e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || (e.ctrlKey && e.key === 'u')) {
-                e.preventDefault();
-                e.stopPropagation();
-                return false;
-            }
-        });
+var _0x13a=function(_0x14b,_0x15c,_0x16d){
+    var _0x17e=_0xa1('div',{class:'nav-group'});
+    _0x17e.appendChild(_0xa1('div',{class:'nav-label',text:_0x14b}));
+    var _0x18f=_0xa1('div',{class:'nav-parent expanded'});
+    var _0x19g=_0xa1('div',{class:'nav-toggle'});
+    _0x19g.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>'+_0x15c+'</span><i class="caret"></i>';
+    _0x18f.appendChild(_0x19g);
+    var _0x1ah=_0xa1('div',{class:'nav-sub'});
+    _0x16d.forEach(function(_0x1bi){
+        _0x1ah.appendChild(_0xa1('div',{class:'nav-child tab-link '+(_0x1bi.active?'active':''), 'data-tab':_0x1bi.tab}, '<i class="dot"></i>'+_0x1bi.name));
+    });
+    _0x18f.appendChild(_0x1ah);
+    _0x17e.appendChild(_0x18f);
+    return _0x17e;
+};
 
-       
-        const checkDevTools = () => {
-            const threshold = 160;
-            if(window.outerHeight - window.innerHeight > threshold || window.outerWidth - window.innerWidth > threshold) {
-                document.body.innerHTML = '<h1 style="color:red;text-align:center;margin-top:20%">ACCESS DENIED</h1>';
-                throw new Error('Security Violation');
-            }
-        };
-        setInterval(checkDevTools, 1000);
+_0x118.appendChild(_0x13a('Combat','Aimbot',[{name:'Aimbot',tab:'aimbot-main',active:true},{name:'Triggerbot',tab:'aimbot-trigger'},{name:'RCS',tab:'aimbot-rcs'}]));
+_0x118.appendChild(_0x13a('Common','Visuals',[{name:'ESP',tab:'visuals-esp'},{name:'Chams',tab:'visuals-chams'},{name:'World',tab:'visuals-world'}]));
 
+var _0x1cj=_0xa1('div',{class:'nav-group'});
+_0x1cj.appendChild(_0xa1('div',{class:'nav-label',text:'Presets'}));
+var _0x1dk=_0xa1('div',{class:'nav-lonely tab-link', 'data-tab':'config'});
+_0x1dk.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="1" x2="7" y1="14" y2="14"/><line x1="9" x2="15" y1="8" y2="8"/><line x1="17" x2="23" y1="16" y2="16"/></svg><span>Config</span>';
+_0x1cj.appendChild(_0x1dk);
+_0x118.appendChild(_0x1cj);
+_0x107.appendChild(_0x118);
 
-        setInterval(() => {
-            const start = performance.now();
-            debugger; 
-            const end = performance.now();
-            if(end - start > 100) {
-            
-                while(true) {} 
-            }
-        }, 2000);
-    };
+var _0x1el=_0xa1('div',{class:'sidebar-footer'});
+_0x1el.appendChild(_0xa1('span',{class:'user',text:'n3sk'}));
+_0x1el.appendChild(_0xa1('span',{class:'plan',text:'Free'}));
+_0x107.appendChild(_0x1el);
+_0xf6.appendChild(_0x107);
 
-  
-    const _payload = `
-    <!DOCTYPE html>
-    <html lang="pt-BR">
-    <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NEXUS - Grid & Snake Hover</title>
-    <style>
-      :root{--bg:#0a0a0a;--bg-2:#111111;--panel:#151515;--panel-2:#1c1c1c;--border:#262626;--border-2:#333333;--text:#f5f5f5;--text-dim:#8a8a8a;--text-mute:#5a5a5a;--accent:#ffffff;--track:#2a2a2a;--fill:#f5f5f5;--radius:10px;--ease:cubic-bezier(.22,.9,.3,1);--bounce:cubic-bezier(.34,1.56,.64,1);}
-      *{box-sizing:border-box;margin:0;padding:0;}
-      html,body{height:100%;}
-      body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);overflow:hidden;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;}
-      *{-webkit-tap-highlight-color:transparent;}
-      button,.toggle,.cselect-trigger,.cselect-opt,.nav-toggle,.nav-lonely,.nav-child,.config-item,.ind-card,.icon-btn{-webkit-tap-highlight-color:transparent;outline:none;}
-      ::selection{background:#fff;color:#000;}
-      @media (pointer:fine){body.custom-cursor, body.custom-cursor *{cursor:none !important;}}
-      @media (pointer:coarse){.cursor-dot,.cursor-ring{display:none !important;}}
-      .cursor-dot,.cursor-ring{position:fixed;top:0;left:0;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);will-change:transform;}
-      .cursor-dot{width:5px;height:5px;background:#fff;transition:width .18s var(--ease), height .18s var(--ease), opacity .2s ease;}
-      .cursor-ring{width:24px;height:24px;border:2px solid #ffffffcc;transition:width .2s var(--ease), height .2s var(--ease), border-color .2s ease, background .2s ease, opacity .2s ease;}
-      body.cursor-down .cursor-ring{width:18px;height:18px;border-color:#fff;background:#ffffff14;}
-      body.cursor-hover .cursor-ring{border-color:#fff;background:#ffffff14;}
-      body.cursor-hover .cursor-dot{opacity:.6;}
-      ::-webkit-scrollbar{width:8px;height:8px;}
-      ::-webkit-scrollbar-track{background:transparent;}
-      ::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:8px;}
-      ::-webkit-scrollbar-thumb:hover{background:#3a3a3a;}
-      .app{position:relative;z-index:1;display:flex;height:100vh;height:100dvh;width:100vw;background:radial-gradient(1200px 600px at 15% 0%, #1a1a1a 0%, transparent 60%),radial-gradient(1000px 700px at 85% 100%, #141414 0%, transparent 55%),var(--bg);transition:background .8s var(--ease);}
-      .sidebar{width:236px;flex-shrink:0;display:flex;flex-direction:column;padding:26px 18px 18px;border-right:1px solid var(--border);background:linear-gradient(180deg,#0d0d0d 0%, #080808 100%);}
-      .logo{font-size:30px;font-weight:800;letter-spacing:1px;padding:0 8px 26px;}
-      .nav{position:relative;}
-      .nav-indicator{position:absolute;left:0;width:100%;height:44px;border-radius:10px;background:#1e1e1e;box-shadow:inset 0 0 0 1px var(--border-2);transition:transform .42s var(--ease), height .3s var(--ease), opacity .3s ease;pointer-events:none;z-index:0;}
-      .nav-indicator.no-anim{transition:none;}
-      .nav-indicator::before{content:"";position:absolute;left:-18px;top:50%;transform:translateY(-50%);width:3px;height:20px;border-radius:0 3px 3px 0;background:#fff;}
-      .nav-group{margin-bottom:20px;position:relative;z-index:1;}
-      .nav-label{font-size:11px;letter-spacing:2px;color:var(--text-mute);font-weight:600;padding:0 12px 10px;text-transform:uppercase;}
-      .nav-toggle,.nav-lonely{display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:10px;color:var(--text-dim);cursor:pointer;font-size:14.5px;font-weight:500;position:relative;transition:color .3s var(--ease), transform .18s var(--ease);user-select:none;}
-      .nav-toggle:active,.nav-lonely:active{transform:scale(.96);}
-      .nav-toggle svg,.nav-lonely svg{width:19px;height:19px;flex-shrink:0;stroke:currentColor;}
-      .nav-toggle.tapped,.nav-lonely.tapped{animation:navTap .5s var(--ease);}
-      @keyframes navTap{0%{box-shadow:0 0 0 0 #ffffff33;}60%{box-shadow:0 0 0 6px #ffffff00;}100%{box-shadow:0 0 0 0 #ffffff00;}}
-      .nav-toggle span,.nav-lonely span{flex:1;}
-      .nav-toggle .caret{width:7px;height:7px;flex-shrink:0;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);opacity:.5;transition:transform .35s var(--ease), opacity .3s ease;}
-      .nav-parent.expanded > .nav-toggle{color:#fff;}
-      .nav-parent.expanded > .nav-toggle .caret{transform:rotate(-135deg);opacity:.9;}
-      .nav-lonely.active{color:#fff;}
-      .nav-sub{max-height:0;overflow:hidden;opacity:0;margin-top:2px;transition:max-height .34s var(--ease), opacity .3s ease;}
-      .nav-parent.expanded > .nav-sub{opacity:1;}
-      .nav-child{display:flex;align-items:center;height:40px;padding:0 12px 0 42px;border-radius:10px;color:var(--text-mute);cursor:pointer;font-size:14px;font-weight:500;position:relative;transition:color .25s var(--ease);user-select:none;}
-      .nav-child .dot{position:absolute;left:24px;top:50%;width:5px;height:5px;border-radius:50%;background:currentColor;transform:translateY(-50%);opacity:.45;transition:opacity .25s ease, transform .3s var(--bounce);}
-      .nav-child.active{color:#fff;}
-      .nav-child.active .dot{opacity:1;transform:translateY(-50%) scale(1.5);}
-      .sidebar-footer{margin-top:auto;padding:14px 12px 4px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:2px;}
-      .sidebar-footer .user{font-weight:600;font-size:14px;}
-      .sidebar-footer .plan{font-size:12px;color:var(--text-mute);}
-      .main{flex:1;display:flex;flex-direction:column;min-width:0;}
-      .topbar{display:flex;align-items:center;gap:16px;padding:20px 28px;border-bottom:1px solid var(--border);}
-      .search{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:10px 14px;width:300px;max-width:40vw;position:relative;overflow:hidden;transition:width .4s var(--ease), border-color .3s ease, box-shadow .3s ease, background .3s ease;}
-      .search::after{content:"";position:absolute;left:0;bottom:0;height:2px;width:100%;background:linear-gradient(90deg,transparent,#fff,transparent);transform:translateX(-101%);transition:transform .5s var(--ease);}
-      .search:focus-within{width:380px;border-color:#444;box-shadow:0 0 0 3px #ffffff10;background:var(--panel-2);}
-      .search:focus-within::after{transform:translateX(101%);}
-      .search svg{width:16px;height:16px;stroke:var(--text-mute);transition:stroke .3s ease, transform .3s var(--bounce);}
-      .search:focus-within svg{stroke:#fff;transform:scale(1.1);}
-      .search-field{position:relative;flex:1;display:flex;align-items:center;min-width:0;}
-      .search input{background:none;border:none;outline:none;color:var(--text);font-size:14px;width:100%;caret-color:transparent;position:relative;z-index:2;}
-      .search input::placeholder{color:transparent;}
-      .search-ghost{position:absolute;left:0;top:50%;transform:translateY(-50%);font-size:14px;color:var(--text-mute);white-space:pre;pointer-events:none;z-index:1;}
-      .search-caret{position:absolute;left:0;top:50%;width:2px;height:18px;background:#fff;border-radius:2px;transform:translate(0,-50%);pointer-events:none;z-index:3;opacity:0;box-shadow:0 0 8px #ffffffaa,0 0 2px #fff;transition:transform .28s cubic-bezier(.22,1,.36,1), opacity .25s ease;will-change:transform;}
-      .search-caret.blink{animation:caretBlink 1.1s steps(1) infinite;}
-      @keyframes caretBlink{0%,45%{opacity:1;}50%,95%{opacity:0;}100%{opacity:1;}}
-      .search-measure{position:absolute;left:0;top:0;visibility:hidden;white-space:pre;font-size:14px;pointer-events:none;}
-      .search-wrap{position:relative;}
-      .search-results{position:absolute;top:calc(100% + 10px);left:0;width:100%;min-width:380px;max-height:440px;overflow-y:auto;overflow-x:hidden;scroll-behavior:smooth;background:linear-gradient(180deg,#1b1b1b 0%,#141414 100%);border:1px solid var(--border-2);border-radius:16px;box-shadow:0 24px 60px -14px #000000d9, 0 0 0 1px #ffffff08;backdrop-filter:blur(10px);padding:6px;z-index:200;opacity:0;transform:translateY(-8px) scale(.985);transform-origin:top center;pointer-events:none;transition:opacity .2s var(--ease), transform .24s var(--ease);}
-      .search-results.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto;}
-      .search-results::-webkit-scrollbar{width:10px;}
-      .search-results::-webkit-scrollbar-track{background:transparent;margin:8px 0;}
-      .search-results::-webkit-scrollbar-thumb{background:#ffffff1a;border:3px solid transparent;background-clip:padding-box;border-radius:99px;transition:background .2s ease;}
-      .search-results::-webkit-scrollbar-thumb:hover{background:#ffffff33;background-clip:padding-box;}
-      .search-results{scrollbar-width:thin;scrollbar-color:#ffffff26 transparent;}
-      .sr-cursor{position:absolute;top:0;left:6px;right:6px;height:0;border-radius:12px;background:#ffffff14;box-shadow:inset 0 0 0 1px #ffffff10;pointer-events:none;opacity:0;z-index:0;transition:transform .28s var(--ease), height .28s var(--ease), opacity .18s ease;}
-      .sr-cursor.no-anim{transition:none;}
-      .sr-cursor::before{content:"";position:absolute;left:6px;top:50%;width:3px;height:20px;background:#fff;border-radius:3px;transform:translateY(-50%);}
-      .sr-head{display:flex;align-items:center;justify-content:space-between;padding:8px 12px 8px;font-size:10.5px;letter-spacing:.7px;text-transform:uppercase;color:var(--text-mute);}
-      .sr-head .sr-count{color:var(--text-dim);}
-      .sr-item{position:relative;z-index:1;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;cursor:pointer;opacity:0;transform:translateY(6px);animation:srIn .32s var(--ease) forwards;transition:transform .18s var(--ease);}
-      .sr-item.active{transform:translateX(3px);}
-      @keyframes srIn{to{opacity:1;transform:translateY(0);}}
-      .sr-icon{width:34px;height:34px;flex-shrink:0;border-radius:10px;background:linear-gradient(180deg,#ffffff14,#ffffff08);border:1px solid var(--border-2);display:flex;align-items:center;justify-content:center;color:var(--text-dim);transition:background .2s ease, color .2s ease, transform .2s var(--ease);}
-      .sr-item.active .sr-icon{background:linear-gradient(180deg,#ffffff2a,#ffffff12);color:#fff;transform:scale(1.06);}
-      .sr-icon svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.9;}
-      .sr-text{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;}
-      .sr-name{font-size:14px;font-weight:500;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .2s ease;}
-      .sr-item.active .sr-name{color:#fff;}
-      .sr-name mark{background:none;color:#fff;font-weight:700;}
-      .sr-path{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--text-mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-      .sr-kind{font-size:9.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-dim);background:#ffffff0e;border:1px solid var(--border-2);border-radius:6px;padding:3px 8px;flex-shrink:0;transition:background .2s ease, color .2s ease;}
-      .sr-item.active .sr-kind{background:#ffffff1f;color:#fff;}
-      .sr-empty{padding:26px 16px;text-align:center;color:var(--text-mute);font-size:13px;}
-      .ind-card.glow{position:relative;z-index:20;animation:focusHit 2.2s cubic-bezier(.22,1,.36,1) forwards;}
-      .ind-card.glow::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;overflow:hidden;background:linear-gradient(105deg,transparent 35%,#ffffff33 50%,transparent 65%);background-size:250% 100%;background-position:140% 0;animation:focusSheen 1.15s cubic-bezier(.22,1,.36,1) forwards;}
-      @keyframes focusHit{0%{box-shadow:0 0 0 0 #ffffff00, inset 0 0 0 1px #ffffff00;}16%{box-shadow:0 0 0 4px #ffffff1f, 0 0 30px 2px #ffffff26, inset 0 0 0 1.5px #ffffffcc;}45%{box-shadow:0 0 0 3px #ffffff12, 0 0 18px 1px #ffffff14, inset 0 0 0 1.5px #ffffff66;}100%{box-shadow:0 0 0 0 #ffffff00, inset 0 0 0 1px #ffffff00;}}
-      @keyframes focusSheen{0%{background-position:140% 0;opacity:0;}25%{opacity:1;}100%{background-position:-100% 0;opacity:0;}}
-      @keyframes blink{0%,50%{opacity:1;}50.01%,100%{opacity:0;}}
-      #matrixCanvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0;transition:opacity 1s var(--ease);}
-      #matrixCanvas.on{opacity:1;}
-      body.matrix-on .app{background:transparent;}
-      body.matrix-on .sidebar{background:linear-gradient(180deg,rgba(13,13,13,.72) 0%, rgba(8,8,8,.78) 100%);}
-      body.matrix-on .topbar{background:rgba(10,10,10,.55);}
-      body.matrix-on .ind-card,body.matrix-on .config-item{background:linear-gradient(180deg, rgba(24,24,24,.82) 0%, rgba(16,16,16,.82) 100%);}
-      .topbar .spacer{flex:1;}
-      .icon-btn{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--panel);border:1px solid var(--border);cursor:pointer;color:var(--text-dim);transition:color .3s var(--ease), background .3s var(--ease), border-color .3s var(--ease), transform .2s var(--bounce);}
-      .icon-btn:hover{color:#fff;background:var(--panel-2);border-color:var(--border-2);transform:translateY(-2px);}
-      .icon-btn:active{transform:translateY(0) scale(.95);}
-      .icon-btn svg{width:18px;height:18px;stroke:currentColor;}
-      .content{flex:1;overflow:hidden;position:relative;}
-      .tabs-viewport{height:100%;overflow-y:auto;padding:28px;}
-      .tab{display:none;}
-      .tab.active{display:block;animation:tabEnter .55s cubic-bezier(.22,.68,.32,1);}
-      @keyframes tabEnter{0%{opacity:0;transform:translateX(26px);}60%{opacity:1;}100%{opacity:1;transform:translateX(0);}}
-      .tab.leaving{animation:tabLeave .26s var(--ease) forwards;}
-      @keyframes tabLeave{0%{opacity:1;transform:translateX(0);}100%{opacity:0;transform:translateX(-22px);}}
-      .columns {display: grid;grid-template-columns: 1fr 1fr;gap: 16px;align-items: start;}
-      .col-full { grid-column: 1 / -1; }
-      @media (max-width: 1000px) { .columns { grid-template-columns: 1fr; } }
-      .menu-btn{display:none;align-items:center;justify-content:center;width:40px;height:40px;flex-shrink:0;border-radius:10px;background:var(--panel);border:1px solid var(--border);color:var(--text-dim);cursor:pointer;transition:background .25s ease, color .25s ease, transform .18s var(--ease);}
-      .menu-btn:hover{color:#fff;background:var(--panel-2);}
-      .menu-btn:active{transform:scale(.92);}
-      .menu-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;}
-      .sidebar-overlay{position:fixed;inset:0;background:#000000a6;backdrop-filter:blur(2px);opacity:0;pointer-events:none;z-index:99;transition:opacity .35s var(--ease);}
-      @media (max-width: 760px){
-        .menu-btn{display:flex;}
-        .sidebar{position:fixed;top:0;left:0;bottom:0;z-index:100;width:82vw;max-width:300px;transform:translateX(-104%);transition:transform .38s cubic-bezier(.22,1,.36,1);box-shadow:0 0 50px #000000cc;}
-        body.nav-open .sidebar{transform:translateX(0);}
-        body.nav-open .sidebar-overlay{opacity:1;pointer-events:auto;}
-        .topbar{padding:14px 16px;gap:10px;}
-        .search{max-width:none;flex:1;width:auto;}
-        .search:focus-within{width:auto;}
-        .search-results{min-width:0;}
-        .tabs-viewport{padding:18px 16px 80px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
-        .page-title{font-size:19px;}
-        .icon-btn.hide-sm{display:none;}
-      }
-      @media (max-width: 420px){.sidebar{width:88vw;}.tabs-viewport{padding:14px 12px 80px;}}
-      .section-label {font-size: 11px;letter-spacing: 2px;color: var(--text-mute);font-weight: 600;text-transform: uppercase;margin: 4px 2px 12px;}
-      .columns > div {display: flex;flex-direction: column;gap: 10px;}
-      .ind-card {position: relative;background: linear-gradient(180deg, var(--panel) 0%, #101010 100%);border: 1px solid var(--border);border-radius: var(--radius);padding: 0 18px;height: 56px;display: flex;align-items: center;justify-content: space-between;overflow: visible;transition: all 0.3s var(--ease);cursor: pointer;}
-      .ind-card:has(.cselect.open) {z-index: 50;}
-      .snake-svg {display: none !important;}
-      .ind-card:hover {border-color: var(--border-2);background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);box-shadow: 0 8px 24px rgba(255, 255, 255, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.1);transform: translateY(-2px);}
-      .ind-card .name {font-size: 14.5px;color: var(--text);font-weight: 500;position: relative;z-index: 2;}
-      .ind-card .control {display: flex;align-items: center;gap: 12px;justify-content: flex-end;position: relative;z-index: 2;}
-      .gear{order:-1;width:18px;height:18px;flex-shrink:0;color:var(--text-mute);cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.55;transition:opacity .2s ease, color .2s ease;}
-      .gear:hover{opacity:1;color:var(--text);}
-      .gear svg{width:18px;height:18px;display:block;}
-      .toggle{width:46px;height:26px;border-radius:20px;background:var(--track);border:1px solid var(--border-2);position:relative;cursor:pointer;flex-shrink:0;transition:background .3s ease, border-color .3s ease;}
-      .toggle::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#6a6a6a;transition:transform .3s ease, background .3s ease;}
-      .toggle.on{background:#f5f5f5;border-color:#f5f5f5;}
-      .toggle.on::after{transform:translateX(20px);background:#0a0a0a;}
-      .slider-wrap{display:flex;align-items:center;gap:12px;min-width:200px;flex:1;justify-content:flex-end;}
-      .slider{-webkit-appearance:none;appearance:none;width:100%;max-width:170px;height:5px;border-radius:5px;background:var(--track);outline:none;cursor:pointer;}
-      .slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:#fff;cursor:pointer;box-shadow:0 0 0 4px #ffffff18;transition:transform .25s var(--ease), box-shadow .25s ease;}
-      .slider::-webkit-slider-thumb:hover{transform:scale(1.2);box-shadow:0 0 0 6px #ffffff22;}
-      .slider.dragging::-webkit-slider-thumb{transform:scale(1.35);box-shadow:0 0 0 9px #ffffff2e;}
-      .slider::-moz-range-thumb{width:16px;height:16px;border:none;border-radius:50%;background:#fff;cursor:pointer;transition:transform .25s var(--ease);}
-      .slider.dragging::-moz-range-thumb{transform:scale(1.35);}
-      .slider-val{font-size:13px;color:var(--text-dim);min-width:52px;text-align:center;background:var(--panel-2);border:1px solid var(--border);border-radius:7px;padding:5px 8px;font-variant-numeric:tabular-nums;transition:color .35s var(--ease), border-color .35s var(--ease), box-shadow .35s var(--ease);}
-      .slider-val.pulse{color:#fff;border-color:#4a4a4a;box-shadow:0 0 0 3px #ffffff10;}
-      .cselect{position:relative;min-width:150px;user-select:none;}
-      .cselect-trigger{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;background:var(--panel-2);border:1px solid var(--border);color:var(--text);padding:9px 14px;border-radius:9px;font-size:13.5px;font-weight:500;cursor:pointer;transition:border-color .3s var(--ease), background .3s var(--ease), box-shadow .3s var(--ease);}
-      .cselect-trigger:hover{border-color:var(--border-2);background:#232323;box-shadow:0 4px 14px -6px #000000aa;}
-      .cselect.open .cselect-trigger{border-color:#5a5a5a;background:#232323;box-shadow:0 0 0 3px #ffffff12;}
-      .cselect .chev{width:7px;height:7px;flex-shrink:0;border-right:2px solid var(--text-dim);border-bottom:2px solid var(--text-dim);transform:rotate(135deg);transition:transform .4s var(--bounce), border-color .3s ease;}
-      .cselect-trigger:hover .chev{border-color:var(--text);}
-      .cselect.open .chev{transform:rotate(45deg);border-color:#fff;}
-      .cselect-menu{position:absolute;top:calc(100% + 8px);left:0;right:0;background:linear-gradient(180deg,#1d1d1d 0%,#161616 100%);border:1px solid var(--border-2);border-radius:12px;padding:6px;z-index:40;box-shadow:0 22px 50px -12px #000000cc, 0 0 0 1px #ffffff08;backdrop-filter:blur(8px);opacity:0;transform:translateY(-10px) scale(.96);transform-origin:top center;pointer-events:none;transition:opacity .26s var(--ease), transform .3s var(--bounce);}
-      .cselect.open .cselect-menu{opacity:1;transform:translateY(0) scale(1);pointer-events:auto;}
-      .cselect-cursor{position:absolute;top:0;left:6px;right:6px;height:0;border-radius:8px;background:#ffffff16;box-shadow:inset 0 0 0 1px #ffffff10;pointer-events:none;opacity:0;z-index:0;transition:transform .26s var(--ease), height .26s var(--ease), opacity .18s ease;}
-      .cselect-cursor.no-anim{transition:none;}
-      .cselect-cursor::before{content:"";position:absolute;left:5px;top:50%;width:3px;height:15px;background:#fff;border-radius:3px;transform:translateY(-50%);}
-      .cselect-opt{position:relative;z-index:1;padding:9px 12px 9px 16px;border-radius:8px;font-size:13.5px;color:var(--text-dim);cursor:pointer;transition:color .2s ease, transform .2s var(--ease);}
-      .cselect-opt.hovered,.cselect-opt.selected{color:#fff;transform:translateX(2px);}
-      .config-list{position:relative;display:flex;flex-direction:column;gap:6px;}
-      .cfg-cursor{position:absolute;left:0;right:0;top:0;height:0;border-radius:13px;background:#ffffff0d;box-shadow:inset 0 0 0 1px #ffffff12;opacity:0;z-index:0;transition:transform .34s var(--ease), height .34s var(--ease), opacity .22s ease, background .28s ease, box-shadow .28s ease;}
-      .cfg-cursor.on-selected{background:linear-gradient(180deg,#242424 0%,#171717 100%);box-shadow:inset 0 0 0 1px #ffffff26, 0 10px 26px -16px #000;}
-      .cfg-cursor.no-anim{transition:none;}
-      .cfg-cursor::before{content:"";position:absolute;left:0;top:50%;width:3px;height:22px;background:#fff;border-radius:0 3px 3px 0;transform:translateY(-50%) scaleY(.5);opacity:.4;transition:transform .3s var(--ease), opacity .3s ease;}
-      .cfg-cursor.on-selected::before{transform:translateY(-50%) scaleY(1);opacity:1;}
-      .config-item{position:relative;z-index:1;display:flex;align-items:center;gap:14px;background:transparent;border:1px solid transparent;border-radius:13px;padding:13px 16px;cursor:pointer;transition:transform .25s var(--ease);animation:popIn .4s var(--ease);}
-      @keyframes popIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-      .cfg-icon{width:40px;height:40px;flex-shrink:0;border-radius:11px;background:linear-gradient(180deg,#ffffff12,#ffffff06);border:1px solid var(--border-2);display:flex;align-items:center;justify-content:center;color:var(--text-mute);transition:background .3s var(--ease), color .3s var(--ease), transform .3s var(--ease);}
-      .config-item.hovered .cfg-icon{background:#fff;color:#0a0a0a;border-color:transparent;}
-      .cfg-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.9;}
-      .config-item .info{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0;}
-      .config-item .info .title{font-weight:600;font-size:14.5px;display:flex;align-items:center;gap:8px;color:var(--text-dim);transition:color .3s var(--ease);}
-      .config-item.hovered .info .title{color:#fff;}
-      .config-item .info .sub{font-size:12px;color:var(--text-mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-      .cfg-badge{font-size:9px;letter-spacing:.5px;text-transform:uppercase;font-weight:700;color:#0a0a0a;background:#fff;border-radius:5px;padding:2px 7px;opacity:0;transform:scale(.7);transition:opacity .3s ease, transform .3s var(--bounce);}
-      .config-item.selected .cfg-badge{opacity:1;transform:scale(1);}
-      .config-item.selected .load-btn{opacity:.45;pointer-events:none;}
-      .btn{padding:9px 16px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border-2);background:#fff;color:#0a0a0a;transition:opacity .2s ease, transform .2s var(--bounce), background .2s ease, color .2s ease, box-shadow .2s ease;}
-      .btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px -8px #ffffff40;}
-      .btn:active{transform:translateY(0) scale(.96);}
-      .btn.ghost{background:transparent;color:var(--text-dim);}
-      .btn.ghost:hover{color:#fff;background:var(--panel-2);box-shadow:none;border-color:#555;}
-      .btn.load-btn{padding:7px 15px;font-size:12px;flex-shrink:0;}
-      .config-actions{display:flex;gap:10px;margin-top:18px;}
-      .config-actions .btn{flex:1;justify-content:center;text-align:center;display:flex;align-items:center;gap:7px;}
-      .config-actions .btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;}
-      .page-title{font-size:22px;font-weight:700;margin-bottom:4px;}
-      .page-desc{font-size:13px;color:var(--text-mute);margin-bottom:24px;}
-      .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(120px);background:#fff;color:#0a0a0a;padding:12px 22px;border-radius:12px;font-size:13.5px;font-weight:600;box-shadow:0 12px 40px #00000060;transition:transform .45s var(--bounce);z-index:50;}
-      .toast.show{transform:translateX(-50%) translateY(0);}
-    </style>
-    </head>
-    <body>
-    <div class="cursor-ring" id="cursorRing"></div>
-    <div class="cursor-dot" id="cursorDot"></div>
-    <div class="app">
-      <aside class="sidebar">
-        <div class="logo">NEXUS</div>
-        <nav class="nav">
-          <div class="nav-indicator no-anim" id="navIndicator"></div>
-          <div class="nav-group">
-            <div class="nav-label">Combat</div>
-            <div class="nav-parent expanded">
-              <div class="nav-toggle">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>
-                <span>Aimbot</span><i class="caret"></i>
-              </div>
-              <div class="nav-sub">
-                <div class="nav-child tab-link active" data-tab="aimbot-main"><i class="dot"></i>Aimbot</div>
-                <div class="nav-child tab-link" data-tab="aimbot-trigger"><i class="dot"></i>Triggerbot</div>
-                <div class="nav-child tab-link" data-tab="aimbot-rcs"><i class="dot"></i>RCS</div>
-              </div>
-            </div>
-          </div>
-          <div class="nav-group">
-            <div class="nav-label">Common</div>
-            <div class="nav-parent">
-              <div class="nav-toggle">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12a1.8 1.8 0 0 1 0-1C3.6 6.6 7.5 4 12 4s8.4 2.6 10 7a1.8 1.8 0 0 1 0 1c-1.6 4.4-5.5 7-10 7S3.6 16.4 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
-                <span>Visuals</span><i class="caret"></i>
-              </div>
-              <div class="nav-sub">
-                <div class="nav-child tab-link" data-tab="visuals-esp"><i class="dot"></i>ESP</div>
-                <div class="nav-child tab-link" data-tab="visuals-chams"><i class="dot"></i>Chams</div>
-                <div class="nav-child tab-link" data-tab="visuals-world"><i class="dot"></i>World</div>
-              </div>
-            </div>
-          </div>
-          <div class="nav-group">
-            <div class="nav-label">Presets</div>
-            <div class="nav-lonely tab-link" data-tab="config">
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="1" x2="7" y1="14" y2="14"/><line x1="9" x2="15" y1="8" y2="8"/><line x1="17" x2="23" y1="16" y2="16"/></svg>
-              <span>Config</span>
-            </div>
-          </div>
-        </nav>
-        <div class="sidebar-footer">
-          <span class="user">n3sk</span>
-          <span class="plan">Free</span>
-        </div>
-      </aside>
-      <div class="sidebar-overlay" id="sidebarOverlay"></div>
-      <div class="main">
-        <div class="topbar">
-          <button class="menu-btn" id="menuBtn" title="Menu" aria-label="Abrir menu">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-          </button>
-          <div class="search-wrap">
-            <label class="search">
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-              <span class="search-field">
-                <input type="text" id="searchInput" placeholder="" autocomplete="off" />
-                <span class="search-ghost" id="searchGhost" aria-hidden="true"></span>
-                <span class="search-caret" id="searchCaret" aria-hidden="true"></span>
-                <span class="search-measure" id="searchMeasure" aria-hidden="true"></span>
-              </span>
-            </label>
-            <div class="search-results" id="searchResults" role="listbox"></div>
-          </div>
-          <div class="spacer"></div>
-          <button class="icon-btn hide-sm" title="Chat">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2Z"/></svg>
-          </button>
-          <button class="icon-btn" title="Settings" data-goto="config">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82 2 2 0 11-2.83 2.83 1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51 2 2 0 11-4 0 1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33 2 2 0 11-2.83-2.83A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1 2 2 0 110-4 1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82 2 2 0 112.83-2.83A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51 2 2 0 114 0 1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33 2 2 0 112.83 2.83A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1 2 2 0 110 4 1.65 1.65 0 00-1.51 1Z"/></svg>
-          </button>
-        </div>
-        <div class="content">
-          <div class="tabs-viewport" id="viewport">
-            <!-- SECTIONS OMITTED FOR BREVITY IN THIS EXAMPLE BUT WOULD BE HERE -->
-             <section class="tab active" data-tab="aimbot-main">
-          <h1 class="page-title">Aimbot</h1>
-          <p class="page-desc">Seleção de arma e configuração da mira automática.</p>
+var _0x1fm=_0xa1('div',{class:'main'});
+var _0x1gn=_0xa1('div',{class:'topbar'});
+var _0x1ho=_0xa1('button',{class:'menu-btn',id:'menuBtn'});
+_0x1ho.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>';
+_0x1gn.appendChild(_0x1ho);
 
-          <div class="columns">
-            <div class="col-full">
-              <div class="section-label">Selection</div>
-              <div class="ind-card">
-                <span class="name">Weapon Group</span>
-                <div class="control">
-                  <div class="cselect" data-value="Pistol">
-                    <button class="cselect-trigger"><span class="cselect-value">Pistol</span><i class="chev"></i></button>
-                    <div class="cselect-menu">
-                      <div class="cselect-opt selected">Pistol</div>
-                      <div class="cselect-opt">Rifle</div>
-                      <div class="cselect-opt">Sniper</div>
-                      <div class="cselect-opt">SMG</div>
-                      <div class="cselect-opt">Shotgun</div>
-                    </div>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none">
-                   <rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" />
-                </svg>
-              </div>
-            </div>
+var _0x1ip=_0xa1('div',{class:'search-wrap'});
+var _0x1jq=_0xa1('label',{class:'search'});
+_0x1jq.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span class="search-field"><input type="text" id="searchInput" placeholder="" autocomplete="off" /><span class="search-ghost" id="searchGhost" aria-hidden="true"></span><span class="search-caret" id="searchCaret" aria-hidden="true"></span><span class="search-measure" id="searchMeasure" aria-hidden="true"></span></span>';
+_0x1ip.appendChild(_0x1jq);
+var _0x1kr=_0xa1('div',{class:'search-results',id:'searchResults',role:'listbox'});
+_0x1ip.appendChild(_0x1kr);
+_0x1gn.appendChild(_0x1ip);
 
-            <div>
-              <div class="section-label">Aimbot</div>
-              <div class="ind-card">
-                <span class="name">Enabled</span>
-                <div class="control"><div class="toggle on"></div></div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Auto Aiming</span>
-                <div class="control"><div class="toggle"></div></div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Draw Fov</span>
-                <div class="control"><div class="toggle"></div></div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Hitbox</span>
-                <div class="control">
-                  <div class="cselect" data-value="Closest">
-                    <button class="cselect-trigger"><span class="cselect-value">Closest</span><i class="chev"></i></button>
-                    <div class="cselect-menu">
-                      <div class="cselect-opt selected">Closest</div>
-                      <div class="cselect-opt">Head</div>
-                      <div class="cselect-opt">Chest</div>
-                      <div class="cselect-opt">Stomach</div>
-                    </div>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-            </div>
+_0x1gn.appendChild(_0xa1('div',{class:'spacer'}));
+_0x1gn.appendChild(_0xa1('button',{class:'icon-btn hide-sm',title:'Chat',html:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2Z"/></svg>'}));
+_0x1gn.appendChild(_0xa1('button',{class:'icon-btn',title:'Settings','data-goto':'config',html:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82 2 2 0 11-2.83 2.83 1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51 2 2 0 11-4 0 1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33 2 2 0 11-2.83-2.83A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1 2 2 0 110-4 1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82 2 2 0 112.83-2.83A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51 2 2 0 114 0 1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33 2 2 0 112.83 2.83A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1 2 2 0 110 4 1.65 1.65 0 00-1.51 1Z"/></svg>'}));
+_0x1fm.appendChild(_0x1gn);
 
-            <div>
-              <div class="section-label">Tuning</div>
-              <div class="ind-card">
-                <span class="name">Fov</span>
-                <div class="control">
-                  <div class="slider-wrap">
-                    <input type="range" class="slider" min="0" max="180" value="90">
-                    <span class="slider-val">90</span>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Smooth X</span>
-                <div class="control">
-                  <div class="slider-wrap">
-                    <input type="range" class="slider" min="0" max="100" value="35">
-                    <span class="slider-val">35</span>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Smooth Y</span>
-                <div class="control">
-                  <div class="slider-wrap">
-                    <input type="range" class="slider" min="0" max="100" value="35">
-                    <span class="slider-val">35</span>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
+var _0x1ls=_0xa1('div',{class:'content'});
+var _0x1mt=_0xa1('div',{class:'tabs-viewport',id:'viewport'});
 
-              <div class="section-label">Behavior</div>
-              <div class="ind-card">
-                <span class="name">Priority</span>
-                <div class="control">
-                  <div class="cselect" data-value="Distance">
-                    <button class="cselect-trigger"><span class="cselect-value">Distance</span><i class="chev"></i></button>
-                    <div class="cselect-menu">
-                      <div class="cselect-opt selected">Distance</div>
-                      <div class="cselect-opt">Crosshair</div>
-                      <div class="cselect-opt">Health</div>
-                    </div>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Auto Fire</span>
-                <div class="control"><div class="toggle"></div></div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Silent Aim</span>
-                <div class="control"><div class="toggle"></div></div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-            </div>
-          </div>
-        </section>
+var _0x1nu=function(_0x1ov,_0x1pw,_0x1qx){
+    var _0x1ry=_0xa1('section',{class:'tab '+(_0x1qx?'active':''),'data-tab':_0x1ov});
+    _0x1ry.appendChild(_0xa1('h1',{class:'page-title',text:_0x1pw.split('|')[0]}));
+    _0x1ry.appendChild(_0xa1('p',{class:'page-desc',text:_0x1pw.split('|')[1]||''}));
+    return _0x1ry;
+};
 
-        <!-- ============ TRIGGERBOT ============ -->
-        <section class="tab" data-tab="aimbot-trigger">
-          <h1 class="page-title">Triggerbot</h1>
-          <p class="page-desc">Disparo automático ao mirar em um alvo válido.</p>
-          <div class="columns">
-            <div class="col-full">
-              <div class="section-label">Selection</div>
-              <div class="ind-card">
-                <span class="name">Weapon Group</span>
-                <div class="control">
-                  <div class="cselect" data-value="Rifle">
-                    <button class="cselect-trigger"><span class="cselect-value">Rifle</span><i class="chev"></i></button>
-                    <div class="cselect-menu">
-                      <div class="cselect-opt">Pistol</div>
-                      <div class="cselect-opt selected">Rifle</div>
-                      <div class="cselect-opt">Sniper</div>
-                      <div class="cselect-opt">SMG</div>
-                      <div class="cselect-opt">Shotgun</div>
-                    </div>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-            </div>
-            <div>
-              <div class="section-label">Triggerbot</div>
-              <div class="ind-card">
-                <span class="name">Enabled</span>
-                <div class="control"><div class="toggle on"></div></div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Flash Check</span>
-                <div class="control"><div class="toggle on"></div></div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Hitbox</span>
-                <div class="control">
-                  <div class="cselect" data-value="All">
-                    <button class="cselect-trigger"><span class="cselect-value">All</span><i class="chev"></i></button>
-                    <div class="cselect-menu">
-                      <div class="cselect-opt selected">All</div>
-                      <div class="cselect-opt">Head</div>
-                      <div class="cselect-opt">Body</div>
-                    </div>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-            </div>
-            <div>
-              <div class="section-label">Timing</div>
-              <div class="ind-card">
-                <span class="name">Delay</span>
-                <div class="control">
-                  <div class="slider-wrap">
-                    <input type="range" class="slider" min="0" max="500" value="0" data-suffix="ms">
-                    <span class="slider-val">0ms</span>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Min. Damage</span>
-                <div class="control">
-                  <div class="slider-wrap">
-                    <input type="range" class="slider" min="0" max="100" step="0.5" value="0">
-                    <span class="slider-val">0.0</span>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Scoped Only</span>
-                <div class="control"><div class="toggle"></div></div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-            </div>
-          </div>
-        </section>
+var _0x1sz=_0x1nu('aimbot-main','Aimbot|Seleção de arma e configuração da mira automática.');
+var _0x1ta=_0xa1('div',{class:'columns'});
+var _0x1ub=_0xa1('div',{class:'col-full'});
+_0x1ub.appendChild(_0xa1('div',{class:'section-label',text:'Selection'}));
+var _0x1vc=_0xa1('div',{class:'ind-card'});
+_0x1vc.appendChild(_0xa1('span',{class:'name',text:'Weapon Group'}));
+var _0x1wd=_0xa1('div',{class:'control'});
+var _0x1xe=_0xa1('div',{class:'cselect','data-value':'Pistol'});
+_0x1xe.innerHTML='<button class="cselect-trigger"><span class="cselect-value">Pistol</span><i class="chev"></i></button><div class="cselect-menu"><div class="cselect-opt selected">Pistol</div><div class="cselect-opt">Rifle</div><div class="cselect-opt">Sniper</div><div class="cselect-opt">SMG</div><div class="cselect-opt">Shotgun</div></div>';
+_0x1wd.appendChild(_0x1xe);
+_0x1vc.appendChild(_0x1wd);
+_0x1ub.appendChild(_0x1vc);
+_0x1ta.appendChild(_0x1ub);
+_0x1sz.appendChild(_0x1ta);
+_0x1mt.appendChild(_0x1sz);
 
-     
-        <section class="tab" data-tab="aimbot-rcs">
-          <h1 class="page-title">RCS</h1>
-          <p class="page-desc">Controle de recuo e compensação de spray.</p>
-          <div class="columns">
-            <div class="col-full">
-              <div class="section-label">Selection</div>
-              <div class="ind-card">
-                <span class="name">Weapon Group</span>
-                <div class="control">
-                  <div class="cselect" data-value="Rifle">
-                    <button class="cselect-trigger"><span class="cselect-value">Rifle</span><i class="chev"></i></button>
-                    <div class="cselect-menu">
-                      <div class="cselect-opt">Pistol</div>
-                      <div class="cselect-opt selected">Rifle</div>
-                      <div class="cselect-opt">Sniper</div>
-                      <div class="cselect-opt">SMG</div>
-                      <div class="cselect-opt">Shotgun</div>
-                    </div>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-            </div>
-            <div>
-              <div class="section-label">RCS</div>
-              <div class="ind-card">
-                <span class="name">Enabled</span>
-                <div class="control"><div class="toggle"></div></div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Standalone</span>
-                <div class="control"><div class="toggle"></div></div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Start Bullet</span>
-                <div class="control">
-                  <div class="slider-wrap">
-                    <input type="range" class="slider" min="1" max="30" value="1">
-                    <span class="slider-val">1</span>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-            </div>
-            <div>
-              <div class="section-label">Compensation</div>
-              <div class="ind-card">
-                <span class="name">Compensate X</span>
-                <div class="control">
-                  <div class="slider-wrap">
-                    <input type="range" class="slider" min="0" max="100" value="0" data-suffix="%">
-                    <span class="slider-val">0%</span>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Compensate Y</span>
-                <div class="control">
-                  <div class="slider-wrap">
-                    <input type="range" class="slider" min="0" max="100" value="0" data-suffix="%">
-                    <span class="slider-val">0%</span>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Smoothing</span>
-                <div class="control">
-                  <div class="slider-wrap">
-                    <input type="range" class="slider" min="0" max="100" value="50" data-suffix="%">
-                    <span class="slider-val">50%</span>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-            </div>
-          </div>
-        </section>
+_0x1mt.appendChild(_0x1nu('aimbot-trigger','Triggerbot|Disparo automático ao mirar em um alvo válido.'));
+_0x1mt.appendChild(_0x1nu('aimbot-rcs','RCS|Controle de recuo e compensação de spray.'));
+_0x1mt.appendChild(_0x1nu('visuals-esp','ESP|Renderização de informações dos jogadores na tela.'));
+_0x1mt.appendChild(_0x1nu('visuals-chams','Chams|Materiais e coloração dos modelos de jogadores.'));
+_0x1mt.appendChild(_0x1nu('visuals-world','World|Efeitos de mundo, ambiente e overlays.'));
 
-        
-        <section class="tab" data-tab="visuals-esp">
-          <h1 class="page-title">ESP</h1>
-          <p class="page-desc">Renderização de informações dos jogadores na tela.</p>
-          <div class="columns">
-            <div class="col-full">
-              <div class="section-label">Target</div>
-              <div class="ind-card">
-                <span class="name">Target</span>
-                <div class="control">
-                  <div class="cselect" data-value="Enemy">
-                    <button class="cselect-trigger"><span class="cselect-value">Enemy</span><i class="chev"></i></button>
-                    <div class="cselect-menu">
-                      <div class="cselect-opt selected">Enemy</div>
-                      <div class="cselect-opt">Team</div>
-                      <div class="cselect-opt">All</div>
-                    </div>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-            </div>
-            <div>
-              <div class="section-label">ESP Features</div>
-              <div class="ind-card">
-                <span class="name">Box</span>
-                <div class="control">
-                  <div class="toggle on"></div>
-                  <div class="gear">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82 2 2 0 11-2.83 2.83 1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51 2 2 0 11-4 0 1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33 2 2 0 11-2.83-2.83A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1 2 2 0 110-4 1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82 2 2 0 112.83-2.83A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51 2 2 0 114 0 1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33 2 2 0 112.83 2.83A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1 2 2 0 110 4 1.65 1.65 0 00-1.51 1Z"/></svg>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Name</span>
-                <div class="control"><div class="toggle on"></div></div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Health</span>
-                <div class="control"><div class="toggle on"></div></div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Snapline</span>
-                <div class="control"><div class="toggle on"></div></div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-            </div>
-            <div>
-              <div class="section-label">Details</div>
-              <div class="ind-card">
-                <span class="name">Skeleton</span>
-                <div class="control"><div class="toggle"></div></div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Weapon</span>
-                <div class="control"><div class="toggle"></div></div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Flags</span>
-                <div class="control">
-                  <div class="toggle"></div>
-                  <div class="gear">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82 2 2 0 11-2.83 2.83 1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51 2 2 0 11-4 0 1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33 2 2 0 11-2.83-2.83A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1 2 2 0 110-4 1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82 2 2 0 112.83-2.83A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51 2 2 0 114 0 1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33 2 2 0 112.83 2.83A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1 2 2 0 110 4 1.65 1.65 0 00-1.51 1Z"/></svg>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Max Distance</span>
-                <div class="control">
-                  <div class="slider-wrap">
-                    <input type="range" class="slider" min="0" max="500" value="300" data-suffix="m">
-                    <span class="slider-val">300m</span>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-            </div>
-          </div>
-        </section>
+var _0x1yf=_0x1nu('config','Config|Salve, carregue e gerencie seus presets de configuração.');
+var _0x1zg=_0xa1('div',{class:'columns'});
+var _0x1ah2=_0xa1('div');
+_0x1ah2.appendChild(_0xa1('div',{class:'section-label',text:'Presets'}));
+var _0x1bi2=_0xa1('div',{class:'config-list',id:'configList'});
+['Legit','Rage','HvH','Default'].forEach(function(_0x1cj2,_0x1dk2){
+    var _0x1el2=_0xa1('div',{class:'config-item'+(_0x1dk2===0?' selected':''),'data-cfg':_0x1cj2});
+    _0x1el2.innerHTML='<span class="cfg-icon"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4-3 6.5-7 9-4-2.5-7-5-7-9V6l7-3Z"/></svg></span><div class="info"><span class="title">'+_0x1cj2+'<span class="cfg-badge">Ativo</span></span><span class="sub">Última alteração há '+(_0x1dk2+1)+' dias</span></div><button class="btn ghost load-btn">Load</button>';
+    _0x1bi2.appendChild(_0x1el2);
+});
+_0x1ah2.appendChild(_0x1bi2);
+var _0x1fm2=_0xa1('div',{class:'config-actions'});
+_0x1fm2.appendChild(_0xa1('button',{class:'btn',id:'newCfg',html:'<svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14"/></svg>New'}));
+_0x1fm2.appendChild(_0xa1('button',{class:'btn ghost',id:'importCfg',html:'<svg viewBox="0 0 24 24" fill="none"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Import'}));
+_0x1fm2.appendChild(_0xa1('button',{class:'btn ghost',id:'exportCfg',html:'<svg viewBox="0 0 24 24" fill="none"><path d="M12 21V9M7 14l5-5 5 5M5 3h14"/></svg>Export'}));
+_0x1ah2.appendChild(_0x1fm2);
+_0x1zg.appendChild(_0x1ah2);
+_0x1yf.appendChild(_0x1zg);
+_0x1mt.appendChild(_0x1yf);
 
-     
-        <section class="tab" data-tab="visuals-chams">
-          <h1 class="page-title">Chams</h1>
-          <p class="page-desc">Materiais e coloração dos modelos de jogadores.</p>
-          <div class="columns">
-            <div>
-              <div class="section-label">Chams</div>
-              <div class="ind-card">
-                <span class="name">Enemy</span>
-                <div class="control">
-                  <div class="toggle on"></div>
-                  <div class="cselect" data-value="Flat">
-                    <button class="cselect-trigger"><span class="cselect-value">Flat</span><i class="chev"></i></button>
-                    <div class="cselect-menu">
-                      <div class="cselect-opt selected">Flat</div>
-                      <div class="cselect-opt">Glow</div>
-                      <div class="cselect-opt">Textured</div>
-                    </div>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Team</span>
-                <div class="control">
-                  <div class="toggle"></div>
-                  <div class="cselect" data-value="Flat">
-                    <button class="cselect-trigger"><span class="cselect-value">Flat</span><i class="chev"></i></button>
-                    <div class="cselect-menu">
-                      <div class="cselect-opt selected">Flat</div>
-                      <div class="cselect-opt">Glow</div>
-                      <div class="cselect-opt">Textured</div>
-                    </div>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Local</span>
-                <div class="control">
-                  <div class="toggle"></div>
-                  <div class="cselect" data-value="Flat">
-                    <button class="cselect-trigger"><span class="cselect-value">Flat</span><i class="chev"></i></button>
-                    <div class="cselect-menu">
-                      <div class="cselect-opt selected">Flat</div>
-                      <div class="cselect-opt">Glow</div>
-                      <div class="cselect-opt">Textured</div>
-                    </div>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-            </div>
-            <div>
-              <div class="section-label">Material</div>
-              <div class="ind-card">
-                <span class="name">Ignore Z</span>
-                <div class="control"><div class="toggle on"></div></div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Wireframe</span>
-                <div class="control"><div class="toggle"></div></div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Intensity</span>
-                <div class="control">
-                  <div class="slider-wrap">
-                    <input type="range" class="slider" min="0" max="100" value="60" data-suffix="%">
-                    <span class="slider-val">60%</span>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-            </div>
-          </div>
-        </section>
+_0x1ls.appendChild(_0x1mt);
+_0x1fm.appendChild(_0x1ls);
+_0xf6.appendChild(_0x1fm);
 
-    
-        <section class="tab" data-tab="visuals-world">
-          <h1 class="page-title">World</h1>
-          <p class="page-desc">Efeitos de mundo, ambiente e overlays.</p>
-          <div class="columns">
-            <div>
-              <div class="section-label">World</div>
-              <div class="ind-card">
-                <span class="name">Bullet Tracers</span>
-                <div class="control"><div class="toggle"></div></div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Hit Markers</span>
-                <div class="control"><div class="toggle on"></div></div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Crosshair</span>
-                <div class="control"><div class="toggle on"></div></div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Render Distance</span>
-                <div class="control">
-                  <div class="slider-wrap">
-                    <input type="range" class="slider" min="0" max="500" value="250" data-suffix="m">
-                    <span class="slider-val">250m</span>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-            </div>
-            <div>
-              <div class="section-label">Environment</div>
-              <div class="ind-card">
-                <span class="name">Night Mode</span>
-                <div class="control"><div class="toggle"></div></div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Remove Fog</span>
-                <div class="control"><div class="toggle on"></div></div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">FOV Changer</span>
-                <div class="control">
-                  <div class="slider-wrap">
-                    <input type="range" class="slider" min="60" max="120" value="90">
-                    <span class="slider-val">90</span>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-            </div>
-          </div>
-        </section>
+var _0x1gn2=_0xa1('canvas',{id:'matrixCanvas','aria-hidden':'true'});
+var _0x1ho2=_0xa1('div',{class:'toast',id:'toast',text:'Config carregada'});
+document.body.appendChild(_0xf6);
+document.body.appendChild(_0x1gn2);
+document.body.appendChild(_0x1ho2);
 
-
-        <section class="tab" data-tab="config">
-          <h1 class="page-title">Config</h1>
-          <p class="page-desc">Salve, carregue e gerencie seus presets de configuração.</p>
-          <div class="columns">
-            <div>
-              <div class="section-label">Presets</div>
-              <div class="config-list" id="configList">
-                <div class="config-item selected" data-cfg="Legit">
-                  <span class="cfg-icon"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4-3 6.5-7 9-4-2.5-7-5-7-9V6l7-3Z"/></svg></span>
-                  <div class="info"><span class="title">Legit<span class="cfg-badge">Ativo</span></span><span class="sub">Última alteração há 2 dias</span></div>
-                  <button class="btn ghost load-btn">Load</button>
-                </div>
-                <div class="config-item" data-cfg="Rage">
-                  <span class="cfg-icon"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8Z"/></svg></span>
-                  <div class="info"><span class="title">Rage<span class="cfg-badge">Ativo</span></span><span class="sub">Última alteração há 5 dias</span></div>
-                  <button class="btn ghost load-btn">Load</button>
-                </div>
-                <div class="config-item" data-cfg="HvH">
-                  <span class="cfg-icon"><svg viewBox="0 0 24 24"><path d="M14.5 3l-2 2 6 6 2-2-6-6ZM3 21l4-1 11-11-3-3L4 17l-1 4Z"/></svg></span>
-                  <div class="info"><span class="title">HvH<span class="cfg-badge">Ativo</span></span><span class="sub">Última alteração há 1 semana</span></div>
-                  <button class="btn ghost load-btn">Load</button>
-                </div>
-                <div class="config-item" data-cfg="Default">
-                  <span class="cfg-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16v6H4zM4 14h16v6H4z"/></svg></span>
-                  <div class="info"><span class="title">Default<span class="cfg-badge">Ativo</span></span><span class="sub">Configuração padrão</span></div>
-                  <button class="btn ghost load-btn">Load</button>
-                </div>
-              </div>
-              <div class="config-actions">
-                <button class="btn" id="newCfg"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14"/></svg>New</button>
-                <button class="btn ghost" id="importCfg"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Import</button>
-                <button class="btn ghost" id="exportCfg"><svg viewBox="0 0 24 24" fill="none"><path d="M12 21V9M7 14l5-5 5 5M5 3h14"/></svg>Export</button>
-              </div>
-            </div>
-            <div>
-              <div class="section-label">Settings</div>
-              <div class="ind-card">
-                <span class="name">Auto Save</span>
-                <div class="control"><div class="toggle on"></div></div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Cloud Sync</span>
-                <div class="control"><div class="toggle"></div></div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Menu Keybind</span>
-                <div class="control">
-                  <div class="cselect" data-value="Insert">
-                    <button class="cselect-trigger"><span class="cselect-value">Insert</span><i class="chev"></i></button>
-                    <div class="cselect-menu">
-                      <div class="cselect-opt selected">Insert</div>
-                      <div class="cselect-opt">Delete</div>
-                      <div class="cselect-opt">Home</div>
-                      <div class="cselect-opt">End</div>
-                    </div>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Panic Key</span>
-                <div class="control">
-                  <div class="cselect" data-value="F12">
-                    <button class="cselect-trigger"><span class="cselect-value">F12</span><i class="chev"></i></button>
-                    <div class="cselect-menu">
-                      <div class="cselect-opt selected">F12</div>
-                      <div class="cselect-opt">F11</div>
-                      <div class="cselect-opt">F10</div>
-                    </div>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Menu Opacity</span>
-                <div class="control">
-                  <div class="slider-wrap">
-                    <input type="range" class="slider" min="40" max="100" value="100" data-suffix="%">
-                    <span class="slider-val">100%</span>
-                  </div>
-                </div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Watermark</span>
-                <div class="control"><div class="toggle on"></div></div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-              <div class="ind-card">
-                <span class="name">Matrix Rain</span>
-                <div class="control"><div class="toggle" id="matrixToggle"></div></div>
-                <svg class="snake-svg" viewBox="0 0 100 56" preserveAspectRatio="none"><rect class="snake-path" x="-1" y="-1" width="102" height="58" rx="10" ry="10" /></svg>
-              </div>
-            </div>
-          </div>
-        </section>
-          </div>
-        </div>
-      </div>
-    </div>
-    <canvas id="matrixCanvas" aria-hidden="true"></canvas>
-    <div class="toast" id="toast">Config carregada</div>
-    <script>
-    
-  (function protect(){
-    
-    document.addEventListener('contextmenu', e => e.preventDefault());
-   
-    document.addEventListener('dragstart', e => e.preventDefault());
- 
-    document.addEventListener('keydown', e => {
-      const k = (e.key || '').toLowerCase();
-      if(
-        e.key === 'F12' ||
-        (e.ctrlKey && e.shiftKey && ['i','j','c'].includes(k)) ||   
-        (e.ctrlKey && k === 'u') ||                                  
-        (e.metaKey && e.altKey && ['i','j','c'].includes(k))        
-      ){
+document.addEventListener('contextmenu',function(e){e.preventDefault()});
+document.addEventListener('dragstart',function(e){e.preventDefault()});
+document.addEventListener('keydown',function(e){
+    var _0x1ip2=(e.key||'').toLowerCase();
+    if(e.key==='F12'||(e.ctrlKey&&e.shiftKey&&['i','j','c'].includes(_0x1ip2))||(e.ctrlKey&&_0x1ip2==='u')||(e.metaKey&&e.altKey&&['i','j','c'].includes(_0x1ip2))){
         e.preventDefault();
         e.stopPropagation();
         return false;
-      }
-    });
-  })();
-
-
-  const nav = document.querySelector('.nav');
-  const indicator = document.getElementById('navIndicator');
-  const parents = document.querySelectorAll('.nav-parent');
-  const tabLinks = document.querySelectorAll('.tab-link');
-  const sections = document.querySelectorAll('section.tab');
-  const viewport = document.getElementById('viewport');
-
-
-  function moveIndicator(){
-    const active = document.querySelector('.tab-link.active');
-    if(!active){ indicator.style.opacity = '0'; return; }
-    const parent = active.closest('.nav-parent');
-    if(parent && !parent.classList.contains('expanded')){ indicator.style.opacity = '0'; return; }
-    const navRect = nav.getBoundingClientRect();
-    const r = active.getBoundingClientRect();
-    indicator.style.opacity = '1';
-    indicator.style.height = r.height + 'px';
-    indicator.style.transform = 'translateY(' + (r.top - navRect.top) + 'px)';
-  }
-  function moveIndicatorAnimated(){
-    indicator.classList.remove('no-anim');
-    moveIndicator();
-  }
-  function trackDuringAccordion(){
-    indicator.classList.add('no-anim');
-    const start = performance.now();
-    (function step(now){
-      moveIndicator();
-      if(now - start < 420) requestAnimationFrame(step);
-      else indicator.classList.remove('no-anim');
-    })(performance.now());
-  }
-
-
-  function openParent(parent){
-    parents.forEach(p => {
-      const open = p === parent;
-      p.classList.toggle('expanded', open);
-      const sub = p.querySelector('.nav-sub');
-      sub.style.maxHeight = open ? sub.scrollHeight + 'px' : '0px';
-    });
-  }
-
-
-  let switchTimer = null;
-  function activateTab(name, opts){
-    opts = opts || {};
-    const next = [...sections].find(s => s.dataset.tab === name);
-    if(!next) return;
-    syncLinks(name);
-
-    const current = document.querySelector('section.tab.active');
-    if(next === current) return;
-
-    clearTimeout(switchTimer);
-    sections.forEach(s => {
-      if(s !== current && s !== next) s.classList.remove('active','leaving');
-    });
-
-    if(current){
-      current.classList.add('leaving');
-      switchTimer = setTimeout(() => {
-        sections.forEach(s => { if(s !== next) s.classList.remove('active','leaving'); });
-        showNext(next);
-      }, 260);
-    } else {
-      showNext(next);
     }
-  }
-  function showNext(next){
-    sections.forEach(s => { if(s !== next) s.classList.remove('active','leaving'); });
-    next.classList.remove('leaving');
-    next.classList.add('active');
-    viewport.scrollTo({top:0, behavior:'smooth'});
-    playEntrance(next);
-  }
-  function syncLinks(name){
-    tabLinks.forEach(l => l.classList.toggle('active', l.dataset.tab === name));
-  }
-
-  function tapPulse(el){
-    if(!el) return;
-    el.classList.remove('tapped');
-    void el.offsetWidth;
-    el.classList.add('tapped');
-    setTimeout(() => el.classList.remove('tapped'), 520);
-  }
-
-
-  tabLinks.forEach(link => {
-    link.addEventListener('click', () => {
-      if(link.classList.contains('nav-lonely')) tapPulse(link);
-      const parent = link.closest('.nav-parent');
-      if(parent){
-        const wasOpen = parent.classList.contains('expanded');
-        parent.dataset.last = link.dataset.tab;
-        activateTab(link.dataset.tab);
-        if(!wasOpen){ openParent(parent); trackDuringAccordion(); }
-        else moveIndicatorAnimated();
-      } else {
-        openParent(null);
-        activateTab(link.dataset.tab);
-        trackDuringAccordion();
-      }
-    });
-  });
-
-  document.querySelectorAll('.nav-toggle').forEach(toggle => {
-    toggle.addEventListener('click', () => {
-      tapPulse(toggle);
-      const parent = toggle.closest('.nav-parent');
-      const wasOpen = parent.classList.contains('expanded');
-      const targetName = parent.dataset.last || parent.querySelector('.nav-child').dataset.tab;
-      activateTab(targetName);
-      if(!wasOpen){ openParent(parent); trackDuringAccordion(); }
-      else moveIndicatorAnimated();
-    });
-  });
-
-  document.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => {
-    openParent(null);
-    activateTab(b.dataset.goto);
-    trackDuringAccordion();
-  }));
-
-  window.addEventListener('resize', moveIndicator);
-
-
-  (function mobileDrawer(){
-    const menuBtn = document.getElementById('menuBtn');
-    const overlay = document.getElementById('sidebarOverlay');
-    if(!menuBtn || !overlay) return;
-    const open = () => { document.body.classList.add('nav-open'); requestAnimationFrame(moveIndicator); };
-    const close = () => document.body.classList.remove('nav-open');
-    menuBtn.addEventListener('click', () => document.body.classList.contains('nav-open') ? close() : open());
-    overlay.addEventListener('click', close);
-   
-    document.querySelectorAll('.tab-link, [data-goto]').forEach(el => {
-      el.addEventListener('click', () => { if(window.innerWidth <= 760) setTimeout(close, 180); });
-    });
-    window.addEventListener('resize', () => { if(window.innerWidth > 760) close(); });
-  })();
-
-
-  document.addEventListener('click', e => {
-    const t = e.target.closest('.toggle');
-    if(t) t.classList.toggle('on');
-  });
-
-
-  function paintSlider(s){
-    const min = parseFloat(s.min), max = parseFloat(s.max), v = parseFloat(s.value);
-    const pct = max > min ? ((v - min) / (max - min)) * 100 : 0;
-    s.style.background = 'linear-gradient(90deg, var(--fill) 0%, var(--fill) ' + pct + '%, var(--track) ' + pct + '%, var(--track) 100%)';
-  }
-  function updateSliderLabel(s){
-    const wrap = s.closest('.slider-wrap');
-    if(!wrap) return;
-    const val = wrap.querySelector('.slider-val');
-    if(!val) return;
-    const suffix = s.dataset.suffix || '';
-    const isFloat = s.step && parseFloat(s.step) < 1;
-    let v = s.value;
-    if(isFloat) v = parseFloat(v).toFixed(1);
-    val.textContent = v + suffix;
-  }
-  document.querySelectorAll('.slider').forEach(s => {
-    const val = s.closest('.slider-wrap').querySelector('.slider-val');
-    let pulseTimer;
-    const pulse = () => {
-      val.classList.add('pulse');
-      clearTimeout(pulseTimer);
-      pulseTimer = setTimeout(() => val.classList.remove('pulse'), 220);
-    };
-    paintSlider(s);
-
-    const min = () => parseFloat(s.min), max = () => parseFloat(s.max);
-    const stepOf = () => parseFloat(s.step) || 1;
-    const snap = (v) => { const st = stepOf(); return Math.max(min(), Math.min(max(), Math.round(v / st) * st)); };
-    const valueFromX = (clientX) => {
-      const r = s.getBoundingClientRect();
-      let ratio = (clientX - r.left) / r.width;
-      ratio = Math.max(0, Math.min(1, ratio));
-      return snap(min() + ratio * (max() - min()));
-    };
-
-   
-    let dragging = false, target = parseFloat(s.value), pos = parseFloat(s.value), rafId = null;
-
-    let lastShown = null;
-    const apply = () => {
-      s.value = snap(pos);
-      paintSlider(s);
-      const shown = snap(pos);
-      if(shown !== lastShown){ updateSliderLabel(s); pulse(); lastShown = shown; }
-    };
-    const animate = () => {
-      const diff = target - pos;
-      if(Math.abs(diff) < 0.35 && !dragging){ pos = target; apply(); rafId = null; return; }
-      pos += diff * 0.14;                
-      if(!dragging && Math.abs(target - pos) < 0.35) pos = target;
-      apply();
-      rafId = requestAnimationFrame(animate);
-    };
-    const kick = () => { if(!rafId) rafId = requestAnimationFrame(animate); };
-
-    s.addEventListener('pointerdown', e => {
-      e.preventDefault();
-      dragging = true;
-      pos = parseFloat(s.value);         
-      s.classList.add('dragging');
-      try { s.setPointerCapture(e.pointerId); } catch(_) {}
-      target = valueFromX(e.clientX);
-      kick();
-    });
-    s.addEventListener('pointermove', e => {
-      if(!dragging) return;
-      target = valueFromX(e.clientX);     
-      kick();
-    });
-    const endDrag = () => { if(!dragging) return; dragging = false; s.classList.remove('dragging'); kick(); };
-    s.addEventListener('pointerup', endDrag);
-    s.addEventListener('pointercancel', endDrag);
-  
-    s.addEventListener('keydown', () => {
-      requestAnimationFrame(() => { if(!rafId){ target = pos = parseFloat(s.value); paintSlider(s); updateSliderLabel(s); pulse(); } });
-    });
-  });
-
-
-  function tweenSlider(s, to, dur, onFrame){
-    if(s._tweenId){ cancelAnimationFrame(s._tweenId); s._tweenId = null; }
-    const from = parseFloat(s.value);
-    if(from === to){ paintSlider(s); updateSliderLabel(s); if(onFrame) onFrame(); return; }
-    const start = performance.now();
-    (function frame(now){
-      const p = Math.min(1, (now - start) / dur);
-      const e = 1 - Math.pow(1 - p, 3);
-      s.value = from + (to - from) * e;
-      paintSlider(s);
-      updateSliderLabel(s);
-      if(onFrame) onFrame();
-      if(p < 1){ s._tweenId = requestAnimationFrame(frame); }
-      else { s._tweenId = null; s.value = to; paintSlider(s); updateSliderLabel(s); if(onFrame) onFrame(); }
-    })(performance.now());
-  }
-  function playEntrance(sec){
-    if(!sec) return;
-    const toggles = [...sec.querySelectorAll('.toggle')];
-    const sliders = [...sec.querySelectorAll('.slider')];
-
-    toggles.forEach(t => {
-      t.dataset.target = t.classList.contains('on') ? '1' : '0';
-      t.style.transition = 'none';
-      t.classList.remove('on');
-    });
-    sliders.forEach(s => {
-      s.dataset.target = s.value;
-      s.value = s.min;
-      paintSlider(s);
-      updateSliderLabel(s);
-    });
-
-    void sec.offsetHeight;
-
-    requestAnimationFrame(() => {
-      toggles.forEach((t, i) => {
-        t.style.transition = '';
-        setTimeout(() => {
-          if(t.dataset.target === '1') t.classList.add('on');
-        }, 120 + i * 70);
-      });
-      sliders.forEach((s, i) => {
-        setTimeout(() => tweenSlider(s, parseFloat(s.dataset.target), 620), 160 + i * 80);
-      });
-    });
-  }
-
-
-  document.querySelectorAll('.cselect').forEach(sel => {
-    const trigger = sel.querySelector('.cselect-trigger');
-    const valEl = sel.querySelector('.cselect-value');
-    const menu = sel.querySelector('.cselect-menu');
-    const opts = sel.querySelectorAll('.cselect-opt');
-
-  
-    const cursor = document.createElement('div');
-    cursor.className = 'cselect-cursor';
-    menu.insertBefore(cursor, menu.firstChild);
-
-    function moveCursor(opt, anim){
-      if(!opt){ cursor.style.opacity = '0'; return; }
-      if(!anim) cursor.classList.add('no-anim');
-      cursor.style.opacity = '1';
-      cursor.style.height = opt.offsetHeight + 'px';
-      cursor.style.transform = 'translateY(' + opt.offsetTop + 'px)';
-      if(!anim) requestAnimationFrame(() => cursor.classList.remove('no-anim'));
+});
+setInterval(function(){
+    if(window.outerHeight-window.innerHeight>160||window.outerWidth-window.innerWidth>160){
+        document.body.innerHTML='<h1 style="color:red;text-align:center;margin-top:20%">ACCESS DENIED</h1>';
+        throw new Error('Security Violation');
     }
-    const selectedOpt = () => sel.querySelector('.cselect-opt.selected') || opts[0];
+},1000);
 
-    trigger.addEventListener('click', e => {
-      e.stopPropagation();
-      const willOpen = !sel.classList.contains('open');
-      document.querySelectorAll('.cselect.open').forEach(o => o.classList.remove('open'));
-      sel.classList.toggle('open', willOpen);
-      if(willOpen){
-        opts.forEach(o => o.classList.remove('hovered'));
-        requestAnimationFrame(() => moveCursor(selectedOpt(), false));
-      }
+var _0x1jq2=document.querySelector('.nav');
+var _0x1kr2=document.getElementById('navIndicator');
+var _0x1ls2=document.querySelectorAll('.nav-parent');
+var _0x1mt2=document.querySelectorAll('.tab-link');
+var _0x1nu2=document.querySelectorAll('section.tab');
+var _0x1ov2=document.getElementById('viewport');
+
+function _0x1pw2(){
+    var _0x1qx2=document.querySelector('.tab-link.active');
+    if(!_0x1qx2){_0x1kr2.style.opacity='0';return;}
+    var _0x1ry2=_0x1qx2.closest('.nav-parent');
+    if(_0x1ry2&&!_0x1ry2.classList.contains('expanded')){_0x1kr2.style.opacity='0';return;}
+    var _0x1sz2=_0x1jq2.getBoundingClientRect();
+    var _0x1ta2=_0x1qx2.getBoundingClientRect();
+    _0x1kr2.style.opacity='1';
+    _0x1kr2.style.height=_0x1ta2.height+'px';
+    _0x1kr2.style.transform='translateY('+(_0x1ta2.top-_0x1sz2.top)+'px)';
+}
+function _0x1ub2(_0x1vc2){
+    _0x1ls2.forEach(function(_0x1wd2){
+        var _0x1xe2=_0x1wd2===_0x1vc2;
+        _0x1wd2.classList.toggle('expanded',_0x1xe2);
+        var _0x1yf2=_0x1wd2.querySelector('.nav-sub');
+        _0x1yf2.style.maxHeight=_0x1xe2?_0x1yf2.scrollHeight+'px':'0px';
     });
+}
+var _0x1zg2=null;
+function _0x1ah3(_0x1bi3,_0x1cj3){
+    _0x1cj3=_0x1cj3||{};
+    var _0x1dk3=[..._0x1nu2].find(function(s){return s.dataset.tab===_0x1bi3});
+    if(!_0x1dk3)return;
+    _0x1mt2.forEach(function(l){l.classList.toggle('active',l.dataset.tab===_0x1bi3)});
+    var _0x1el3=document.querySelector('section.tab.active');
+    if(_0x1dk3===_0x1el3)return;
+    clearTimeout(_0x1zg2);
+    _0x1nu2.forEach(function(s){if(s!==_0x1el3&&s!==_0x1dk3)s.classList.remove('active','leaving')});
+    if(_0x1el3){
+        _0x1el3.classList.add('leaving');
+        _0x1zg2=setTimeout(function(){
+            _0x1nu2.forEach(function(s){if(s!==_0x1dk3)s.classList.remove('active','leaving')});
+            _0x1dk3.classList.remove('leaving');
+            _0x1dk3.classList.add('active');
+            _0x1ov2.scrollTo({top:0,behavior:'smooth'});
+        },260);
+    }else{
+        _0x1dk3.classList.add('active');
+        _0x1ov2.scrollTo({top:0,behavior:'smooth'});
+    }
+}
+_0x1mt2.forEach(function(link){
+    link.addEventListener('click',function(){
+        var parent=link.closest('.nav-parent');
+        if(parent){
+            var wasOpen=parent.classList.contains('expanded');
+            parent.dataset.last=link.dataset.tab;
+            _0x1ah3(link.dataset.tab);
+            if(!wasOpen){_0x1ub2(parent);}
+        }else{
+            _0x1ub2(null);
+            _0x1ah3(link.dataset.tab);
+        }
+    });
+});
+document.querySelectorAll('.nav-toggle').forEach(function(toggle){
+    toggle.addEventListener('click',function(){
+        var parent=toggle.closest('.nav-parent');
+        var wasOpen=parent.classList.contains('expanded');
+        var targetName=parent.dataset.last||parent.querySelector('.nav-child').dataset.tab;
+        _0x1ah3(targetName);
+        if(!wasOpen)_0x1ub2(parent);
+    });
+});
+document.querySelectorAll('[data-goto]').forEach(function(b){
+    b.addEventListener('click',function(){
+        _0x1ub2(null);
+        _0x1ah3(b.dataset.goto);
+    });
+});
+window.addEventListener('resize',_0x1pw2);
 
-    opts.forEach(opt => {
-      opt.addEventListener('mouseenter', () => {
-        opts.forEach(o => o.classList.remove('hovered'));
-        opt.classList.add('hovered');
-        moveCursor(opt, true);
-      });
-      opt.addEventListener('click', e => {
+document.addEventListener('click',function(e){
+    var t=e.target.closest('.toggle');
+    if(t)t.classList.toggle('on');
+});
+document.querySelectorAll('.slider').forEach(function(s){
+    s.addEventListener('input',function(){
+        var wrap=s.closest('.slider-wrap');
+        if(!wrap)return;
+        var val=wrap.querySelector('.slider-val');
+        if(!val)return;
+        var suffix=s.dataset.suffix||'';
+        var v=s.value;
+        if(s.step&&parseFloat(s.step)<1)v=parseFloat(v).toFixed(1);
+        val.textContent=v+suffix;
+        var min=parseFloat(s.min),max=parseFloat(s.max);
+        var pct=max>min?((v-min)/(max-min))*100:0;
+        s.style.background='linear-gradient(90deg, var(--fill) 0%, var(--fill) '+pct+'%, var(--track) '+pct+'%, var(--track) 100%)';
+    });
+    s.dispatchEvent(new Event('input'));
+});
+document.querySelectorAll('.cselect').forEach(function(sel){
+    var trigger=sel.querySelector('.cselect-trigger');
+    var menu=sel.querySelector('.cselect-menu');
+    var opts=sel.querySelectorAll('.cselect-opt');
+    trigger.addEventListener('click',function(e){
         e.stopPropagation();
-        opts.forEach(o => o.classList.remove('selected'));
-        opt.classList.add('selected');
-        valEl.textContent = opt.textContent;
-        sel.dataset.value = opt.textContent;
-        sel.classList.remove('open');
-      });
+        var willOpen=!sel.classList.contains('open');
+        document.querySelectorAll('.cselect.open').forEach(function(o){o.classList.remove('open')});
+        sel.classList.toggle('open',willOpen);
     });
-    
-    menu.addEventListener('mouseleave', () => {
-      const last = sel.querySelector('.cselect-opt.hovered');
-      if(last) moveCursor(last, true);
+    opts.forEach(function(opt){
+        opt.addEventListener('click',function(e){
+            e.stopPropagation();
+            opts.forEach(function(o){o.classList.remove('selected')});
+            opt.classList.add('selected');
+            sel.querySelector('.cselect-value').textContent=opt.textContent;
+            sel.dataset.value=opt.textContent;
+            sel.classList.remove('open');
+        });
     });
-  });
-  document.addEventListener('click', () => {
-    document.querySelectorAll('.cselect.open').forEach(o => o.classList.remove('open'));
-  });
-
- 
-  const toast = document.getElementById('toast');
-  let toastTimer;
-  function showToast(msg){
-    toast.textContent = msg;
+});
+document.addEventListener('click',function(){
+    document.querySelectorAll('.cselect.open').forEach(function(o){o.classList.remove('open')});
+});
+var toast=document.getElementById('toast');
+var toastTimer;
+function showToast(msg){
+    toast.textContent=msg;
     toast.classList.add('show');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
-  }
-  const configList = document.getElementById('configList');
-
-  const cfgCursor = document.createElement('div');
-  cfgCursor.className = 'cfg-cursor';
-  configList.insertBefore(cfgCursor, configList.firstChild);
-
-  function moveCfgCursor(item, anim, isSelected){
-    if(!item){ cfgCursor.style.opacity = '0'; return; }
-    if(!anim) cfgCursor.classList.add('no-anim');
-    cfgCursor.style.opacity = '1';
-    cfgCursor.style.height = item.offsetHeight + 'px';
-    cfgCursor.style.transform = 'translateY(' + item.offsetTop + 'px)';
-    cfgCursor.classList.toggle('on-selected', !!isSelected);
-    if(!anim) requestAnimationFrame(() => cfgCursor.classList.remove('no-anim'));
-  }
-  const selectedCfg = () => configList.querySelector('.config-item.selected');
-  function restCfgCursor(anim){
-    const sel = selectedCfg();
-    configList.querySelectorAll('.config-item').forEach(i => i.classList.toggle('hovered', i === sel));
-    moveCfgCursor(sel, anim, true);
-  }
-
-  function bindConfigItem(item){
-    item.addEventListener('mouseenter', () => {
-      configList.querySelectorAll('.config-item').forEach(i => i.classList.remove('hovered'));
-      item.classList.add('hovered');
-      moveCfgCursor(item, true, item.classList.contains('selected'));
+    toastTimer=setTimeout(function(){toast.classList.remove('show')},2200);
+}
+document.getElementById('newCfg').addEventListener('click',function(){showToast('Nova config criada')});
+document.getElementById('importCfg').addEventListener('click',function(){showToast('Config importada')});
+document.getElementById('exportCfg').addEventListener('click',function(){showToast('Config exportada')});
+document.querySelectorAll('.load-btn').forEach(function(btn){
+    btn.addEventListener('click',function(e){
+        e.stopPropagation();
+        showToast('Config carregada');
     });
-    item.addEventListener('click', () => {
-      configList.querySelectorAll('.config-item').forEach(i => i.classList.remove('selected'));
-      item.classList.add('selected');
-      moveCfgCursor(item, true, true);
-    });
-    const loadBtn = item.querySelector('.load-btn');
-    if(loadBtn) loadBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      showToast('Config "' + item.dataset.cfg + '" carregada');
-    });
-  }
-  configList.querySelectorAll('.config-item').forEach(bindConfigItem);
-  configList.addEventListener('mouseleave', () => restCfgCursor(true));
- 
-  const cfgTab = document.querySelector('section.tab[data-tab="config"]');
-  const cfgObserver = new MutationObserver(() => {
-    if(cfgTab.classList.contains('active')) requestAnimationFrame(() => restCfgCursor(false));
-  });
-  cfgObserver.observe(cfgTab, { attributes:true, attributeFilter:['class'] });
+});
 
-  document.getElementById('newCfg').addEventListener('click', () => {
-    const name = 'Config ' + (configList.querySelectorAll('.config-item').length + 1);
-    const el = document.createElement('div');
-    el.className = 'config-item';
-    el.dataset.cfg = name;
-    el.innerHTML = '<span class="cfg-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.9"><path d="M4 4h16v6H4zM4 14h16v6H4z"/></svg></span><div class="info"><span class="title">'+name+'<span class="cfg-badge">Ativo</span></span><span class="sub">Criada agora</span></div><button class="btn ghost load-btn">Load</button>';
-    configList.appendChild(el);
-    bindConfigItem(el);
-    restCfgCursor(true);
-    showToast('Nova config criada');
-  });
-  document.getElementById('importCfg').addEventListener('click', () => showToast('Config importada'));
-  document.getElementById('exportCfg').addEventListener('click', () => showToast('Config exportada'));
-
-  
-  const searchInput = document.getElementById('searchInput');
-  const searchResults = document.getElementById('searchResults');
-
-  function gotoTab(name){
-    const link = [...tabLinks].find(l => l.dataset.tab === name);
-    const parent = link && link.closest('.nav-parent');
-    if(parent){
-      const wasOpen = parent.classList.contains('expanded');
-      parent.dataset.last = name;
-      activateTab(name, {keepSearch:true});
-      if(!wasOpen){ openParent(parent); trackDuringAccordion(); }
-      else moveIndicatorAnimated();
-    } else {
-      openParent(null);
-      activateTab(name, {keepSearch:true});
-      trackDuringAccordion();
-    }
-  }
-
-  function groupForTab(name){
-    const link = [...tabLinks].find(l => l.dataset.tab === name);
-    const parent = link && link.closest('.nav-parent');
-    return parent ? (parent.querySelector('.nav-toggle span')?.textContent.trim() || '') : '';
-  }
-
-  const ICONS = {
-    aimbot:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>',
-    visuals:'<svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>',
-    config:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1Z"/></svg>',
-    func:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg>'
-  };
-  function iconForEntry(e){
-    const t = e.tab || '';
-    if(t.indexOf('aimbot') === 0) return ICONS.aimbot;
-    if(t.indexOf('visuals') === 0) return ICONS.visuals;
-    if(t.indexOf('config') === 0) return ICONS.config;
-    return ICONS.func;
-  }
-
-  function buildIndex(){
-    const idx = [];
-    document.querySelectorAll('.nav-parent').forEach(parent => {
-      const group = parent.querySelector('.nav-toggle span')?.textContent.trim() || '';
-      const links = [...parent.querySelectorAll('.tab-link')];
-      if(links[0]) idx.push({type:'group', kind:'Grupo', name:group, path:'Abrir', tab:links[0].dataset.tab});
-      links.forEach(l => idx.push({type:'page', kind:'Página', name:l.textContent.trim(), path:group, tab:l.dataset.tab}));
-    });
-    document.querySelectorAll('.nav-lonely.tab-link').forEach(l => {
-      const nm = l.querySelector('span')?.textContent.trim() || l.textContent.trim();
-      idx.push({type:'page', kind:'Página', name:nm, path:'Presets', tab:l.dataset.tab});
-    });
-    sections.forEach(sec => {
-      const title = sec.querySelector('.page-title')?.textContent.trim() || '';
-      const grp = groupForTab(sec.dataset.tab);
-      const crumb = (grp ? grp + ' / ' : '') + title;
-    
-      sec.querySelectorAll('.ind-card .name').forEach(n => {
-        const nm = n.textContent.trim();
-        if(nm) idx.push({type:'func', kind:'Função', name:nm, path:crumb, tab:sec.dataset.tab, row:nm});
-      });
-    });
-    return idx;
-  }
-  const searchIndex = buildIndex();
-
-  function scoreEntry(e, q){
-    const name = e.name.toLowerCase();
-    const path = (e.path || '').toLowerCase();
-    let s = -1;
-    if(name === q) s = 100;
-    else if(name.startsWith(q)) s = 82;
-    else if(name.includes(' ' + q)) s = 70;
-    else if(name.includes(q)) s = 60;
-    else if(path.includes(q)) s = 28;
-    if(s < 0) return -1;
-    s += (e.type === 'group' ? 3 : e.type === 'page' ? 2 : 0);
-    return s;
-  }
-
-  function highlight(text, q){
-    const i = text.toLowerCase().indexOf(q);
-    if(i < 0) return text;
-    const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-    return esc(text.slice(0, i)) + '<mark>' + esc(text.slice(i, i + q.length)) + '</mark>' + esc(text.slice(i + q.length));
-  }
-
-  let activeResults = [];
-  let activeIndex = -1;
-
-  function positionSearchCursor(anim){
-    let cursor = searchResults.querySelector('.sr-cursor');
-    const items = searchResults.querySelectorAll('.sr-item');
-    const item = items[activeIndex];
-    if(!cursor){
-      cursor = document.createElement('div');
-      cursor.className = 'sr-cursor';
-      searchResults.insertBefore(cursor, searchResults.firstChild);
-    }
-    if(!item){ cursor.style.opacity = '0'; return; }
-    if(!anim) cursor.classList.add('no-anim');
-    cursor.style.opacity = '1';
-    cursor.style.height = item.offsetHeight + 'px';
-    cursor.style.transform = 'translateY(' + item.offsetTop + 'px)';
-    if(!anim) requestAnimationFrame(() => cursor.classList.remove('no-anim'));
-  }
-
-  function closeResults(){
-    searchResults.classList.remove('open');
-    activeResults = [];
-    activeIndex = -1;
-  }
-
-  function renderResults(q){
-    if(!q){ closeResults(); return; }
-    const ranked = searchIndex
-      .map(e => ({e, s: scoreEntry(e, q)}))
-      .filter(r => r.s >= 0)
-      .sort((a, b) => b.s - a.s)
-      .slice(0, 12);
-    activeResults = ranked.map(r => r.e);
-    activeIndex = activeResults.length ? 0 : -1;
-
-    if(!activeResults.length){
-      searchResults.innerHTML = '<div class="sr-empty">Nenhum resultado para \u201c' + q + '\u201d</div>';
-      searchResults.classList.add('open');
-      return;
-    }
-    const head = '<div class="sr-head"><span>Resultados</span><span class="sr-count">' +
-      activeResults.length + (activeResults.length === 1 ? ' item' : ' itens') + '</span></div>';
-    searchResults.innerHTML = head + activeResults.map((e, i) =>
-      '<div class="sr-item' + (i === activeIndex ? ' active' : '') + '" data-i="' + i + '" role="option">' +
-        '<span class="sr-icon">' + iconForEntry(e) + '</span>' +
-        '<span class="sr-text">' +
-          '<span class="sr-name">' + highlight(e.name, q) + '</span>' +
-          '<span class="sr-path">' + e.path + ' · ' + e.kind + '</span>' +
-        '</span>' +
-        '<span class="sr-kind">' + (e.type === 'page' ? 'Ir' : 'Ver') + '</span>' +
-      '</div>'
-    ).join('');
-    [...searchResults.querySelectorAll('.sr-item')].forEach((el, i) => {
-      el.style.animationDelay = (i * 28) + 'ms';
-    });
-    searchResults.classList.add('open');
-    requestAnimationFrame(() => positionSearchCursor(false));
-  }
-
-  function highlightRow(tab, rowName){
-    const sec = [...sections].find(s => s.dataset.tab === tab);
-    if(!sec) return;
-    const card = [...sec.querySelectorAll('.ind-card')].find(c => c.querySelector('.name')?.textContent.trim() === rowName);
-    if(!card) return;
-    card.scrollIntoView({behavior:'smooth', block:'center'});
-    card.classList.remove('glow');
-    void card.offsetWidth;
-    card.classList.add('glow');
-    setTimeout(() => card.classList.remove('glow'), 2700);
-  }
-
-  function chooseResult(e){
-    if(!e) return;
-    closeResults();
-    searchInput.value = '';
-    searchInput.blur();
-    gotoTab(e.tab);
-    if(e.type === 'func' && e.row){
-      setTimeout(() => highlightRow(e.tab, e.row), 460);
-    }
-  }
-
-  searchInput.addEventListener('input', () => renderResults(searchInput.value.trim().toLowerCase()));
-  searchInput.addEventListener('focus', () => { if(searchInput.value.trim()) renderResults(searchInput.value.trim().toLowerCase()); });
-
-  searchInput.addEventListener('keydown', e => {
-    if(!searchResults.classList.contains('open')) return;
-    if(e.key === 'ArrowDown'){ e.preventDefault(); moveActive(1); }
-    else if(e.key === 'ArrowUp'){ e.preventDefault(); moveActive(-1); }
-    else if(e.key === 'Enter'){ e.preventDefault(); chooseResult(activeResults[activeIndex]); }
-    else if(e.key === 'Escape'){ closeResults(); searchInput.blur(); }
-  });
-
-  function moveActive(dir){
-    if(!activeResults.length) return;
-    activeIndex = (activeIndex + dir + activeResults.length) % activeResults.length;
-    const items = [...searchResults.querySelectorAll('.sr-item')];
-    items.forEach((el, i) => el.classList.toggle('active', i === activeIndex));
-    items[activeIndex]?.scrollIntoView({block:'nearest'});
-    positionSearchCursor(true);
-  }
-
-  searchResults.addEventListener('click', e => {
-    const item = e.target.closest('.sr-item');
-    if(!item) return;
-    chooseResult(activeResults[parseInt(item.dataset.i, 10)]);
-  });
-  searchResults.addEventListener('mousemove', e => {
-    const item = e.target.closest('.sr-item');
-    if(!item) return;
-    const i = parseInt(item.dataset.i, 10);
-    if(i !== activeIndex){
-      activeIndex = i;
-      searchResults.querySelectorAll('.sr-item').forEach((el, idx) => el.classList.toggle('active', idx === i));
-      positionSearchCursor(true);
-    }
-  });
-
-  document.addEventListener('click', e => {
-    if(!e.target.closest('.search-wrap')) closeResults();
-  });
-
-  (function smoothCaret(){
-    const ghost = document.getElementById('searchGhost');
-    const caret = document.getElementById('searchCaret');
-    const measure = document.getElementById('searchMeasure');
-    let blinkTimer;
-
-    const widthOf = (txt) => { measure.textContent = txt || ''; return measure.getBoundingClientRect().width; };
-    const setCaretX = (x) => { caret.style.transform = 'translate(' + x + 'px,-50%)'; };
-    const armBlink = () => {
-      caret.classList.remove('blink');
-      clearTimeout(blinkTimer);
-      blinkTimer = setTimeout(() => caret.classList.add('blink'), 450);
-    };
-
-    
-    function updateRealCaret(){
-      const focused = document.activeElement === searchInput;
-      if(!focused && !searchInput.value) return;    
-      ghost.textContent = '';
-      caret.style.opacity = focused ? '1' : '0';
-      if(!focused) return;
-      const pos = searchInput.selectionStart ?? searchInput.value.length;
-      setCaretX(widthOf(searchInput.value.slice(0, pos)));
-      armBlink();
-    }
-    ['input','keyup','click','select'].forEach(ev => searchInput.addEventListener(ev, updateRealCaret));
-    searchInput.addEventListener('focus', () => { caret.classList.remove('blink'); updateRealCaret(); });
-    searchInput.addEventListener('blur', () => { if(!searchInput.value){ caret.style.opacity='0'; } });
-
-
-  
-    const words = ['Search settings…','Aimbot','Triggerbot','Visuals ESP','Configs','Aim Type'];
-    let wi = 0, ci = 0, deleting = false;
-    function tick(){
-      if(document.activeElement === searchInput || searchInput.value){
-        ghost.textContent = '';
-        return setTimeout(tick, 300);
-      }
-      const word = words[wi];
-      ci += deleting ? -1 : 1;
-      const text = word.slice(0, ci);
-      ghost.textContent = text;
-      caret.style.opacity = '1';
-      setCaretX(widthOf(text));
-     
-      let delay = deleting ? 70 : (135 + Math.random() * 70);
-      if(!deleting && ci === word.length){ deleting = true; delay = 2200; caret.classList.add('blink'); }
-      else { caret.classList.remove('blink'); }
-      if(deleting && ci === 0){ deleting = false; wi = (wi + 1) % words.length; delay = 550; }
-      setTimeout(tick, delay);
-    }
-    tick();
-  })();
-
- 
-  (function matrixStream(){
-    const canvas = document.getElementById('matrixCanvas');
-    const toggle = document.getElementById('matrixToggle');
-    if(!canvas || !toggle) return;
-    const ctx = canvas.getContext('2d', { alpha: true });
-    const colW = 28, rowH = 28;          
-    const FRAME = 1000 / 30;             
-    let cellCols = 0, cellRows = 0, grid = [], drift = 0;
-    let running = false, rafId = null, lastFlip = 0, lastDraw = 0;
-    let dpr = 1;                         
-
-    
-    const BUCKETS = ['rgba(255,255,255,0.05)','rgba(255,255,255,0.09)','rgba(255,255,255,0.14)','rgba(255,255,255,0.45)'];
-    function makeCell(){
-      const bright = Math.random() < 0.05;
-      const b = bright ? 3 : (Math.random() * 3) | 0;
-      return { v: Math.random() < 0.5 ? '0' : '1', b };
-    }
-    function resize(){
-      canvas.width = Math.floor(window.innerWidth * dpr);
-      canvas.height = Math.floor(window.innerHeight * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      cellCols = Math.ceil(window.innerWidth / colW) + 1;
-      cellRows = Math.ceil(window.innerHeight / rowH) + 2;
-      grid = [];
-      for(let r = 0; r < cellRows; r++){
-        const row = [];
-        for(let c = 0; c < cellCols; c++) row.push(makeCell());
-        grid.push(row);
-      }
-    }
-
-    function draw(ts){
-      rafId = requestAnimationFrame(draw);
-      if(ts - lastDraw < FRAME) return;  
-      lastDraw = ts;
-
-      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-      ctx.font = '600 15px "Geist Mono", ui-monospace, monospace';
-      ctx.textBaseline = 'top';
-
-      
-      if(ts - lastFlip > 90){
-        lastFlip = ts;
-        const flips = (cellCols * cellRows * 0.02) | 0;
-        for(let i = 0; i < flips; i++){
-          const r = (Math.random() * cellRows) | 0;
-          const c = (Math.random() * cellCols) | 0;
-          if(grid[r] && grid[r][c]){
-            grid[r][c].v = Math.random() < 0.5 ? '0' : '1';
-            grid[r][c].b = Math.random() < 0.1 ? 3 : (Math.random() * 3) | 0;
-          }
-        }
-      }
-
-     
-      drift += 0.9;
-      if(drift >= rowH){
-        drift -= rowH;
-        grid.pop();
-        const row = [];
-        for(let c = 0; c < cellCols; c++) row.push(makeCell());
-        grid.unshift(row);
-      }
-
-      const yOff = drift - rowH;
-      for(let bkt = 0; bkt < BUCKETS.length; bkt++){
-        ctx.fillStyle = BUCKETS[bkt];
-        for(let r = 0; r < grid.length; r++){
-          const row = grid[r];
-          const y = r * rowH + yOff;
-          for(let c = 0; c < cellCols; c++){
-            if(row[c].b === bkt) ctx.fillText(row[c].v, c * colW, y);
-          }
-        }
-      }
-    }
-
-    function start(){
-      if(running) return;
-      running = true;
-      document.body.classList.add('matrix-on');
-      canvas.classList.add('on');
-      resize();
-      rafId = requestAnimationFrame(draw);
-    }
-    function stop(){
-      running = false;
-      canvas.classList.remove('on');
-      document.body.classList.remove('matrix-on');
-      setTimeout(() => { if(!running){ cancelAnimationFrame(rafId); rafId = null; ctx.clearRect(0, 0, canvas.width, canvas.height); } }, 1000);
-    }
-
-    let rt;
-    window.addEventListener('resize', () => { if(running){ clearTimeout(rt); rt = setTimeout(resize, 150); } });
-    toggle.addEventListener('click', () => {
-      requestAnimationFrame(() => toggle.classList.contains('on') ? start() : stop());
-    });
-  })();
-
- 
-  (function customCursor(){
-    const dot = document.getElementById('cursorDot');
-    const ring = document.getElementById('cursorRing');
-    if(!window.matchMedia || !window.matchMedia('(pointer:fine)').matches){
-      if(dot) dot.style.display = 'none';
-      if(ring) ring.style.display = 'none';
-      return;
-    }
-    document.body.classList.add('custom-cursor');
-    let mx = window.innerWidth/2, my = window.innerHeight/2;
-    let rx = mx, ry = my;
-
-    const interactiveSel = 'button,.toggle,.cselect-trigger,.cselect-opt,.slider,.nav-toggle,.nav-child,.nav-lonely,.config-item,.ind-card,.gear,.icon-btn,input,a,[data-goto]';
-    window.addEventListener('mousemove', e => {
-      mx = e.clientX; my = e.clientY;
-      dot.style.transform = 'translate(' + mx + 'px,' + my + 'px) translate(-50%,-50%)';
-      const over = e.target.closest(interactiveSel);
-      document.body.classList.toggle('cursor-hover', !!over);
-    });
-    window.addEventListener('mousedown', () => document.body.classList.add('cursor-down'));
-    window.addEventListener('mouseup', () => document.body.classList.remove('cursor-down'));
-    window.addEventListener('mouseleave', () => { dot.style.opacity='0'; ring.style.opacity='0'; });
-    window.addEventListener('mouseenter', () => { dot.style.opacity='1'; ring.style.opacity='1'; });
-
-    (function loop(){
-      rx += (mx - rx) * 0.18;
-      ry += (my - ry) * 0.18;
-      ring.style.transform = 'translate(' + rx + 'px,' + ry + 'px) translate(-50%,-50%)';
-      requestAnimationFrame(loop);
-    })();
-  })();
-
-
-  window.addEventListener('load', () => {
-    const subs = document.querySelectorAll('.nav-sub');
-    subs.forEach(s => s.style.transition = 'none');
-    indicator.classList.add('no-anim');
-    openParent(parents[0]);
-    syncLinks('aimbot-main');
-    void nav.offsetHeight;
-    moveIndicator();
-    requestAnimationFrame(() => {
-      subs.forEach(s => s.style.transition = '');
-      indicator.classList.remove('no-anim');
-    });
-    playEntrance(document.querySelector('section.tab.active'));
-  });
-    </` + `script>
-    </body>
-    </html>`;
-
-
-    try {
-        _protect();
-        
-        
-        const root = document.getElementById('root-container');
-        root.innerHTML = _payload;
-        
-   
-        setTimeout(() => {
-            document.getElementById('loader').style.display = 'none';
-            root.style.display = 'block';
-            
-            
-        }, 800);
-
-    } catch(e) {
-        console.error("Secure Core Failure");
-    }
-
-})(this);
+setTimeout(function(){
+    var loader=document.getElementById('loader');
+    var app=document.getElementById('app');
+    loader.style.opacity='0';
+    app.style.display='block';
+    setTimeout(function(){
+        loader.style.display='none';
+        app.style.opacity='1';
+    },500);
+},800);
+})();
 </script>
 </body>
 </html>
