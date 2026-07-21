@@ -31,12 +31,19 @@
     color:var(--text);
     overflow:hidden;
     -webkit-font-smoothing:antialiased;
+    -webkit-tap-highlight-color:transparent;
   }
+  *{-webkit-tap-highlight-color:transparent;}
+  button,.toggle,.cselect-trigger,.cselect-opt,.nav-toggle,.nav-lonely,.nav-child,.config-item,.ind-card,.icon-btn{-webkit-tap-highlight-color:transparent;outline:none;}
   ::selection{background:#fff;color:#000;}
 
   /* Cursor Customizado */
   @media (pointer:fine){
     body.custom-cursor, body.custom-cursor *{cursor:none !important;}
+  }
+  /* esconde o cursor customizado em telas de toque */
+  @media (pointer:coarse){
+    .cursor-dot,.cursor-ring{display:none !important;}
   }
   .cursor-dot,.cursor-ring{
     position:fixed;top:0;left:0;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);will-change:transform;
@@ -52,7 +59,7 @@
   ::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:8px;}
   ::-webkit-scrollbar-thumb:hover{background:#3a3a3a;}
 
-  .app{position:relative;z-index:1;display:flex;height:100vh;width:100vw;background:radial-gradient(1200px 600px at 15% 0%, #1a1a1a 0%, transparent 60%),radial-gradient(1000px 700px at 85% 100%, #141414 0%, transparent 55%),var(--bg);transition:background .8s var(--ease);}
+  .app{position:relative;z-index:1;display:flex;height:100vh;height:100dvh;width:100vw;background:radial-gradient(1200px 600px at 15% 0%, #1a1a1a 0%, transparent 60%),radial-gradient(1000px 700px at 85% 100%, #141414 0%, transparent 55%),var(--bg);transition:background .8s var(--ease);}
 
   /* ============ SIDEBAR ============ */
   .sidebar{width:236px;flex-shrink:0;display:flex;flex-direction:column;padding:26px 18px 18px;border-right:1px solid var(--border);background:linear-gradient(180deg,#0d0d0d 0%, #080808 100%);}
@@ -65,8 +72,7 @@
   .nav-label{font-size:11px;letter-spacing:2px;color:var(--text-mute);font-weight:600;padding:0 12px 10px;text-transform:uppercase;}
   .nav-toggle,.nav-lonely{display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:10px;color:var(--text-dim);cursor:pointer;font-size:14.5px;font-weight:500;position:relative;transition:color .3s var(--ease), transform .18s var(--ease);user-select:none;}
   .nav-toggle:active,.nav-lonely:active{transform:scale(.96);}
-  .nav-toggle svg,.nav-lonely svg{width:19px;height:19px;flex-shrink:0;stroke:currentColor;transition:transform .4s var(--bounce);}
-  .nav-toggle:hover svg,.nav-lonely:hover svg{transform:scale(1.12) rotate(-4deg);}
+  .nav-toggle svg,.nav-lonely svg{width:19px;height:19px;flex-shrink:0;stroke:currentColor;}
   /* pulso ao ativar a seção */
   .nav-toggle.tapped,.nav-lonely.tapped{animation:navTap .5s var(--ease);}
   @keyframes navTap{0%{box-shadow:0 0 0 0 #ffffff33;}60%{box-shadow:0 0 0 6px #ffffff00;}100%{box-shadow:0 0 0 0 #ffffff00;}}
@@ -198,13 +204,13 @@
     .search{max-width:none;flex:1;width:auto;}
     .search:focus-within{width:auto;}
     .search-results{min-width:0;}
-    .tabs-viewport{padding:18px 16px;}
+    .tabs-viewport{padding:18px 16px 80px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
     .page-title{font-size:19px;}
     .icon-btn.hide-sm{display:none;}
   }
   @media (max-width: 420px){
     .sidebar{width:88vw;}
-    .tabs-viewport{padding:14px 12px;}
+    .tabs-viewport{padding:14px 12px 80px;}
   }
 
   .section-label {
@@ -314,9 +320,10 @@
   /* config tab specific */
   .config-list{position:relative;display:flex;flex-direction:column;gap:6px;}
   /* seletor deslizante */
-  .cfg-cursor{position:absolute;left:0;right:0;top:0;height:0;border-radius:13px;background:linear-gradient(180deg,#242424 0%,#171717 100%);box-shadow:inset 0 0 0 1px #ffffff1f, 0 10px 26px -16px #000;opacity:0;z-index:0;transition:transform .34s var(--ease), height .34s var(--ease), opacity .22s ease;}
+  .cfg-cursor{position:absolute;left:0;right:0;top:0;height:0;border-radius:13px;background:#ffffff0d;box-shadow:inset 0 0 0 1px #ffffff12;opacity:0;z-index:0;transition:transform .34s var(--ease), height .34s var(--ease), opacity .22s ease, background .28s ease, box-shadow .28s ease;}
+  .cfg-cursor.on-selected{background:linear-gradient(180deg,#242424 0%,#171717 100%);box-shadow:inset 0 0 0 1px #ffffff26, 0 10px 26px -16px #000;}
   .cfg-cursor.no-anim{transition:none;}
-  .cfg-cursor::before{content:"";position:absolute;left:0;top:50%;width:3px;height:22px;background:#fff;border-radius:0 3px 3px 0;transform:translateY(-50%) scaleY(.6);opacity:.55;transition:transform .3s var(--ease), opacity .3s ease;}
+  .cfg-cursor::before{content:"";position:absolute;left:0;top:50%;width:3px;height:22px;background:#fff;border-radius:0 3px 3px 0;transform:translateY(-50%) scaleY(.5);opacity:.4;transition:transform .3s var(--ease), opacity .3s ease;}
   .cfg-cursor.on-selected::before{transform:translateY(-50%) scaleY(1);opacity:1;}
   .config-item{position:relative;z-index:1;display:flex;align-items:center;gap:14px;background:transparent;border:1px solid transparent;border-radius:13px;padding:13px 16px;cursor:pointer;transition:transform .25s var(--ease);animation:popIn .4s var(--ease);}
   @keyframes popIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
@@ -366,7 +373,7 @@
         <div class="nav-label">Combat</div>
         <div class="nav-parent expanded">
           <div class="nav-toggle">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.2"/><path d="M12 3v3.5M12 17.5V21M3 12h3.5M17.5 12H21"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>
             <span>Aimbot</span><i class="caret"></i>
           </div>
           <div class="nav-sub">
@@ -380,7 +387,7 @@
         <div class="nav-label">Common</div>
         <div class="nav-parent">
           <div class="nav-toggle">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3.2"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12a1.8 1.8 0 0 1 0-1C3.6 6.6 7.5 4 12 4s8.4 2.6 10 7a1.8 1.8 0 0 1 0 1c-1.6 4.4-5.5 7-10 7S3.6 16.4 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
             <span>Visuals</span><i class="caret"></i>
           </div>
           <div class="nav-sub">
@@ -393,7 +400,7 @@
       <div class="nav-group">
         <div class="nav-label">Presets</div>
         <div class="nav-lonely tab-link" data-tab="config">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="21" x2="14" y1="6" y2="6"/><line x1="10" x2="3" y1="6" y2="6"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="18" y2="18"/><line x1="12" x2="3" y1="18" y2="18"/><circle cx="12" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="14" cy="18" r="2"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="1" x2="7" y1="14" y2="14"/><line x1="9" x2="15" y1="8" y2="8"/><line x1="17" x2="23" y1="16" y2="16"/></svg>
           <span>Config</span>
         </div>
       </div>
@@ -1835,10 +1842,14 @@
 
   // ---------- Custom cursor with smooth trailing ----------
   (function customCursor(){
-    if(!window.matchMedia || !window.matchMedia('(pointer:fine)').matches) return;
-    document.body.classList.add('custom-cursor');
     const dot = document.getElementById('cursorDot');
     const ring = document.getElementById('cursorRing');
+    if(!window.matchMedia || !window.matchMedia('(pointer:fine)').matches){
+      if(dot) dot.style.display = 'none';
+      if(ring) ring.style.display = 'none';
+      return;
+    }
+    document.body.classList.add('custom-cursor');
     let mx = window.innerWidth/2, my = window.innerHeight/2;
     let rx = mx, ry = my;
 
